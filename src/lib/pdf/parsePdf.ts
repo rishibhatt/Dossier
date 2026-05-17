@@ -12,25 +12,53 @@ if (typeof g.DOMMatrix === "undefined") {
 
 let cachedWorkerSrc: string | null = null
 
+const WORKER_NAMES = ["pdf.worker.mjs", "pdf.worker.min.mjs"] as const
+
 /**
- * pdfjs fake worker must load with a `file:` URL in Node (https: is rejected by the ESM loader).
- * Path is resolved from installed `pdfjs-dist` (keep `outputFileTracingIncludes` in next.config for serverless).
+ * pdfjs fake worker must use a `file:` URL in Node (https: is rejected by the ESM loader).
+ * Netlify often has no top-level `pdfjs-dist` on the require graph from `/var/task/package.json`,
+ * so we probe hoisted + nested paths and only then try `require.resolve` from known anchors.
  */
 function getPdfWorkerFileUrl(): string {
   if (cachedWorkerSrc) return cachedWorkerSrc
-  // Resolve from app root — `import.meta.url` points at `.next/server/chunks/...` under Turbopack,
-  // so `createRequire(import.meta.url)` often cannot see `node_modules` and breaks local dev.
-  const require = createRequire(path.join(process.cwd(), "package.json"))
-  const pkgJsonPath = require.resolve("pdfjs-dist/package.json")
-  const legacyBuild = path.join(path.dirname(pkgJsonPath), "legacy", "build")
-  const primary = path.join(legacyBuild, "pdf.worker.mjs")
-  const fallback = path.join(legacyBuild, "pdf.worker.min.mjs")
-  const workerFsPath = existsSync(primary) ? primary : fallback
-  if (!existsSync(workerFsPath)) {
-    throw new Error(`pdfjs worker not found (checked ${primary} and ${fallback})`)
+  const cwd = process.cwd()
+
+  const legacyRoots = [
+    path.join(cwd, "node_modules", "pdfjs-dist", "legacy", "build"),
+    path.join(cwd, "node_modules", "pdf-parse", "node_modules", "pdfjs-dist", "legacy", "build"),
+  ]
+  for (const legacyBuild of legacyRoots) {
+    for (const name of WORKER_NAMES) {
+      const full = path.join(legacyBuild, name)
+      if (existsSync(full)) {
+        cachedWorkerSrc = pathToFileURL(full).href
+        return cachedWorkerSrc
+      }
+    }
   }
-  cachedWorkerSrc = pathToFileURL(workerFsPath).href
-  return cachedWorkerSrc
+
+  const anchors = [path.join(cwd, "package.json"), path.join(cwd, "node_modules", "pdf-parse", "package.json")]
+  for (const anchor of anchors) {
+    if (!existsSync(anchor)) continue
+    try {
+      const require = createRequire(anchor)
+      const pkgJsonPath = require.resolve("pdfjs-dist/package.json")
+      const legacyBuild = path.join(path.dirname(pkgJsonPath), "legacy", "build")
+      for (const name of WORKER_NAMES) {
+        const full = path.join(legacyBuild, name)
+        if (existsSync(full)) {
+          cachedWorkerSrc = pathToFileURL(full).href
+          return cachedWorkerSrc
+        }
+      }
+    } catch {
+      /* try next anchor */
+    }
+  }
+
+  throw new Error(
+    `pdfjs worker not found under node_modules (checked hoisted pdfjs-dist, nested pdf-parse/pdfjs-dist, require.resolve from package.json and pdf-parse)`
+  )
 }
 
 /**

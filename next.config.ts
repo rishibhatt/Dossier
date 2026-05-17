@@ -7,8 +7,14 @@ const nextConfig: NextConfig = {
    * "Cannot find module .../pdf.worker.mjs". Include worker artifacts for this route.
    */
   outputFileTracingIncludes: {
-    "/api/parse-pdf": ["./node_modules/pdfjs-dist/legacy/build/**/*"],
-    "/api/parse-pdf/route": ["./node_modules/pdfjs-dist/legacy/build/**/*"],
+    "/api/parse-pdf": [
+      "./node_modules/pdfjs-dist/legacy/build/**/*",
+      "./node_modules/pdf-parse/node_modules/pdfjs-dist/legacy/build/**/*",
+    ],
+    "/api/parse-pdf/route": [
+      "./node_modules/pdfjs-dist/legacy/build/**/*",
+      "./node_modules/pdf-parse/node_modules/pdfjs-dist/legacy/build/**/*",
+    ],
   },
   images: {
     remotePatterns: [
