@@ -1,0 +1,156 @@
+/**
+ * Portfolio canvas — token-bound utilities (reads --color-* / --font-* from mergeCanvasCssVars).
+ */
+
+.dossier-portfolio-canvas {
+  /* `clip` forbids scrolling (including programmatic) on descendants — breaks carousels. */
+  overflow-x: hidden;
+}
+
+[data-portfolio-embedded="true"] .dossier-portfolio-canvas .min-h-screen {
+  min-height: min(720px, calc(100dvh - 11rem));
+}
+
+.dossier-portfolio-canvas img,
+.dossier-portfolio-canvas video {
+  max-width: 100%;
+  height: auto;
+}
+
+@keyframes de-marquee-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.dossier-portfolio-canvas .de-marquee-inner {
+  animation: de-marquee-scroll var(--de-marquee-duration, 28s) linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dossier-portfolio-canvas .de-marquee-inner {
+    animation: none;
+    transform: none;
+  }
+}
+
+@keyframes de-skills-marquee-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.dossier-portfolio-canvas .de-skills-marquee-inner {
+  animation: de-skills-marquee-scroll var(--de-skills-marquee-duration, 36s) linear infinite;
+  will-change: transform;
+}
+
+.dossier-portfolio-canvas .skills-marquee-root:hover .de-skills-marquee-inner {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dossier-portfolio-canvas .de-skills-marquee-inner {
+    animation: none;
+    transform: none;
+  }
+}
+
+.de-bg {
+  background-color: var(--color-bg, var(--de-bg));
+}
+.de-bg-secondary {
+  background-color: var(--color-bg-secondary, var(--de-elevated));
+}
+.de-surface-token {
+  background-color: var(--color-surface, var(--de-elevated));
+}
+.de-text {
+  color: var(--color-text, var(--de-fg));
+}
+.de-text-muted {
+  color: var(--color-text-muted, var(--de-muted));
+}
+.de-primary {
+  color: var(--color-primary, var(--de-accent));
+}
+.de-accent {
+  color: var(--color-accent, var(--de-accent));
+}
+.de-border {
+  border-color: var(--color-border, var(--de-border));
+}
+.de-font-display {
+  font-family: var(--font-display, var(--de-font-heading));
+}
+.de-font-body {
+  font-family: var(--font-body, var(--de-font-body));
+}
+.de-font-mono {
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+.de-hero-text {
+  font-size: var(--size-hero, var(--dt-display-size));
+  font-weight: var(--weight-display, 700);
+  letter-spacing: var(--tracking-display, -0.03em);
+  line-height: var(--leading-display, 1.05);
+  font-family: var(--font-display, var(--de-font-heading));
+  color: var(--color-text, var(--de-fg));
+}
+.de-h1 {
+  font-size: var(--size-h1, clamp(2rem, 5vw, 4rem));
+  font-weight: var(--weight-heading, 600);
+  letter-spacing: var(--tracking-heading, -0.025em);
+  font-family: var(--font-display, var(--de-font-heading));
+  color: var(--color-heading, var(--color-text, var(--de-fg)));
+}
+.de-h2 {
+  font-size: var(--size-h2, clamp(1.5rem, 3.5vw, 2.75rem));
+  font-weight: var(--weight-heading, 600);
+  font-family: var(--font-display, var(--de-font-heading));
+  color: var(--color-heading, var(--color-text, var(--de-fg)));
+}
+.de-body {
+  font-size: var(--size-body, var(--de-body-size, 1rem));
+  font-family: var(--font-body, var(--de-font-body));
+  line-height: var(--leading-body, var(--de-leading, 1.55));
+  color: var(--color-text-muted, var(--de-muted));
+}
+.de-card {
+  background-color: var(--color-surface, var(--de-elevated));
+  border: 1px solid var(--color-border, var(--de-border));
+  border-radius: var(--effect-radius, 12px);
+}
+.de-section-heading {
+  color: var(--color-heading, var(--color-text, var(--de-fg)));
+}
+.de-section-heading-accent {
+  color: var(--color-heading, var(--color-primary, var(--de-accent)));
+}
+.de-section-heading-chaos {
+  color: var(--color-heading, var(--color-primary, var(--de-accent)));
+}
+.de-glow-soft {
+  box-shadow: var(--effect-glow-size, 0 0 48px) color-mix(in srgb, var(--effect-glow, var(--de-accent)) 35%, transparent);
+}
+
+@keyframes de-mesh-drift {
+  0%,
+  100% {
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    filter: hue-rotate(10deg);
+  }
+}
+
+.de-mesh-drift {
+  animation: de-mesh-drift 60s ease-in-out infinite;
+}

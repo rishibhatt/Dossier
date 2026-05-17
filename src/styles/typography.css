@@ -1,0 +1,52 @@
+/**
+ * Editorial type scale — Inter via Next font variable (--font-sans).
+ */
+.typo-h1 {
+  font-size: 1.5rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.typo-h2 {
+  font-size: 1.25rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.typo-h3 {
+  font-size: 1rem;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.typo-body-lg {
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.typo-body-md {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.typo-label-sm {
+  font-size: 0.75rem;
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.typo-code {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  font-weight: 400;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  letter-spacing: 0;
+}

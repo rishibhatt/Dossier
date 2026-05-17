@@ -1,0 +1,53 @@
+/**
+ * Marketing landing — marquee and motion (theme colors via Tailwind tokens).
+ */
+
+@keyframes landing-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.landing-marquee {
+  display: flex;
+  overflow: hidden;
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    black 8%,
+    black 92%,
+    transparent
+  );
+}
+
+.landing-marquee__track {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 2.5rem;
+  padding-inline: 1.25rem;
+  width: max-content;
+  animation: landing-marquee 45s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-marquee__track {
+    animation: none;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 56rem;
+    margin-inline: auto;
+  }
+}
+
+.landing-trust-grid {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--foreground) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--foreground) 4%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+}

@@ -1,0 +1,62 @@
+/**
+ * Portfolio-specific type scales — scoped by profile.
+ * Uses existing font variables from the app shell.
+ */
+
+[data-portfolio-kind="developer"] .portfolio-type-hero {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+}
+
+[data-portfolio-kind="designer"] .portfolio-type-hero {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -0.06em;
+  line-height: 0.95;
+}
+
+[data-portfolio-kind="product"] .portfolio-type-hero {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+
+[data-portfolio-kind="student"] .portfolio-type-hero {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.85rem, 4vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+[data-portfolio-kind="general"] .portfolio-type-hero {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.12;
+}
+
+[data-portfolio-kind="developer"] .portfolio-type-mono {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+[data-portfolio-kind="designer"] .portfolio-type-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+}
+
+[data-portfolio-kind="product"] .portfolio-type-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}

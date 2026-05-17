@@ -1,0 +1,104 @@
+/**
+ * Portfolio design engine — semantic tokens per profile.
+ * Components reference var(--color-*) only inside [data-portfolio-kind] subtrees.
+ */
+
+[data-portfolio-kind="developer"][data-preview-theme="dark"] {
+  --color-bg: #0b0c0f;
+  --color-bg-elevated: #12141a;
+  --color-fg: #eceff4;
+  --color-muted: #7b8496;
+  --color-primary: #3ecf8e;
+  --color-accent: #58a6ff;
+  --color-border: color-mix(in oklab, var(--color-fg) 16%, transparent);
+}
+
+[data-portfolio-kind="developer"][data-preview-theme="light"] {
+  --color-bg: #f6f7f9;
+  --color-bg-elevated: #ffffff;
+  --color-fg: #0f1115;
+  --color-muted: #5c6370;
+  --color-primary: #0d7a4d;
+  --color-accent: #0b57d0;
+  --color-border: color-mix(in oklab, var(--color-fg) 12%, transparent);
+}
+
+[data-portfolio-kind="designer"][data-preview-theme="dark"] {
+  --color-bg: #0a0a0c;
+  --color-bg-elevated: #141418;
+  --color-fg: #f4f1ea;
+  --color-muted: #a39e93;
+  --color-primary: #ff6b4a;
+  --color-accent: #d4a853;
+  --color-border: color-mix(in oklab, var(--color-primary) 22%, transparent);
+}
+
+[data-portfolio-kind="designer"][data-preview-theme="light"] {
+  --color-bg: #faf7f2;
+  --color-bg-elevated: #ffffff;
+  --color-fg: #1a1814;
+  --color-muted: #6e6860;
+  --color-primary: #c2410c;
+  --color-accent: #b45309;
+  --color-border: color-mix(in oklab, var(--color-fg) 10%, transparent);
+}
+
+[data-portfolio-kind="product"][data-preview-theme="dark"] {
+  --color-bg: #0f1117;
+  --color-bg-elevated: #181b24;
+  --color-fg: #eef0f7;
+  --color-muted: #9aa3b5;
+  --color-primary: #7c9cff;
+  --color-accent: #9b87f5;
+  --color-border: color-mix(in oklab, var(--color-fg) 14%, transparent);
+}
+
+[data-portfolio-kind="product"][data-preview-theme="light"] {
+  --color-bg: #f8f9fc;
+  --color-bg-elevated: #ffffff;
+  --color-fg: #12151f;
+  --color-muted: #5b6478;
+  --color-primary: #334cce;
+  --color-accent: #5b21b6;
+  --color-border: color-mix(in oklab, var(--color-fg) 12%, transparent);
+}
+
+[data-portfolio-kind="student"][data-preview-theme="dark"] {
+  --color-bg: #101820;
+  --color-bg-elevated: #182230;
+  --color-fg: #f2f6fb;
+  --color-muted: #94a3b8;
+  --color-primary: #38bdf8;
+  --color-accent: #a78bfa;
+  --color-border: color-mix(in oklab, var(--color-fg) 12%, transparent);
+}
+
+[data-portfolio-kind="student"][data-preview-theme="light"] {
+  --color-bg: #f0f9ff;
+  --color-bg-elevated: #ffffff;
+  --color-fg: #0f172a;
+  --color-muted: #475569;
+  --color-primary: #0284c7;
+  --color-accent: #7c3aed;
+  --color-border: color-mix(in oklab, var(--color-fg) 10%, transparent);
+}
+
+[data-portfolio-kind="general"][data-preview-theme="dark"] {
+  --color-bg: #111015;
+  --color-bg-elevated: #1a1824;
+  --color-fg: #f4f2fa;
+  --color-muted: #a19fb8;
+  --color-primary: #a78bfa;
+  --color-accent: #38bdf8;
+  --color-border: color-mix(in oklab, var(--color-fg) 14%, transparent);
+}
+
+[data-portfolio-kind="general"][data-preview-theme="light"] {
+  --color-bg: #fcf8ff;
+  --color-bg-elevated: #ffffff;
+  --color-fg: #1b1b24;
+  --color-muted: #464555;
+  --color-primary: #3525cd;
+  --color-accent: #4d44e3;
+  --color-border: color-mix(in oklab, var(--color-fg) 12%, transparent);
+}

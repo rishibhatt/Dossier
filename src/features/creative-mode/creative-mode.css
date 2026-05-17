@@ -1,0 +1,25 @@
+/* Creative mode — marquee row (pause on hover via .group:hover) */
+@keyframes creative-marquee-x {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+[data-creative-mode="true"] .creative-marquee-row {
+  animation: creative-marquee-x var(--creative-marquee-dur, 32s) linear infinite;
+  will-change: transform;
+}
+
+[data-creative-mode="true"] .creative-marquee-group:hover .creative-marquee-row {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-creative-mode="true"] .creative-marquee-row {
+    animation: none;
+    transform: none;
+  }
+}

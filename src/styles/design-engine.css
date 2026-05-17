@@ -1,0 +1,116 @@
+/**
+ * Design engine — layout + palette tokens (scoped via data attributes).
+ */
+
+[data-de-spacing="airy"] {
+  --de-pad-x: clamp(1.25rem, 4vw, 3rem);
+  --de-pad-y: clamp(2.5rem, 6vw, 5rem);
+  --de-stack: clamp(2rem, 4vw, 3.5rem);
+}
+
+[data-de-spacing="compact"] {
+  --de-pad-x: clamp(1rem, 3vw, 2rem);
+  --de-pad-y: clamp(1.5rem, 3vw, 2.75rem);
+  --de-stack: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+[data-de-color="monochrome"][data-preview-theme="dark"] {
+  --de-bg: #0b0c0f;
+  --de-elevated: #12141a;
+  --de-fg: #eceff4;
+  --de-muted: #8b93a1;
+  --de-accent: #3ecf8e;
+  --de-border: color-mix(in oklab, var(--de-fg) 14%, transparent);
+}
+
+[data-de-color="monochrome"][data-preview-theme="light"] {
+  --de-bg: #f6f7f9;
+  --de-elevated: #ffffff;
+  --de-fg: #0f1115;
+  --de-muted: #5c6370;
+  --de-accent: #0d7a4d;
+  --de-border: color-mix(in oklab, var(--de-fg) 10%, transparent);
+}
+
+[data-de-color="accent"][data-preview-theme="dark"] {
+  --de-bg: #0f1117;
+  --de-elevated: #181b24;
+  --de-fg: #eef0f7;
+  --de-muted: #9aa3b5;
+  --de-accent: #7c9cff;
+  --de-border: color-mix(in oklab, var(--de-fg) 14%, transparent);
+}
+
+[data-de-color="accent"][data-preview-theme="light"] {
+  --de-bg: #f8f9fc;
+  --de-elevated: #ffffff;
+  --de-fg: #12151f;
+  --de-muted: #5b6478;
+  --de-accent: #334cce;
+  --de-border: color-mix(in oklab, var(--de-fg) 12%, transparent);
+}
+
+[data-de-color="gradient"][data-preview-theme="dark"] {
+  --de-bg: #0a0a0c;
+  --de-elevated: #141418;
+  --de-fg: #f4f1ea;
+  --de-muted: #a39e93;
+  --de-accent: #ff6b4a;
+  --de-border: color-mix(in oklab, var(--de-accent) 22%, transparent);
+}
+
+[data-de-color="gradient"][data-preview-theme="light"] {
+  --de-bg: #faf7f2;
+  --de-elevated: #ffffff;
+  --de-fg: #1a1814;
+  --de-muted: #6e6860;
+  --de-accent: #c2410c;
+  --de-border: color-mix(in oklab, var(--de-fg) 10%, transparent);
+}
+
+[data-de-typography-heading="mono"] {
+  --de-font-heading: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+[data-de-typography-heading="large"],
+[data-de-typography-heading="editorial"] {
+  --de-font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+[data-de-typography-body="dense"] {
+  --de-leading: 1.45;
+  --de-body-size: 0.875rem;
+}
+
+[data-de-typography-body="clean"] {
+  --de-leading: 1.62;
+  --de-body-size: 1rem;
+}
+
+.de-surface {
+  background: var(--de-bg);
+  color: var(--de-fg);
+}
+
+.de-body-text {
+  font-size: var(--de-body-size, 1rem);
+  line-height: var(--de-leading, 1.55);
+  color: var(--de-muted);
+}
+
+.de-heading-xl {
+  font-family: var(--font-display, var(--de-font-heading));
+  font-size: var(--size-hero, var(--dt-display-size, clamp(3.5rem, 8vw, 7rem)));
+  font-weight: var(--weight-display, 650);
+  letter-spacing: var(--tracking-display, -0.04em);
+  line-height: var(--leading-display, 1.05);
+  color: var(--color-text, var(--de-fg));
+}
+
+.de-heading-lg {
+  font-family: var(--font-display, var(--de-font-heading));
+  font-size: var(--size-h2, var(--dt-heading-lg-size, clamp(1.5rem, 3vw, 2.25rem)));
+  font-weight: var(--weight-heading, 600);
+  letter-spacing: var(--tracking-heading, -0.03em);
+  color: var(--color-heading, var(--color-text, var(--de-fg)));
+}

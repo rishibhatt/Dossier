@@ -1,0 +1,91 @@
+/**
+ * Aceternity-adjacent utilities for the portfolio canvas (uses --dt-* from buildDesignTokens).
+ */
+
+.de-surface .de-mesh-bg {
+  background-image: var(--dt-gradient-mesh);
+  background-color: var(--dt-bg);
+}
+
+.de-surface .de-glass-panel {
+  background: color-mix(in oklab, var(--dt-elevated) 72%, transparent);
+  backdrop-filter: blur(var(--dt-blur-glass));
+  -webkit-backdrop-filter: blur(var(--dt-blur-glass));
+  border: 1px solid color-mix(in oklab, var(--dt-fg) 10%, transparent);
+  box-shadow: var(--dt-shadow-elevated);
+}
+
+.de-surface .de-gradient-border {
+  position: relative;
+  border-radius: var(--dt-radius-xl);
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--dt-accent) 55%, transparent),
+    color-mix(in oklab, var(--dt-fg) 12%, transparent)
+  );
+  padding: 1px;
+}
+
+.de-surface .de-gradient-border > .de-gradient-border-inner {
+  border-radius: calc(var(--dt-radius-xl) - 1px);
+  background: color-mix(in oklab, var(--dt-elevated) 88%, var(--dt-bg));
+}
+
+.de-surface .de-glow-card {
+  border-radius: var(--dt-radius-lg);
+  border: 1px solid color-mix(in oklab, var(--dt-accent) 28%, transparent);
+  box-shadow: var(--dt-glow-accent), var(--dt-shadow-elevated);
+  background: color-mix(in oklab, var(--dt-elevated) 94%, transparent);
+}
+
+.de-surface .de-floating-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(60px);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.de-surface .de-text-gradient {
+  background: var(--dt-gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Generative-style mesh for image placeholders (no external URLs) */
+.de-abstract-ai-layer {
+  opacity: 0.42;
+  mix-blend-mode: soft-light;
+  background-image:
+    repeating-linear-gradient(
+      118deg,
+      transparent,
+      transparent 9px,
+      color-mix(in oklab, var(--color-primary, var(--dt-accent, #6366f1)) 35%, transparent) 9px,
+      color-mix(in oklab, var(--color-primary, var(--dt-accent, #6366f1)) 35%, transparent) 10px
+    ),
+    repeating-linear-gradient(
+      12deg,
+      transparent,
+      transparent 14px,
+      rgba(255, 255, 255, 0.04) 14px,
+      rgba(255, 255, 255, 0.04) 15px
+    );
+  animation: de-abstract-ai-pan 22s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .de-abstract-ai-layer {
+    animation: none;
+  }
+}
+
+@keyframes de-abstract-ai-pan {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(28px, 20px);
+  }
+}
