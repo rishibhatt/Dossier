@@ -1,3 +1,8 @@
+import { existsSync } from "node:fs"
+import { createRequire } from "node:module"
+import path from "node:path"
+import { pathToFileURL } from "node:url"
+
 import DOMMatrixPolyfill from "dommatrix"
 
 const g = globalThis as typeof globalThis & { DOMMatrix?: unknown }
@@ -5,11 +10,23 @@ if (typeof g.DOMMatrix === "undefined") {
   g.DOMMatrix = DOMMatrixPolyfill
 }
 
+let cachedWorkerSrc: string | null = null
+
 /**
- * pdfjs-dist worker is omitted from some serverless traces; without it, fake worker setup throws.
- * CDN URL must match the `pdfjs-dist` version shipped with `pdf-parse` (see package-lock).
+ * pdfjs fake worker must load with a `file:` URL in Node (https: is rejected by the ESM loader).
+ * Path is resolved from installed `pdfjs-dist` (keep `outputFileTracingIncludes` in next.config for serverless).
  */
-const PDFJS_WORKER_VERSION = "5.4.296"
+function getPdfWorkerFileUrl(): string {
+  if (cachedWorkerSrc) return cachedWorkerSrc
+  const require = createRequire(import.meta.url)
+  const pkgJsonPath = require.resolve("pdfjs-dist/package.json")
+  const legacyBuild = path.join(path.dirname(pkgJsonPath), "legacy", "build")
+  const primary = path.join(legacyBuild, "pdf.worker.mjs")
+  const fallback = path.join(legacyBuild, "pdf.worker.min.mjs")
+  const workerFsPath = existsSync(primary) ? primary : fallback
+  cachedWorkerSrc = pathToFileURL(workerFsPath).href
+  return cachedWorkerSrc
+}
 
 /**
  * Extract plain text from a PDF buffer (Node runtime).
@@ -17,9 +34,7 @@ const PDFJS_WORKER_VERSION = "5.4.296"
  */
 export async function parsePdfFromBuffer(buffer: Buffer): Promise<string> {
   const { PDFParse } = await import("pdf-parse")
-  PDFParse.setWorker(
-    `https://cdn.jsdelivr.net/npm/pdfjs-dist@${PDFJS_WORKER_VERSION}/legacy/build/pdf.worker.mjs`
-  )
+  PDFParse.setWorker(getPdfWorkerFileUrl())
   const parser = new PDFParse({ data: new Uint8Array(buffer) })
   try {
     const result = await parser.getText()
