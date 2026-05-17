@@ -18,12 +18,17 @@ let cachedWorkerSrc: string | null = null
  */
 function getPdfWorkerFileUrl(): string {
   if (cachedWorkerSrc) return cachedWorkerSrc
-  const require = createRequire(import.meta.url)
+  // Resolve from app root — `import.meta.url` points at `.next/server/chunks/...` under Turbopack,
+  // so `createRequire(import.meta.url)` often cannot see `node_modules` and breaks local dev.
+  const require = createRequire(path.join(process.cwd(), "package.json"))
   const pkgJsonPath = require.resolve("pdfjs-dist/package.json")
   const legacyBuild = path.join(path.dirname(pkgJsonPath), "legacy", "build")
   const primary = path.join(legacyBuild, "pdf.worker.mjs")
   const fallback = path.join(legacyBuild, "pdf.worker.min.mjs")
   const workerFsPath = existsSync(primary) ? primary : fallback
+  if (!existsSync(workerFsPath)) {
+    throw new Error(`pdfjs worker not found (checked ${primary} and ${fallback})`)
+  }
   cachedWorkerSrc = pathToFileURL(workerFsPath).href
   return cachedWorkerSrc
 }
