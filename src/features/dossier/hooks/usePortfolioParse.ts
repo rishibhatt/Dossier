@@ -27,12 +27,61 @@ type ApiErrorBody = {
   message?: string
 }
 
+type ParsePdfStreamChunk =
+  | { type: "progress"; stage: string }
+  | { type: "heartbeat" }
+  | { type: "result"; data: ParsePdfSuccess }
+  | ({ type: "error" } & ApiErrorBody)
+
 function resolveClientErrorMessage(code: string | undefined): string {
   const errs = messages.dossier.errors
   if (code && code in errs) {
     return errs[code as keyof typeof errs]
   }
   return errs.generic
+}
+
+async function readParsePdfResponse(response: Response): Promise<ParsePdfSuccess & ApiErrorBody> {
+  const contentType = response.headers.get("content-type") ?? ""
+  if (!response.body || !contentType.includes("application/x-ndjson")) {
+    return (await response.json()) as ParsePdfSuccess & ApiErrorBody
+  }
+
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+  let buffered = ""
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (value) {
+      buffered += decoder.decode(value, { stream: !done })
+      let newlineIndex = buffered.indexOf("\n")
+      while (newlineIndex >= 0) {
+        const line = buffered.slice(0, newlineIndex).trim()
+        buffered = buffered.slice(newlineIndex + 1)
+
+        if (line) {
+          const chunk = JSON.parse(line) as ParsePdfStreamChunk
+          if (chunk.type === "result") return chunk.data
+          if (chunk.type === "error") return { error: chunk.error, message: chunk.message } as ParsePdfSuccess & ApiErrorBody
+        }
+
+        newlineIndex = buffered.indexOf("\n")
+      }
+    }
+
+    if (done) break
+  }
+
+  const trailing = buffered.trim()
+  if (trailing) {
+    const chunk = JSON.parse(trailing) as ParsePdfStreamChunk
+    if (chunk.type === "result") return chunk.data
+    if (chunk.type === "error") return { error: chunk.error, message: chunk.message } as ParsePdfSuccess & ApiErrorBody
+  }
+
+  return { error: "pipelineFailed", message: "The PDF parser finished without returning a result." } as ParsePdfSuccess &
+    ApiErrorBody
 }
 
 export function usePortfolioParse() {
@@ -59,9 +108,9 @@ export function usePortfolioParse() {
           body: formData,
         })
 
-        const body = (await response.json()) as ParsePdfSuccess & ApiErrorBody
+        const body = await readParsePdfResponse(response)
 
-        if (!response.ok) {
+        if (!response.ok || body.error) {
           setError(resolveClientErrorMessage(body.error))
           setLoading(false)
           return

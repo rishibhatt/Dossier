@@ -13,6 +13,12 @@ import { intentProfileSchema } from "@/lib/schemas/intent.schema"
 import type { StructuredResume } from "@/types/dossier"
 import type { DesignDirectionId } from "@/types/resolvedDesignConfig"
 
+export type PortfolioPipelineStage =
+  | "pdf_text_extracted"
+  | "llm_extract_done"
+  | "llm_intent_done"
+  | "layout_done"
+
 const EXTRACT_SYSTEM = `You extract structured résumé data from raw text.
 Return ONLY a JSON object matching this shape:
 { "name", "title", "summary", "skills": [], "experience": [{company,role,duration,description}], "projects": [{name,description,tech:[]}], "education": [{institution,degree,period,details}], "contact": {email,phone,links:[]} }
@@ -41,22 +47,27 @@ function mergeIntentNotes(ctx: PortfolioGenerationContext, intent: unknown): Por
 export async function executePortfolioPipeline(
   buffer: Buffer,
   generationContext: PortfolioGenerationContext,
-  options?: { mode?: Mode }
+  options?: { mode?: Mode; onStage?: (stage: PortfolioPipelineStage) => void }
 ) {
   const mode: Mode = options?.mode ?? generationContext.llmMode ?? "balanced"
   const rawText = await parsePdfFromBuffer(buffer)
+  options?.onStage?.("pdf_text_extracted")
 
   const [extracted, intented] = await Promise.all([
     runLLMTask("extract", rawText.slice(0, 24_000), {
       systemPrompt: EXTRACT_SYSTEM,
       mode,
       zodSchema: extractResumeSchema,
-    }).catch(() => null),
+    })
+      .catch(() => null)
+      .finally(() => options?.onStage?.("llm_extract_done")),
     runLLMTask("intent", rawText.slice(0, 24_000), {
       systemPrompt: INTENT_SYSTEM,
       mode,
       zodSchema: intentProfileSchema,
-    }).catch(() => null),
+    })
+      .catch(() => null)
+      .finally(() => options?.onStage?.("llm_intent_done")),
   ])
 
   let structuredData: StructuredResume = extractStructuredResume(rawText)
@@ -71,6 +82,7 @@ export async function executePortfolioPipeline(
     ...ctxWithIntent,
     llmMode: mode,
   })
+  options?.onStage?.("layout_done")
 
   const direction: DesignDirectionId =
     generationContext.designDirection ?? mapPresetToDesignDirection(generationContext.portfolioStylePreset)
