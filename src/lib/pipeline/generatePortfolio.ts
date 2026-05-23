@@ -19,6 +19,9 @@ export type PortfolioPipelineStage =
   | "llm_intent_done"
   | "layout_done"
 
+const OPTIONAL_ENRICHMENT_TIMEOUT_MS = 6_000
+const OPTIONAL_ENRICHMENT_PROVIDER_TIMEOUT_MS = 5_000
+
 const EXTRACT_SYSTEM = `You extract structured résumé data from raw text.
 Return ONLY a JSON object matching this shape:
 { "name", "title", "summary", "skills": [], "experience": [{company,role,duration,description}], "projects": [{name,description,tech:[]}], "education": [{institution,degree,period,details}], "contact": {email,phone,links:[]} }
@@ -41,6 +44,20 @@ function mergeIntentNotes(ctx: PortfolioGenerationContext, intent: unknown): Por
   }
 }
 
+async function withDeadline<T>(promise: Promise<T>, timeoutMs: number): Promise<T | null> {
+  let timeout: ReturnType<typeof setTimeout> | null = null
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<null>((resolve) => {
+        timeout = setTimeout(() => resolve(null), timeoutMs)
+      }),
+    ])
+  } finally {
+    if (timeout) clearTimeout(timeout)
+  }
+}
+
 /**
  * Full PDF → portfolio orchestration with parallel extract + intent, then layout + deterministic design engine.
  */
@@ -54,20 +71,30 @@ export async function executePortfolioPipeline(
   options?.onStage?.("pdf_text_extracted")
 
   const [extracted, intented] = await Promise.all([
-    runLLMTask("extract", rawText.slice(0, 24_000), {
-      systemPrompt: EXTRACT_SYSTEM,
-      mode,
-      zodSchema: extractResumeSchema,
-    })
-      .catch(() => null)
-      .finally(() => options?.onStage?.("llm_extract_done")),
-    runLLMTask("intent", rawText.slice(0, 24_000), {
-      systemPrompt: INTENT_SYSTEM,
-      mode,
-      zodSchema: intentProfileSchema,
-    })
-      .catch(() => null)
-      .finally(() => options?.onStage?.("llm_intent_done")),
+    withDeadline(
+      runLLMTask("extract", rawText.slice(0, 24_000), {
+        systemPrompt: EXTRACT_SYSTEM,
+        mode,
+        zodSchema: extractResumeSchema,
+        timeoutMs: OPTIONAL_ENRICHMENT_PROVIDER_TIMEOUT_MS,
+        maxAttempts: 1,
+        maxJsonAttempts: 1,
+        useFallback: false,
+      }).catch(() => null),
+      OPTIONAL_ENRICHMENT_TIMEOUT_MS
+    ).finally(() => options?.onStage?.("llm_extract_done")),
+    withDeadline(
+      runLLMTask("intent", rawText.slice(0, 24_000), {
+        systemPrompt: INTENT_SYSTEM,
+        mode,
+        zodSchema: intentProfileSchema,
+        timeoutMs: OPTIONAL_ENRICHMENT_PROVIDER_TIMEOUT_MS,
+        maxAttempts: 1,
+        maxJsonAttempts: 1,
+        useFallback: false,
+      }).catch(() => null),
+      OPTIONAL_ENRICHMENT_TIMEOUT_MS
+    ).finally(() => options?.onStage?.("llm_intent_done")),
   ])
 
   let structuredData: StructuredResume = extractStructuredResume(rawText)

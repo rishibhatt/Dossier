@@ -4,7 +4,7 @@ import { openrouterComplete } from "@/lib/llm/providers/openrouter"
 
 export async function dispatchProvider(
   provider: LLMProviderId,
-  args: { model: string; system: string; user: string; temperature?: number; jsonMode?: boolean }
+  args: { model: string; system: string; user: string; temperature?: number; jsonMode?: boolean; timeoutMs?: number }
 ): Promise<string> {
   switch (provider) {
     case "groq":

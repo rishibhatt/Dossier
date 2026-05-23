@@ -6,7 +6,7 @@ import { LLMHttpError } from "@/lib/llm/errors"
 import { safeJsonParse } from "@/lib/llm/jsonUtils"
 import { dispatchProvider } from "@/lib/llm/providers"
 import { resolveModelForTask } from "@/lib/llm/registry"
-import type { LLMProviderId, LLMResponse, LLMTask, Mode, RunLLMOptions, RunLLMResult } from "@/lib/llm/types"
+import type { LLMProviderId, LLMTask, Mode, RunLLMOptions, RunLLMResult } from "@/lib/llm/types"
 import { cacheGet, cacheKey, cacheSet } from "@/lib/utils/cache"
 import { llmLogger } from "@/lib/utils/logger"
 import { isNonRetryablePayloadOrQuota, isRetryableNetworkOrRateLimit, withRetry } from "@/lib/utils/retry"
@@ -17,7 +17,9 @@ async function invokeProvider(
   system: string,
   user: string,
   temperature: number | undefined,
-  jsonMode: boolean
+  jsonMode: boolean,
+  timeoutMs: number | undefined,
+  maxAttempts: number | undefined
 ): Promise<{ content: string; latency: number }> {
   const t0 = Date.now()
   const content = await withRetry(
@@ -28,9 +30,10 @@ async function invokeProvider(
         user,
         temperature,
         jsonMode,
+        timeoutMs,
       }),
     {
-      maxAttempts: 3,
+      maxAttempts: maxAttempts ?? 3,
       baseDelayMs: 150,
       shouldRetry: (err, attempt) => {
         if (attempt >= 2) return false
@@ -53,12 +56,23 @@ async function completeWithValidation<T>(
   temperature: number | undefined,
   jsonMode: boolean,
   zodSchema: z.ZodType<T> | undefined,
-  maxJsonAttempts: number
+  maxJsonAttempts: number,
+  timeoutMs: number | undefined,
+  maxAttempts: number | undefined
 ): Promise<RunLLMResult<T>> {
   let lastErr: unknown
   for (let attempt = 0; attempt < maxJsonAttempts; attempt++) {
     try {
-      const { content, latency } = await invokeProvider(ref.provider, ref.model, systemPrompt, userPrompt, temperature, jsonMode)
+      const { content, latency } = await invokeProvider(
+        ref.provider,
+        ref.model,
+        systemPrompt,
+        userPrompt,
+        temperature,
+        jsonMode,
+        timeoutMs,
+        maxAttempts
+      )
 
       if (!zodSchema) {
         llmLogger.info("llm_complete", { task, model: ref.model, provider: ref.provider, latency, validated: false })
@@ -142,7 +156,10 @@ export async function runLLMTask<T = string>(task: LLMTask, userPrompt: string, 
   const primary = resolveModelForTask(task, mode, "primary")
   const fallback = resolveModelForTask(task, mode, "fallback")
 
-  const maxJsonAttempts = 3
+  const maxJsonAttempts = options.maxJsonAttempts ?? 3
+  const timeoutMs = options.timeoutMs
+  const maxAttempts = options.maxAttempts
+  const useFallback = options.useFallback !== false
 
   try {
     const out = await completeWithValidation(
@@ -153,7 +170,9 @@ export async function runLLMTask<T = string>(task: LLMTask, userPrompt: string, 
       temperature,
       jsonMode,
       zodSchema,
-      maxJsonAttempts
+      maxJsonAttempts,
+      timeoutMs,
+      maxAttempts
     )
     if (!options.skipCache) cacheSet(key, out.content, options.cacheTtlMs)
     return out
@@ -162,6 +181,9 @@ export async function runLLMTask<T = string>(task: LLMTask, userPrompt: string, 
       task,
       error: primaryErr instanceof Error ? primaryErr.message : String(primaryErr),
     })
+    if (!useFallback) {
+      throw primaryErr
+    }
     try {
       const out = await completeWithValidation(
         task,
@@ -171,7 +193,9 @@ export async function runLLMTask<T = string>(task: LLMTask, userPrompt: string, 
         temperature,
         jsonMode,
         zodSchema,
-        maxJsonAttempts
+        maxJsonAttempts,
+        timeoutMs,
+        maxAttempts
       )
       if (!options.skipCache) cacheSet(key, out.content, options.cacheTtlMs)
       return out

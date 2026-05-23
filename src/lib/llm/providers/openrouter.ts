@@ -8,6 +8,7 @@ export async function openrouterComplete(params: {
   user: string
   temperature?: number
   jsonMode?: boolean
+  timeoutMs?: number
 }): Promise<string> {
   const key = process.env.OPENROUTER_API_KEY
   if (!key) throw new LLMHttpError("OPENROUTER_API_KEY is not configured", 503)
@@ -39,6 +40,7 @@ export async function openrouterComplete(params: {
       "X-Title": title,
     },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(params.timeoutMs ?? 12_000),
   })
 
   if (!res.ok) {

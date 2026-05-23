@@ -30,6 +30,14 @@ export type RunLLMOptions<T = unknown> = {
   skipCache?: boolean
   /** Cache TTL override (ms). */
   cacheTtlMs?: number
+  /** Per-provider request timeout. Keeps serverless requests inside platform limits. */
+  timeoutMs?: number
+  /** Transport retry attempts per provider. */
+  maxAttempts?: number
+  /** JSON/schema validation attempts per provider. */
+  maxJsonAttempts?: number
+  /** Whether to try the registry fallback provider after the primary fails. */
+  useFallback?: boolean
 }
 
 export type RunLLMResult<T = string> = LLMResponse & {

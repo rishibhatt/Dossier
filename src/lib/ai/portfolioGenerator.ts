@@ -94,6 +94,10 @@ export async function generatePortfolioFromStructuredResume(
       temperature: temp,
       zodSchema: layoutPortfolioSchema,
       mode,
+      timeoutMs: 10_000,
+      maxAttempts: 1,
+      maxJsonAttempts: 1,
+      useFallback: false,
     })
     if (out.parsed) {
       return ensurePortfolioMeta(out.parsed as PortfolioDocument, structured)
@@ -107,6 +111,10 @@ export async function generatePortfolioFromStructuredResume(
       systemPrompt: PORTFOLIO_JSON_SYSTEM,
       temperature: temp,
       mode,
+      timeoutMs: 5_000,
+      maxAttempts: 1,
+      maxJsonAttempts: 1,
+      useFallback: false,
     })
     const parsed = parseModelJson(raw.content)
     const validated = portfolioDocumentSchema.safeParse(parsed)
