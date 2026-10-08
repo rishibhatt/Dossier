@@ -3,73 +3,46 @@
 import { useActionState } from "react"
 import Link from "next/link"
 
-import {
-  Field,
-  FieldContent,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { AuthField, AuthSubmit, FormBanner, useAuthToast } from "@/features/auth/components/AuthFields"
+import { signUpWithCredentialsAction } from "@/features/auth/actions/auth.actions"
+import { authFormInitialState } from "@/features/auth/auth-form-state"
 import { messages } from "@/config/messages"
 import { ROUTES } from "@/lib/constants/routes"
-import { authFormInitialState } from "@/features/auth/auth-form-state"
-import { signUpWithCredentialsAction } from "@/features/auth/actions/auth.actions"
 
-export function SignupForm() {
+export function SignupForm({ next }: { next?: string }) {
   const [state, action, pending] = useActionState(signUpWithCredentialsAction, authFormInitialState)
+  useAuthToast(state)
 
   return (
-    <form action={action} className="flex flex-col gap-6">
-      <FieldGroup>
-        <Field>
-          <FieldLabel htmlFor="email">{messages.auth.emailLabel}</FieldLabel>
-          <FieldContent>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              placeholder={messages.auth.emailPlaceholder}
-            />
-          </FieldContent>
-        </Field>
-        <Field>
-          <FieldLabel htmlFor="password">{messages.auth.passwordLabel}</FieldLabel>
-          <FieldContent>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              required
-              placeholder={messages.auth.passwordPlaceholder}
-            />
-          </FieldContent>
-        </Field>
-        <Field>
-          <FieldLabel htmlFor="confirmPassword">{messages.auth.confirmPasswordLabel}</FieldLabel>
-          <FieldContent>
-            <Input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              required
-              placeholder={messages.auth.passwordPlaceholder}
-            />
-          </FieldContent>
-        </Field>
-      </FieldGroup>
-      {state.error ? <FieldError>{state.error}</FieldError> : null}
-      <Button type="submit" disabled={pending} size="lg" className="w-full">
+    <form action={action} className="flex flex-col gap-5" noValidate>
+      {next ? <input type="hidden" name="next" value={next} /> : null}
+      <AuthField
+        name="email"
+        label={messages.auth.emailLabel}
+        type="email"
+        autoComplete="email"
+        placeholder={messages.auth.emailPlaceholder}
+        defaultValue={state.email}
+        error={state.fieldErrors?.email}
+        disabled={pending}
+      />
+      <AuthField
+        name="password"
+        label={messages.auth.passwordLabel}
+        type="password"
+        autoComplete="new-password"
+        placeholder="At least 8 characters"
+        error={state.fieldErrors?.password}
+        hint="At least 8 characters. Tap the eye to check what you typed."
+        disabled={pending}
+      />
+      <FormBanner state={state} />
+      <AuthSubmit pending={pending} pendingLabel="Creating your account">
         {messages.auth.signupSubmit}
-      </Button>
-      <p className="typo-body-md text-muted-foreground">
+      </AuthSubmit>
+      <p className="text-center text-sm text-[var(--site-ink-2)]">
         {messages.auth.hasAccount}{" "}
-        <Link href={ROUTES.login} className="text-primary underline-offset-4 hover:underline">
+        <Link href={ROUTES.login} className="font-semibold text-[var(--site-accent-ink)] underline underline-offset-4 hover:text-[var(--site-ink)]">
           {messages.auth.goLogin}
         </Link>
       </p>

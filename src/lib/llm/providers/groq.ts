@@ -1,113 +1,82 @@
 import Groq from "groq-sdk"
 
-import { LLMHttpError } from "@/lib/llm/errors"
+import { LLMHttpError, toLLMError } from "@/lib/llm/errors"
+import type { ProviderCall, ProviderResult } from "@/lib/llm/types"
 
-let nextGroqKeyIndex = 0
+let nextKey = 0
+const clients = new Map<string, Groq>()
 
-function parseGroqKeys(): string[] {
+function groqKeys(): string[] {
   const raw = [process.env.GROQ_API_KEYS, process.env.GROQ_API_KEY].filter(Boolean).join(",")
-  const keys = raw
-    .split(/[\s,]+/)
-    .map((key) => key.trim())
-    .filter(Boolean)
-  return Array.from(new Set(keys))
+  return Array.from(new Set(raw.split(/[\s,]+/).map((k) => k.trim()).filter(Boolean)))
 }
 
-function maskKey(key: string): string {
-  if (key.length <= 8) return "****"
-  return `${key.slice(0, 4)}...${key.slice(-4)}`
-}
-
-function getRotatedGroqKeys(): string[] {
-  const keys = parseGroqKeys()
+/** Round-robin start so load spreads across keys. */
+function rotatedKeys(): string[] {
+  const keys = groqKeys()
   if (keys.length <= 1) return keys
-  const start = nextGroqKeyIndex % keys.length
-  nextGroqKeyIndex = (nextGroqKeyIndex + 1) % keys.length
+  const start = nextKey++ % keys.length
   return keys.slice(start).concat(keys.slice(0, start))
 }
 
-function isKeyFailoverError(status: number | undefined, message: string): boolean {
-  const msg = message.toLowerCase()
-  return (
-    status === 401 ||
-    status === 403 ||
-    status === 408 ||
-    status === 429 ||
-    status === 500 ||
-    status === 502 ||
-    status === 503 ||
-    status === 504 ||
-    msg.includes("rate limit") ||
-    msg.includes("quota") ||
-    msg.includes("tokens per minute") ||
-    msg.includes("timeout") ||
-    msg.includes("fetch failed") ||
-    msg.includes("api key")
-  )
+function client(apiKey: string): Groq {
+  let c = clients.get(apiKey)
+  if (!c) {
+    c = new Groq({ apiKey, maxRetries: 0 })
+    clients.set(apiKey, c)
+  }
+  return c
 }
 
-function normalizeGroqError(e: unknown): LLMHttpError {
-  const msg = e instanceof Error ? e.message : "groq_error"
-  let status: number | undefined
-  if (e && typeof e === "object") {
-    const o = e as Record<string, unknown>
-    if (typeof o.status === "number") status = o.status
-    else if (typeof o.statusCode === "number") status = o.statusCode
-  }
-  if (status === undefined && /^413\b/.test(msg)) status = 413
-  if (status === undefined && /\b429\b/.test(msg)) status = 429
-  if (status === undefined && msg.toLowerCase().includes("timeout")) status = 408
-  return new LLMHttpError(msg, status)
+const mask = (k: string) => (k.length <= 8 ? "****" : `${k.slice(0, 4)}...${k.slice(-4)}`)
+
+/** Only key problems (auth, per-key rate limit) are worth another key. Timeouts and outages are the model's: move on. */
+const keyFault = (s: number | undefined) => s === 401 || s === 403 || s === 429
+
+/**
+ * Reasoning models spend completion tokens thinking. gpt-oss: lowest effort and no reasoning text in the reply.
+ * qwen3: thinking off.
+ */
+function reasoningParams(model: string): { reasoning_effort?: "low" | "none" | "medium" | "high"; include_reasoning?: boolean } {
+  if (model.startsWith("openai/gpt-oss")) return { reasoning_effort: "low", include_reasoning: false }
+  if (model.startsWith("qwen/")) return { reasoning_effort: "none" }
+  return {}
 }
 
-export async function groqComplete(params: {
-  model: string
-  system: string
-  user: string
-  temperature?: number
-  jsonMode?: boolean
-  timeoutMs?: number
-}): Promise<string> {
-  const keys = getRotatedGroqKeys()
-  if (!keys.length) {
-    throw new LLMHttpError("GROQ_API_KEY or GROQ_API_KEYS is not configured", 503)
-  }
+export async function groqComplete(p: ProviderCall): Promise<ProviderResult> {
+  const keys = rotatedKeys()
+  if (!keys.length) throw new LLMHttpError("GROQ_API_KEY or GROQ_API_KEYS is not configured", 503)
 
-  let lastError: LLMHttpError | null = null
+  const endAt = Date.now() + p.timeoutMs
+  let last: LLMHttpError | null = null
   for (const apiKey of keys) {
-    const client = new Groq({
-      apiKey,
-      timeout: params.timeoutMs ?? 12_000,
-      maxRetries: 0,
-    })
+    const left = endAt - Date.now()
+    if (left < 500) break
     try {
-      const completion = await client.chat.completions.create(
+      const completion = await client(apiKey).chat.completions.create(
         {
-          model: params.model,
+          model: p.model,
           messages: [
-            { role: "system", content: params.system },
-            { role: "user", content: params.user },
+            { role: "system", content: p.system },
+            { role: "user", content: p.user },
           ],
-          temperature: params.temperature ?? 0.35,
-          max_tokens: 8192,
-          ...(params.jsonMode === false ? {} : { response_format: { type: "json_object" as const } }),
+          temperature: p.temperature ?? 0.2,
+          max_completion_tokens: p.maxTokens ?? 2000,
+          ...reasoningParams(p.model),
+          ...(p.jsonMode === false ? {} : { response_format: { type: "json_object" as const } }),
         },
-        {
-          timeout: params.timeoutMs ?? 12_000,
-          maxRetries: 0,
-        }
+        { timeout: left, maxRetries: 0, signal: p.signal }
       )
-      const text = completion.choices[0]?.message?.content
-      if (!text) throw new LLMHttpError("Empty completion from Groq", 502)
-      return text
+      const content = completion.choices[0]?.message?.content
+      if (!content) throw new LLMHttpError("Empty completion from Groq", 502)
+      const u = completion.usage
+      return { content, usage: u ? { prompt: u.prompt_tokens ?? 0, completion: u.completion_tokens ?? 0 } : undefined }
     } catch (e: unknown) {
-      const normalized = normalizeGroqError(e)
-      lastError = new LLMHttpError(`${normalized.message} (Groq key ${maskKey(apiKey)})`, normalized.status)
-      if (!isKeyFailoverError(normalized.status, normalized.message)) {
-        throw lastError
-      }
+      const err = toLLMError(e, p.signal)
+      if (!(err instanceof LLMHttpError)) throw err
+      last = new LLMHttpError(`${err.message} (Groq key ${mask(apiKey)})`, err.status)
+      if (!keyFault(err.status)) throw last
     }
   }
-
-  throw lastError ?? new LLMHttpError("All Groq keys failed", 503)
+  throw last ?? new LLMHttpError("Groq: no time left for another key", 408)
 }

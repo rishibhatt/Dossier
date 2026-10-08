@@ -1,0 +1,444 @@
+/* Build flow (/build) and auth brand panel. Plain CSS, imported by the components that use it. */
+
+/* The build flow is one fixed frame. Only .bf-main scrolls, and only if a step cannot fit at all. */
+.bf-root {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--site-paper);
+}
+
+.bf-main {
+  display: flex;
+  flex: 1 1 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.bf-step {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  will-change: transform, opacity, clip-path;
+}
+
+/* From lg the look step has an internal scroll area, so its natural height is large: size it to the window instead. */
+@media (min-width: 1024px) {
+  .bf-step {
+    flex: 1 1 0;
+    min-height: 30rem;
+  }
+}
+
+/* (live build styles: see the Workspace block at the end) */
+
+/* Drop zone */
+.bf-drop {
+  position: relative;
+  isolation: isolate;
+}
+
+.bf-drop-border {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.bf-drop-border rect {
+  x: 1px;
+  y: 1px;
+  width: calc(100% - 2px);
+  height: calc(100% - 2px);
+  fill: none;
+  stroke: var(--site-rule-strong);
+  stroke-width: 1.5px;
+  stroke-dasharray: 7 7;
+  vector-effect: non-scaling-stroke;
+  transition: stroke 200ms ease;
+}
+
+.bf-drop[data-over="true"] .bf-drop-border rect {
+  stroke: var(--site-accent-ink);
+  animation: bf-march 700ms linear infinite;
+}
+
+.bf-drop[data-problem="true"] .bf-drop-border rect {
+  stroke: #d9776e;
+}
+
+.bf-drop:hover .bf-drop-border rect {
+  stroke: var(--site-ink);
+}
+
+@keyframes bf-march {
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+
+.bf-shake {
+  animation: bf-shake 380ms var(--site-ease);
+}
+
+@keyframes bf-shake {
+  20% {
+    transform: translateX(-6px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  80% {
+    transform: translateX(-2px);
+  }
+}
+
+/* Look chooser: snap carousel on small screens, scrolling grid from lg. */
+.bf-looks {
+  display: flex;
+  gap: 0.625rem;
+  overflow-x: auto;
+  padding: 0.25rem 1rem 0.5rem;
+  margin-inline: -1rem;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 1rem;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  /* The right edge fades, so the next look reads as "more this way". */
+  -webkit-mask-image: linear-gradient(90deg, #000 82%, transparent);
+  mask-image: linear-gradient(90deg, #000 82%, transparent);
+}
+
+.bf-looks::-webkit-scrollbar {
+  display: none;
+}
+
+.bf-looks > * {
+  flex: 0 0 8.5rem;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 1024px) {
+  .bf-looks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    grid-auto-rows: max-content;
+    gap: 0.75rem;
+    overflow-x: visible;
+    overflow-y: auto;
+    margin-inline: 0;
+    padding: 0.25rem 0.25rem 0.5rem;
+    scroll-snap-type: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+    scrollbar-width: thin;
+  }
+
+  .bf-looks > * {
+    flex: none;
+  }
+}
+
+.bf-preview-box {
+  container-type: size;
+  display: grid;
+  flex: 1 1 0;
+  min-height: 0;
+  place-items: center;
+}
+
+.bf-preview {
+  width: min(100cqw, 133cqh);
+}
+
+/* Auth brand panel */
+.auth-stage {
+  position: relative;
+  container-type: size;
+  flex: 1 1 auto;
+  min-height: 28rem;
+}
+
+.auth-layer {
+  position: absolute;
+  will-change: transform;
+}
+
+.auth-card {
+  overflow: hidden;
+  border: 1px solid var(--site-rule-strong);
+  border-radius: 0.9rem;
+  background: #fff;
+  box-shadow: 0 18px 40px -26px rgba(16, 17, 20, 0.35);
+}
+
+.auth-strip-look {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: auth-cycle 9s infinite;
+}
+
+.auth-strip-look:nth-child(1) {
+  opacity: 1;
+  animation-delay: 0s;
+}
+
+.auth-strip-look:nth-child(2) {
+  animation-delay: 3s;
+}
+
+.auth-strip-look:nth-child(3) {
+  animation-delay: 6s;
+}
+
+@keyframes auth-cycle {
+  0%,
+  30% {
+    opacity: 1;
+  }
+  36%,
+  94% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bf-shake,
+  .auth-strip-look {
+    animation: none;
+  }
+
+  .auth-strip-look:not(:first-child) {
+    opacity: 0;
+  }
+
+  .bf-drop[data-over="true"] .bf-drop-border rect {
+    animation: none;
+  }
+}
+
+
+/* ---- Workspace: live build ---- A proof plate whose site sets itself as the stream arrives. */
+.lb-plate {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--site-rule-strong);
+  border-radius: 2px;
+  background: #fff;
+  box-shadow: var(--site-lift);
+}
+
+.lb-stage {
+  position: relative;
+  container-type: inline-size;
+  min-height: 15rem;
+  flex: 1 1 0;
+  overflow: hidden;
+}
+
+.lb-site,
+.lb-ink {
+  position: absolute;
+  inset: 0;
+}
+
+.lb-site {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: hidden;
+  padding: 0 1rem 1rem;
+  font-size: clamp(0.75rem, 2.6cqw, 0.9375rem);
+}
+
+.lb-nav {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid color-mix(in oklab, currentColor 14%, transparent);
+}
+
+.lb-links {
+  display: flex;
+  min-width: 0;
+  gap: 0.9em;
+  overflow: hidden;
+  font-family: var(--site-mono-face);
+  font-size: 0.85em;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.lb-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+
+.lb-name {
+  display: block;
+  overflow: hidden;
+  font-size: clamp(1.75rem, 11cqw, 4.5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+}
+
+.lb-name > span {
+  display: inline-block;
+}
+
+.lb-title {
+  font-size: 1.05em;
+  opacity: 0.75;
+}
+
+.lb-accent {
+  display: block;
+  width: 3rem;
+  height: 4px;
+  margin-top: 0.4em;
+}
+
+.lb-blocks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr));
+  align-content: start;
+  gap: 1px;
+  padding: 1px;
+}
+
+.lb-block {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.5em;
+  background: var(--lb-bg, #fff);
+  box-shadow: 0 0 0 1px color-mix(in oklab, currentColor 14%, transparent);
+  padding: 0.75em;
+}
+
+.lb-count {
+  font-family: var(--site-mono-face);
+  font-size: 0.8em;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.lb-bar {
+  display: block;
+  border-radius: 2px;
+  background: currentColor;
+  filter: blur(1.5px);
+  transition: filter 700ms var(--site-ease);
+}
+
+.lb-site[data-sharp="true"] .lb-bar {
+  filter: none;
+}
+
+.lb-site:not([data-sharp="true"]) .lb-bar {
+  animation: lb-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes lb-pulse {
+  50% {
+    opacity: 0.08;
+  }
+}
+
+.lb-caption {
+  min-height: 2.25rem;
+  border-top: 1px solid var(--site-rule);
+  background: var(--site-sheet);
+  padding: 0.55rem 0.75rem;
+  font-family: var(--site-mono-face);
+  font-size: 0.75rem;
+  color: var(--site-ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Four step cells: done ink, current marked violet. */
+.lb-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid var(--site-rule-strong);
+  border-radius: 4px;
+  background: var(--site-rule);
+  overflow: hidden;
+}
+
+.lb-steps > li {
+  display: flex;
+  min-width: 0;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--site-paper);
+  padding-inline: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--site-ink-3);
+}
+
+.lb-steps > li .sp-no {
+  display: grid;
+  width: 1.25rem;
+  flex-shrink: 0;
+  place-items: center;
+  font-size: 0.6875rem;
+}
+
+.lb-steps > li[data-state="done"] {
+  background: var(--site-ink);
+  color: var(--site-paper);
+}
+
+.lb-steps > li[data-state="on"] {
+  color: var(--site-ink);
+  box-shadow: inset 0 -2px 0 var(--site-accent);
+}
+
+@media (max-width: 380px) {
+  .lb-steps > li {
+    justify-content: center;
+    font-size: 0.75rem;
+  }
+  .lb-steps > li .sp-no {
+    display: none;
+  }
+}
+
+/* Hand-off: the build plate fades off the studio once the real page is underneath. */
+.lb-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lb-bar {
+    animation: none !important;
+    transition: none;
+    filter: none;
+  }
+}

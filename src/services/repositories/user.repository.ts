@@ -2,7 +2,9 @@ import type { SupabaseClient } from "@supabase/supabase-js"
 
 import type { Database } from "@/types/database"
 
-type UserInsert = Database["public"]["Tables"]["users"]["Insert"]
+/** `plan` and `plan_expires_at` are service-role only (see phase0 migration column grants). */
+type UserInsert = Omit<Database["public"]["Tables"]["users"]["Insert"], "plan" | "plan_expires_at">
+
 
 export type PublicSupabaseClient = SupabaseClient<Database>
 

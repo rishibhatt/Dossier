@@ -10,15 +10,10 @@ type AppProvidersProps = {
 
 export function AppProviders({ children }: AppProvidersProps) {
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="light"
-      forcedTheme="light"
-      enableSystem={false}
-      disableTransitionOnChange
-    >
+    <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light" enableSystem={false} disableTransitionOnChange>
       {children}
-      <Toaster richColors closeButton />
+      {/* Swipe or wait to dismiss; errors carry their own action. No close button cluttering every slip. */}
+      <Toaster />
     </ThemeProvider>
   )
 }

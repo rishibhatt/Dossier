@@ -11,6 +11,8 @@ export type PortfolioGenerationContext = {
   designDirection?: DesignDirectionId | null
   /** Routes multi-LLM orchestration (registry) — defaults in the pipeline. */
   llmMode?: Mode
+  /** "Let Dossier choose": template pick ignores portfolioStylePreset bias. */
+  autoStyle?: boolean
 }
 
 export const DEFAULT_GENERATION_CONTEXT: PortfolioGenerationContext = {

@@ -1,16 +1,13 @@
-import type { LLMProviderId } from "@/lib/llm/types"
 import { groqComplete } from "@/lib/llm/providers/groq"
 import { openrouterComplete } from "@/lib/llm/providers/openrouter"
+import type { LLMProviderId, ProviderCall, ProviderResult } from "@/lib/llm/types"
 
-export async function dispatchProvider(
-  provider: LLMProviderId,
-  args: { model: string; system: string; user: string; temperature?: number; jsonMode?: boolean; timeoutMs?: number }
-): Promise<string> {
+export function dispatchProvider(provider: LLMProviderId, call: ProviderCall): Promise<ProviderResult> {
   switch (provider) {
     case "groq":
-      return groqComplete(args)
+      return groqComplete(call)
     case "openrouter":
-      return openrouterComplete(args)
+      return openrouterComplete(call)
     default: {
       const _exhaustive: never = provider
       return _exhaustive

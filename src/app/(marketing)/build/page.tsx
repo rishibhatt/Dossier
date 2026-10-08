@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 
+import "@/styles/build-flow.css"
 import { DossierPortfolioWorkspace } from "@/features/dossier/components/DossierPortfolioWorkspace"
 import { buildPageMetadata } from "@/config/seo"
 import { messages } from "@/config/messages"
@@ -13,7 +14,7 @@ export const metadata: Metadata = buildPageMetadata({
 
 export default function BuildPortfolioPage() {
   return (
-    <main className="workspace-redesign">
+    <main className="workspace-redesign site">
       <DossierPortfolioWorkspace />
     </main>
   )

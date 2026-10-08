@@ -2,8 +2,9 @@
 
 import { usePathname } from "next/navigation"
 
-import { MarketingNavbar } from "@/components/organisms/MarketingNavbar"
-import { MarketingSiteFooter } from "@/features/landing/components/MarketingSiteFooter"
+import { SiteFooter } from "@/components/marketing/SiteFooter"
+import { SiteHeader } from "@/components/marketing/SiteHeader"
+import { SmoothScroll } from "@/components/marketing/motion/SmoothScroll"
 import { ROUTES } from "@/lib/constants/routes"
 import { cn } from "@/lib/utils"
 
@@ -12,21 +13,21 @@ type MarketingLayoutTemplateProps = {
   className?: string
 }
 
-/** Portfolio studio (`/build`) uses its own full-height chrome — skip marketing nav + footer. */
+/** The builder (`/build`) has its own full-height chrome. Every other public page gets the site shell. */
 export function MarketingLayoutTemplate({ children, className }: MarketingLayoutTemplateProps) {
   const pathname = usePathname()
-  const pageOwnsChrome =
-    pathname === ROUTES.home || pathname === ROUTES.build || pathname?.startsWith(`${ROUTES.build}/`)
+  const builderOwnsChrome = pathname === ROUTES.build || pathname?.startsWith(`${ROUTES.build}/`)
 
-  if (pageOwnsChrome) {
+  if (builderOwnsChrome) {
     return <div className={cn("min-h-dvh bg-background", className)}>{children}</div>
   }
 
   return (
-    <div className={cn("flex min-h-screen flex-col bg-background", className)}>
-      <MarketingNavbar />
-      <div className="flex flex-1 flex-col pt-[var(--marketing-nav-height)]">{children}</div>
-      <MarketingSiteFooter />
+    <div className={cn("site flex min-h-dvh flex-col", className)}>
+      <SmoothScroll />
+      <SiteHeader />
+      <main className="flex-1">{children}</main>
+      <SiteFooter />
     </div>
   )
 }

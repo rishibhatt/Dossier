@@ -14,6 +14,7 @@ import { useRef } from "react"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { resolveVariant } from "@/components/portfolio/sections/registry"
 import { SECTION_VARIANT_CYCLE } from "@/lib/portfolio/sectionVariantPools"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
 import type { DesignSectionPlan } from "@/types/designEngine"
@@ -33,8 +34,8 @@ export function SectionEditToolbar({ section, plan, dragAttributes, dragListener
   const deleteSection = usePortfolioStore((s) => s.deleteSection)
   const cycleSectionVariant = usePortfolioStore((s) => s.cycleSectionVariant)
   const setSectionSurfaceOverride = usePortfolioStore((s) => s.setSectionSurfaceOverride)
-  const updateSection = usePortfolioStore((s) => s.updateSection)
-  const updateProjectItem = usePortfolioStore((s) => s.updateProjectItem)
+  const updateSectionById = usePortfolioStore((s) => s.updateSectionById)
+  const updateSectionItem = usePortfolioStore((s) => s.updateSectionItem)
   const hiddenSectionIds = usePortfolioStore((s) => s.hiddenSectionIds)
   const overrides = usePortfolioStore((s) => s.sectionSurfaceOverrides)
   const hidden = Boolean(hiddenSectionIds[section.id])
@@ -46,7 +47,7 @@ export function SectionEditToolbar({ section, plan, dragAttributes, dragListener
     const reader = new FileReader()
     reader.onload = () => {
       const url = typeof reader.result === "string" ? reader.result : null
-      if (url) updateSection("hero", { imageUrl: url })
+      if (url) updateSectionById(section.id, { imageUrl: url })
     }
     reader.readAsDataURL(f)
     e.target.value = ""
@@ -58,20 +59,20 @@ export function SectionEditToolbar({ section, plan, dragAttributes, dragListener
     const reader = new FileReader()
     reader.onload = () => {
       const url = typeof reader.result === "string" ? reader.result : null
-      if (url) updateProjectItem(0, { imageUrl: url })
+      if (url) updateSectionItem(section.id, 0, { imageUrl: url })
     }
     reader.readAsDataURL(f)
     e.target.value = ""
   }
 
   const pool = SECTION_VARIANT_CYCLE[section.type]
-  const variantHint = `${plan.variant.slice(0, 24)}${plan.variant.length > 24 ? "…" : ""} · ${pool.length} styles`
+  const variantHint = `Layout: ${resolveVariant(section.type, plan.variant)} (${pool.length} styles)`
 
   return (
     <div
       className={cn(
         "pointer-events-auto absolute right-2 top-2 z-20 flex flex-wrap items-center gap-1 rounded-lg border border-[var(--de-border)] bg-[var(--de-elevated)]/95 p-1 shadow-md backdrop-blur-sm",
-        "opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
+        "opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100"
       )}
       onPointerDown={(e) => e.stopPropagation()}
     >
@@ -114,7 +115,7 @@ export function SectionEditToolbar({ section, plan, dragAttributes, dragListener
           type="button"
           size="sm"
           variant="ghost"
-          className="h-8 px-1 text-[10px] text-[var(--de-muted)]"
+          className="h-8 px-1 text-xs text-[var(--de-muted)]"
           onClick={() => setSectionSurfaceOverride(section.id, null)}
         >
           clear

@@ -4,7 +4,7 @@
  * extra sections (certifications, extracurricular), and inferred signals.
  */
 
-import { extractStructuredResume } from "@/lib/pdf/extractSections"
+import { extractStructuredResume, type ResumeData } from "@/lib/pdf/extractSections"
 import type { DesignDirectionId } from "@/types/resolvedDesignConfig"
 import type { DesignUserType } from "@/types/designEngine"
 import type { EducationEntry, ExperienceEntry, ProjectEntry, PortfolioDocument } from "@/types/dossier"
@@ -624,46 +624,6 @@ function normalizeLines(raw: string): string[] {
     .filter((l) => l.length > 0)
 }
 
-function headerIndex(lines: string[], labels: string[]): number {
-  const upperLines = lines.map((l) => l.toUpperCase().replace(/[:#]/g, "").trim())
-  for (let i = 0; i < upperLines.length; i++) {
-    const line = upperLines[i]
-    for (const label of labels) {
-      if (line === label || line.startsWith(`${label} `) || line === `${label}:`) {
-        return i
-      }
-    }
-  }
-  return -1
-}
-
-function sliceBetween(lines: string[], startIdx: number, endIdx: number): string[] {
-  if (startIdx < 0) return []
-  const end = endIdx < 0 ? lines.length : endIdx
-  return lines.slice(startIdx + 1, end)
-}
-
-function nextSectionEnd(lines: string[], fromIdx: number, allStarts: number[]): number {
-  const sorted = allStarts.filter((i) => i > fromIdx).sort((a, b) => a - b)
-  return sorted.length ? sorted[0] : lines.length
-}
-
-function parseListBlock(block: string): string[] {
-  const lines = block.split(/\n/).map((l) => l.trim()).filter(Boolean)
-  const items: string[] = []
-  for (const line of lines) {
-    const cleaned = line.replace(/^[-*•\u2022]\s*/, "").replace(/^\d+[.)]\s*/, "").trim()
-    if (cleaned.length > 1 && cleaned.length < 400) items.push(cleaned)
-  }
-  if (items.length === 0 && block.trim()) {
-    return block
-      .split(/[,;|]/)
-      .map((s) => s.trim())
-      .filter((s) => s.length > 2 && s.length < 200)
-  }
-  return items
-}
-
 function splitDescriptionToBullets(description: string): string[] {
   const d = description.trim()
   if (!d) return []
@@ -945,7 +905,7 @@ function mapEducation(e: EducationEntry): ParsedEducation {
 }
 
 function mapExperience(e: ExperienceEntry): ParsedExperience {
-  const bullets = splitDescriptionToBullets(e.description)
+  const bullets = e.highlights?.length ? e.highlights : splitDescriptionToBullets(e.description)
   const techStack = extractTechFromCorpus(`${e.role} ${e.company} ${e.description}`)
   return {
     company: e.company,
@@ -962,58 +922,24 @@ function mapProject(p: ProjectEntry, globalLinks: string[]): ParsedProject {
     name: p.name,
     description: p.description,
     techStack,
-    links: parseProjectLinks(p.description, globalLinks),
+    links: parseProjectLinks(`${p.description} ${p.link ?? ""}`, globalLinks),
   }
-}
-
-function extractExtraSections(rawText: string): { certifications: string[]; extracurricular: string[] } {
-  const lines = normalizeLines(rawText)
-  const certIdx = headerIndex(lines, [
-    "CERTIFICATIONS",
-    "CERTIFICATES",
-    "LICENSES",
-    "LICENSE",
-    "CREDENTIALS",
-  ])
-  const extraIdx = headerIndex(lines, [
-    "EXTRACURRICULAR",
-    "EXTRACURRICULAR ACTIVITIES",
-    "VOLUNTEER",
-    "VOLUNTEERING",
-    "ACTIVITIES",
-    "LEADERSHIP",
-    "AWARDS",
-    "HONORS",
-  ])
-  const summaryIdx = headerIndex(lines, ["SUMMARY", "PROFILE", "OBJECTIVE", "ABOUT"])
-  const expIdx = headerIndex(lines, ["EXPERIENCE", "WORK EXPERIENCE", "PROFESSIONAL EXPERIENCE", "EMPLOYMENT"])
-  const projIdx = headerIndex(lines, ["PROJECTS", "SELECTED PROJECTS", "KEY PROJECTS"])
-  const eduIdx = headerIndex(lines, ["EDUCATION", "ACADEMIC"])
-  const skillsIdx = headerIndex(lines, ["SKILLS", "TECHNICAL SKILLS", "CORE COMPETENCIES", "COMPETENCIES"])
-
-  const starts = [summaryIdx, expIdx, projIdx, eduIdx, skillsIdx, certIdx, extraIdx].filter((i) => i >= 0)
-
-  let certifications: string[] = []
-  let extracurricular: string[] = []
-
-  if (certIdx >= 0) {
-    const end = nextSectionEnd(lines, certIdx, starts)
-    certifications = parseListBlock(sliceBetween(lines, certIdx, end).join("\n"))
-  }
-  if (extraIdx >= 0) {
-    const end = nextSectionEnd(lines, extraIdx, starts)
-    extracurricular = parseListBlock(sliceBetween(lines, extraIdx, end).join("\n"))
-  }
-
-  return { certifications, extracurricular }
 }
 
 /**
  * Parse raw resume text into structured fields plus inferred design signals.
  */
 export function parseResume(rawText: string): ParsedResume {
-  const structured = extractStructuredResume(rawText)
-  const { certifications, extracurricular } = extractExtraSections(rawText)
+  return parsedFromStructured(extractStructuredResume(rawText), rawText)
+}
+
+/**
+ * Design signals from resume data that was already read (regex pass, or the AI read merged with it).
+ * Does not re-run extraction. `rawText` is only used for the location fallback and keyword corpus extras.
+ */
+export function parsedFromStructured(structured: ResumeData, rawText: string): ParsedResume {
+  const certifications = structured.certifications.map((c) => [c.name, c.issuer, c.year].filter(Boolean).join(", "))
+  const extracurricular = structured.extracurricular
   const lines = normalizeLines(rawText)
   const { linkedin, github, website } = classifyLinks(structured.contact.links)
 
@@ -1059,7 +985,7 @@ export function parseResume(rawText: string): ParsedResume {
       linkedin,
       github,
       website,
-      location: inferLocation(lines, rawText),
+      location: structured.location || inferLocation(lines, rawText),
     },
     summary: structured.summary,
     experience,

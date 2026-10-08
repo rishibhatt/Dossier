@@ -2,86 +2,88 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu } from "lucide-react"
+import { CreditCard, Gift, LayoutGrid, Settings } from "lucide-react"
 
-import { BrandLogo } from "@/components/atoms/BrandLogo"
-import { buttonVariants } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { messages } from "@/config/messages"
-import { dashboardNavItems } from "@/config/navigation"
+import { ROUTES } from "@/lib/constants/routes"
 import { cn } from "@/lib/utils"
 
-function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
-  const pathname = usePathname()
+const NAV = [
+  { id: "portfolios", href: ROUTES.dashboard, label: messages.dashboard.nav.portfolios, Icon: LayoutGrid },
+  { id: "referrals", href: ROUTES.referrals, label: messages.dashboard.nav.referrals, Icon: Gift },
+  { id: "billing", href: ROUTES.billing, label: messages.dashboard.nav.billing, Icon: CreditCard },
+  { id: "settings", href: ROUTES.settings, label: messages.dashboard.nav.settings, Icon: Settings },
+] as const
 
-  return (
-    <nav className="flex flex-col gap-1" aria-label={messages.dashboard.mobileNavTitle}>
-      {dashboardNavItems.map((item) => {
-        const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
-        return (
-          <Link
-            key={item.id}
-            href={item.href}
-            onClick={onNavigate}
-            className={cn(
-              "typo-body-md rounded-md px-3 py-2 transition-colors",
-              active
-                ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
-            )}
-          >
-            {item.label}
-          </Link>
-        )
-      })}
-    </nav>
-  )
+function useIsActive() {
+  const pathname = usePathname()
+  return (href: string) => (href === ROUTES.dashboard ? pathname === href : pathname.startsWith(href))
 }
 
 type AppSidebarProps = {
+  /** Plan chip and usage, shown at the foot of the desktop sidebar. */
   footer?: React.ReactNode
 }
 
+/** Desktop: sticky sidebar. Below `md`: a fixed bottom tab bar (the top bar lives in the shell). */
 export function AppSidebar({ footer }: AppSidebarProps) {
+  const isActive = useIsActive()
+
   return (
     <>
-      <aside className="hidden w-64 shrink-0 border-r border-sidebar-border bg-sidebar md:flex md:flex-col">
-        <div className="flex h-14 items-center border-b border-sidebar-border px-4">
-          <BrandLogo className="typo-h3 text-sidebar-foreground" />
-        </div>
-        <ScrollArea className="flex-1 px-3 py-4">
-          <NavLinks />
-        </ScrollArea>
-        {footer ? (
-          <div className="border-t border-sidebar-border p-3">
-            <Separator className="mb-3 bg-sidebar-border" />
-            {footer}
-          </div>
-        ) : null}
+      <aside className="sticky top-16 hidden h-[calc(100dvh-4rem)] w-64 shrink-0 flex-col border-r border-[var(--site-rule)] bg-[var(--site-paper-deep)]/60 md:flex">
+        <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Dashboard">
+          <ul className="flex flex-col gap-1">
+            {NAV.map(({ id, href, label, Icon }) => {
+              const active = isActive(href)
+              return (
+                <li key={id}>
+                  <Link
+                    href={href}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors",
+                      active
+                        ? "bg-white text-[var(--site-ink)] shadow-[inset_0_0_0_1px_var(--site-rule-strong)]"
+                        : "text-[var(--site-ink-2)] hover:bg-black/[0.05] hover:text-[var(--site-ink)]"
+                    )}
+                  >
+                    <Icon className={cn("size-[1.125rem] shrink-0", active && "text-[var(--site-accent-ink)]")} aria-hidden />
+                    {label}
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        </nav>
+        {footer ? <div className="p-3">{footer}</div> : null}
       </aside>
 
-      <div className="flex items-center gap-2 border-b border-border px-3 py-2 md:hidden">
-        <Sheet>
-          <SheetTrigger
-            className={buttonVariants({ variant: "outline", size: "icon-sm" })}
-            aria-label={messages.dashboard.sidebarToggle}
-          >
-            <Menu className="size-4" />
-          </SheetTrigger>
-          <SheetContent side="left" className="w-72 p-0">
-            <SheetHeader className="border-b border-border px-4 py-3 text-left">
-              <SheetTitle className="typo-h3">{messages.common.appName}</SheetTitle>
-            </SheetHeader>
-            <div className="px-3 py-4">
-              <NavLinks />
-            </div>
-            {footer ? <div className="border-t border-border px-3 py-4">{footer}</div> : null}
-          </SheetContent>
-        </Sheet>
-        <BrandLogo className="min-w-0 flex-1 truncate" />
-      </div>
+      <nav
+        aria-label="Dashboard"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--site-rule-strong)] bg-white pb-[env(safe-area-inset-bottom)] md:hidden"
+      >
+        <ul className="grid grid-cols-4">
+          {NAV.map(({ id, href, label, Icon }) => {
+            const active = isActive(href)
+            return (
+              <li key={id}>
+                <Link
+                  href={href}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "flex min-h-14 flex-col items-center justify-center gap-1 text-[0.6875rem] font-semibold transition-colors",
+                    active ? "text-[var(--site-accent-ink)]" : "text-[var(--site-ink-2)] hover:text-[var(--site-ink)]"
+                  )}
+                >
+                  <Icon className="size-5" aria-hidden />
+                  {label}
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      </nav>
     </>
   )
 }

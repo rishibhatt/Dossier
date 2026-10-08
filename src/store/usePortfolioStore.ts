@@ -1,38 +1,30 @@
 import { arrayMove } from "@dnd-kit/sortable"
 import { create } from "zustand"
 
+import { resolveVariant, VARIANT_IDS } from "@/components/portfolio/sections/registry"
+import type { TextPath } from "@/components/portfolio/sections/types"
 import { DEFAULT_GENERATION_CONTEXT } from "@/lib/design/generationContext"
 import type { PortfolioStylePreset } from "@/lib/design/stylePrompts"
 import { createEmptySection } from "@/lib/portfolio/createEmptySection"
+export { listAddableSections, type AddableSection } from "@/lib/portfolio/createEmptySection"
 import { STUDIO_DESIGN_PRESETS, type StudioDesignPresetId } from "@/lib/portfolio/designTokenPresets"
 import { ensurePortfolioMeta } from "@/lib/portfolio/ensurePortfolioMeta"
-import { SECTION_VARIANT_CYCLE } from "@/lib/portfolio/sectionVariantPools"
-import type {
-  ExperienceEntry,
-  PortfolioDocument,
-  PortfolioSection,
-  PortfolioSectionType,
-  ProjectEntry,
-} from "@/types/dossier"
+import { templateVariant } from "@/lib/portfolio/pairSections"
+import { insertIndex, patchSectionData, patchSectionItem, setTextField } from "@/lib/portfolio/sectionEdits"
+import type { ExperienceEntry, PortfolioDocument, PortfolioSection, PortfolioSectionType, ProjectEntry } from "@/types/dossier"
 import type { ParsedResume } from "@/lib/parseResume"
 import type { DesignConfig } from "@/types/designEngine"
 import type { DesignColorTokens, DesignEffectsTokens, DesignSpacingTokens, DesignTypographyTokens } from "@/types/resolvedDesignConfig"
 
-type HeroData = Extract<PortfolioSection, { type: "hero" }>["data"]
-type AboutData = Extract<PortfolioSection, { type: "about" }>["data"]
-type SkillsData = Extract<PortfolioSection, { type: "skills" }>["data"]
-type ExperienceData = Extract<PortfolioSection, { type: "experience" }>["data"]
-type ProjectsData = Extract<PortfolioSection, { type: "projects" }>["data"]
-type ContactData = Extract<PortfolioSection, { type: "contact" }>["data"]
+type SectionDataMap = { [K in PortfolioSectionType]: Extract<PortfolioSection, { type: K }>["data"] }
 
-type SectionDataMap = {
-  hero: HeroData
-  about: AboutData
-  skills: SkillsData
-  experience: ExperienceData
-  projects: ProjectsData
-  contact: ContactData
+/** Owner view settings that travel with publish / preview / export. */
+export type PortfolioViewState = {
+  hiddenSectionIds?: readonly string[] | Record<string, boolean>
+  sectionSurfaceOverrides?: Record<string, { bg?: string }>
 }
+
+export type AddSectionOptions = { afterId?: string; variant?: string }
 
 export type PortfolioStylePreferences = {
   portfolioStylePreset: PortfolioStylePreset
@@ -62,7 +54,9 @@ export type PortfolioStoreState = {
     document: PortfolioDocument,
     designConfig: DesignConfig,
     prefs?: Partial<PortfolioStylePreferences>,
-    parsedResume?: ParsedResume | null
+    parsedResume?: ParsedResume | null,
+    /** Restore hidden sections / surface tints (e.g. from a saved draft). Omitted = reset. */
+    view?: PortfolioViewState
   ) => void
   reset: () => void
   setEditMode: (on: boolean) => void
@@ -72,17 +66,34 @@ export type PortfolioStoreState = {
   deleteSection: (sectionId: string) => void
   cycleSectionVariant: (sectionId: string) => void
   updateMeta: (patch: Partial<PortfolioDocument["meta"]>) => void
-  /** Shallow-merge into the first section of `type` (AI output uses one block per type). */
+  /** Legacy: shallow-merge into the FIRST section of `type`. Prefer updateSectionById. */
   updateSection: <T extends PortfolioSectionType>(type: T, patch: Partial<SectionDataMap[T]>) => void
+  /** Shallow-merge into one section's data, by id. */
+  updateSectionById: (sectionId: string, patch: Record<string, unknown>) => void
+  /** Shallow-merge into `data.items[index]` of one section, by id. */
+  updateSectionItem: (sectionId: string, index: number, patch: Record<string, unknown>) => void
+  /** Write one canvas text field (used by EditableText). */
+  updateSectionField: (path: TextPath, value: string) => void
+  /** Append an item to a list section (any section whose data has `items`). */
+  addSectionItem: (sectionId: string, item: unknown) => void
+  removeSectionItem: (sectionId: string, index: number) => void
+  /** Legacy (first experience section). */
   updateExperienceItem: (index: number, patch: Partial<ExperienceEntry>) => void
+  /** Legacy (first projects section). */
   updateProjectItem: (index: number, patch: Partial<ProjectEntry>) => void
+  /** Legacy (first skills section). */
   setSkillItems: (items: string[]) => void
-  /** Update a single skill chip by index (canvas inline edit). */
+  /** Legacy (first skills section). */
   updateSkillItem: (index: number, value: string) => void
   setSectionNickname: (sectionId: string, name: string) => void
   setSectionVariantBySectionId: (sectionId: string, variant: string) => void
   moveSectionById: (sectionId: string, direction: -1 | 1) => void
-  addSection: (type: PortfolioSectionType, variant: string) => void
+  /**
+   * Insert a new section and return its id. Second arg: a variant id (legacy) or { afterId?, variant? }.
+   * Position: after `afterId`, else just before contact (hero always first).
+   */
+  addSection: (type: PortfolioSectionType, variantOrOptions?: string | AddSectionOptions) => string | null
+  /** Studio "regenerate section": switches to the next layout variant. Never edits the person's text. */
   mockRegenerateSection: (sectionId: string) => void
   patchDesignTokens: (patch: {
     colors?: Partial<DesignColorTokens>
@@ -93,405 +104,287 @@ export type PortfolioStoreState = {
   applyDesignPreset: (preset: StudioDesignPresetId) => void
 }
 
-function replaceSection(
-  sections: readonly PortfolioSection[],
-  nextSection: PortfolioSection
-): PortfolioSection[] {
-  return sections.map((s) => (s.id === nextSection.id ? nextSection : s))
-}
-
 const styleInitial: PortfolioStylePreferences = {
   portfolioStylePreset: DEFAULT_GENERATION_CONTEXT.portfolioStylePreset,
   portfolioDesignNotes: DEFAULT_GENERATION_CONTEXT.designNotes,
   generationVariation: DEFAULT_GENERATION_CONTEXT.variationSeed,
 }
 
-export const usePortfolioStore = create<PortfolioStoreState>((set, get) => ({
-  document: null,
-  designConfig: null,
-  parsedResume: null,
-  editMode: false,
-  hiddenSectionIds: {},
-  sectionSurfaceOverrides: {},
-  sectionNicknames: {},
-  ...styleInitial,
+const viewReset = { hiddenSectionIds: {}, sectionSurfaceOverrides: {}, sectionNicknames: {} }
 
-  setDocument: (document) =>
-    set({
-      document: document ? ensurePortfolioMeta(document) : null,
-      designConfig: null,
-      parsedResume: null,
-      editMode: false,
-      hiddenSectionIds: {},
-      sectionSurfaceOverrides: {},
-      sectionNicknames: {},
-    }),
+function hiddenMap(h: PortfolioViewState["hiddenSectionIds"]): Record<string, boolean> {
+  if (!h) return {}
+  return Array.isArray(h) ? Object.fromEntries(h.map((id) => [id, true])) : { ...(h as Record<string, boolean>) }
+}
 
-  setDesignConfig: (designConfig) => set({ designConfig }),
+/** Publish / preview / export body fields (the PublishView contract). */
+export function selectPublishView(s: Pick<PortfolioStoreState, "hiddenSectionIds" | "sectionSurfaceOverrides">) {
+  return {
+    hiddenSectionIds: Object.entries(s.hiddenSectionIds).filter(([, v]) => v).map(([k]) => k),
+    sectionSurfaceOverrides: s.sectionSurfaceOverrides,
+  }
+}
 
-  hydratePortfolio: (document, designConfig, prefs, parsedResume) =>
-    set((s) => ({
-      document: ensurePortfolioMeta(document),
-      designConfig,
-      parsedResume: parsedResume ?? s.parsedResume,
-      portfolioStylePreset: prefs?.portfolioStylePreset ?? s.portfolioStylePreset,
-      portfolioDesignNotes: prefs?.portfolioDesignNotes ?? s.portfolioDesignNotes,
-      generationVariation: prefs?.generationVariation ?? s.generationVariation,
-      hiddenSectionIds: {},
-      sectionSurfaceOverrides: {},
-      sectionNicknames: {},
-    })),
+const firstIdOf = (doc: PortfolioDocument, type: PortfolioSectionType) => doc.sections.find((s) => s.type === type)?.id
 
-  reset: () =>
-    set({
-      document: null,
-      designConfig: null,
-      parsedResume: null,
-      editMode: false,
-      hiddenSectionIds: {},
-      sectionSurfaceOverrides: {},
-      sectionNicknames: {},
-      ...styleInitial,
-    }),
-
-  setEditMode: (on) => set({ editMode: on }),
-
-  toggleSectionHidden: (sectionId) =>
-    set((s) => ({
-      hiddenSectionIds: {
-        ...s.hiddenSectionIds,
-        [sectionId]: !s.hiddenSectionIds[sectionId],
-      },
-    })),
-
-  setSectionSurfaceOverride: (sectionId, patch) =>
-    set((s) => {
-      const next = { ...s.sectionSurfaceOverrides }
-      if (patch === null) {
-        delete next[sectionId]
-        return { sectionSurfaceOverrides: next }
-      }
-      const merged = { ...next[sectionId], ...patch }
-      if (!merged.bg?.trim()) {
-        delete next[sectionId]
-      } else {
-        next[sectionId] = merged
-      }
-      return { sectionSurfaceOverrides: next }
-    }),
-
-  reorderSections: (activeSectionId, overSectionId) => {
+export const usePortfolioStore = create<PortfolioStoreState>((set, get) => {
+  /** Apply a pure document edit. */
+  const editDoc = (fn: (doc: PortfolioDocument) => PortfolioDocument) => {
     const doc = get().document
-    const cfg = get().designConfig
-    if (!doc || !cfg || activeSectionId === overSectionId) return
-    const ids = doc.sections.map((x) => x.id)
-    const oldI = ids.indexOf(activeSectionId)
-    const newI = ids.indexOf(overSectionId)
-    if (oldI < 0 || newI < 0) return
-    const nextSections = arrayMove([...doc.sections], oldI, newI)
-    const nextPlans = arrayMove([...cfg.sections], oldI, newI)
-    const sectionOrder = nextSections.map((x) => x.type)
-    set({
-      document: { ...doc, sections: nextSections },
-      designConfig: {
-        ...cfg,
-        sections: nextPlans,
-        layout: { ...cfg.layout, sectionOrder },
-      },
-    })
-  },
+    if (doc) set({ document: fn(doc) })
+  }
 
-  deleteSection: (sectionId) => {
+  /** Move sections and their plans together so they stay index-aligned. */
+  const setOrder = (sections: PortfolioSection[], plans: DesignConfig["sections"]) => {
+    const cfg = get().designConfig!
+    set({
+      document: { ...get().document!, sections },
+      designConfig: { ...cfg, sections: plans, layout: { ...cfg.layout, sectionOrder: sections.map((x) => x.type) } },
+    })
+  }
+
+  const setVariant = (sectionId: string, pick: (current: string, type: PortfolioSectionType) => string) => {
     const doc = get().document
     const cfg = get().designConfig
     if (!doc || !cfg) return
     const idx = doc.sections.findIndex((s) => s.id === sectionId)
-    if (idx < 0 || doc.sections.length <= 1) return
-    const nextSections = doc.sections.filter((s) => s.id !== sectionId)
-    const nextPlans = cfg.sections.filter((_, i) => i !== idx)
-    const sectionOrder = nextSections.map((s) => s.type)
-    const hidden = { ...get().hiddenSectionIds }
-    delete hidden[sectionId]
-    const overrides = { ...get().sectionSurfaceOverrides }
-    delete overrides[sectionId]
-    const nick = { ...get().sectionNicknames }
-    delete nick[sectionId]
-    set({
-      document: { ...doc, sections: nextSections },
-      designConfig: {
-        ...cfg,
-        sections: nextPlans,
-        layout: { ...cfg.layout, sectionOrder },
-      },
-      hiddenSectionIds: hidden,
-      sectionSurfaceOverrides: overrides,
-      sectionNicknames: nick,
-    })
-  },
-
-  cycleSectionVariant: (sectionId) => {
-    const doc = get().document
-    const cfg = get().designConfig
-    if (!doc || !cfg) return
-    const idx = doc.sections.findIndex((s) => s.id === sectionId)
-    if (idx < 0) return
     const section = doc.sections[idx]
-    const plan = cfg.sections[idx]
-    if (!plan || plan.type !== section.type) return
-    const pool = [...SECTION_VARIANT_CYCLE[section.type]]
-    const cur = plan.variant
-    const i = pool.findIndex((v) => v.toLowerCase() === cur.toLowerCase())
-    const nextVariant = pool[(i < 0 ? 0 : i + 1) % pool.length]
-    const nextPlans = cfg.sections.map((p, j) => (j === idx ? { ...p, variant: nextVariant } : p))
-    set({ designConfig: { ...cfg, sections: nextPlans } })
-  },
+    if (!section) return
+    const plans = [...cfg.sections]
+    const current = plans[idx]?.type === section.type ? plans[idx]!.variant : ""
+    plans[idx] = { type: section.type, variant: pick(current, section.type) }
+    set({ designConfig: { ...cfg, sections: plans } })
+  }
 
-  updateMeta: (patch) => {
-    const doc = get().document
-    if (!doc) return
-    set({ document: { ...doc, meta: { ...doc.meta, ...patch } } })
-  },
+  const nextVariant = (current: string, type: PortfolioSectionType) => {
+    const ids = VARIANT_IDS[type]
+    const cur = resolveVariant(type, current, templateVariant(get().designConfig!, type))
+    return ids[(ids.indexOf(cur) + 1) % ids.length]!
+  }
 
-  updateSection: (type, patch) => {
-    const doc = get().document
-    if (!doc) return
-    const idx = doc.sections.findIndex((s) => s.type === type)
-    if (idx === -1) return
-    const current = doc.sections[idx]
-    if (current.type !== type) return
-    const nextData = { ...current.data, ...patch } as (typeof current)["data"]
-    const nextSection = { ...current, data: nextData } as PortfolioSection
-    set({ document: { ...doc, sections: replaceSection(doc.sections, nextSection) } })
-  },
+  return {
+    document: null,
+    designConfig: null,
+    parsedResume: null,
+    editMode: false,
+    ...viewReset,
+    ...styleInitial,
 
-  updateExperienceItem: (index, patch) => {
-    const doc = get().document
-    if (!doc) return
-    const idx = doc.sections.findIndex((s) => s.type === "experience")
-    if (idx === -1) return
-    const s = doc.sections[idx]
-    if (s.type !== "experience") return
-    const items = s.data.items.map((it, i) => (i === index ? { ...it, ...patch } : it))
-    const nextSection: PortfolioSection = { ...s, data: { items } }
-    set({ document: { ...doc, sections: replaceSection(doc.sections, nextSection) } })
-  },
+    setDocument: (document) =>
+      set({
+        document: document ? ensurePortfolioMeta(document) : null,
+        designConfig: null,
+        parsedResume: null,
+        editMode: false,
+        ...viewReset,
+      }),
 
-  updateProjectItem: (index, patch) => {
-    const doc = get().document
-    if (!doc) return
-    const idx = doc.sections.findIndex((s) => s.type === "projects")
-    if (idx === -1) return
-    const s = doc.sections[idx]
-    if (s.type !== "projects") return
-    const items = s.data.items.map((it, i) => (i === index ? { ...it, ...patch } : it))
-    const nextSection: PortfolioSection = { ...s, data: { items } }
-    set({ document: { ...doc, sections: replaceSection(doc.sections, nextSection) } })
-  },
+    setDesignConfig: (designConfig) => set({ designConfig }),
 
-  setSkillItems: (items) => {
-    const doc = get().document
-    if (!doc) return
-    const idx = doc.sections.findIndex((s) => s.type === "skills")
-    if (idx === -1) return
-    const s = doc.sections[idx]
-    if (s.type !== "skills") return
-    const nextSection: PortfolioSection = { ...s, data: { items } }
-    set({ document: { ...doc, sections: replaceSection(doc.sections, nextSection) } })
-  },
+    hydratePortfolio: (document, designConfig, prefs, parsedResume, view) =>
+      set((s) => ({
+        document: ensurePortfolioMeta(document),
+        designConfig,
+        parsedResume: parsedResume ?? s.parsedResume,
+        portfolioStylePreset: prefs?.portfolioStylePreset ?? s.portfolioStylePreset,
+        portfolioDesignNotes: prefs?.portfolioDesignNotes ?? s.portfolioDesignNotes,
+        generationVariation: prefs?.generationVariation ?? s.generationVariation,
+        ...viewReset,
+        ...(view
+          ? { hiddenSectionIds: hiddenMap(view.hiddenSectionIds), sectionSurfaceOverrides: { ...(view.sectionSurfaceOverrides ?? {}) } }
+          : {}),
+      })),
 
-  updateSkillItem: (index, value) => {
-    const doc = get().document
-    if (!doc) return
-    const idx = doc.sections.findIndex((s) => s.type === "skills")
-    if (idx === -1) return
-    const s = doc.sections[idx]
-    if (s.type !== "skills") return
-    const items = [...s.data.items]
-    if (index < 0 || index >= items.length) return
-    items[index] = value.trim() || items[index]
-    const nextSection: PortfolioSection = { ...s, data: { items } }
-    set({ document: { ...doc, sections: replaceSection(doc.sections, nextSection) } })
-  },
+    reset: () => set({ document: null, designConfig: null, parsedResume: null, editMode: false, ...viewReset, ...styleInitial }),
 
-  setSectionNickname: (sectionId, name) =>
-    set((s) => {
-      const next = { ...s.sectionNicknames }
-      const t = name.trim()
-      if (!t) delete next[sectionId]
-      else next[sectionId] = t
-      return { sectionNicknames: next }
-    }),
+    setEditMode: (on) => set({ editMode: on }),
 
-  setSectionVariantBySectionId: (sectionId, variant) => {
-    const doc = get().document
-    const cfg = get().designConfig
-    if (!doc || !cfg) return
-    const idx = doc.sections.findIndex((s) => s.id === sectionId)
-    if (idx < 0 || !cfg.sections[idx]) return
-    const nextPlans = cfg.sections.map((p, i) => (i === idx ? { ...p, variant } : p))
-    set({ designConfig: { ...cfg, sections: nextPlans } })
-  },
+    toggleSectionHidden: (sectionId) =>
+      set((s) => ({ hiddenSectionIds: { ...s.hiddenSectionIds, [sectionId]: !s.hiddenSectionIds[sectionId] } })),
 
-  moveSectionById: (sectionId, direction) => {
-    const doc = get().document
-    const cfg = get().designConfig
-    if (!doc || !cfg) return
-    const idx = doc.sections.findIndex((s) => s.id === sectionId)
-    const j = idx + direction
-    if (idx < 0 || j < 0 || j >= doc.sections.length) return
-    const nextSections = arrayMove([...doc.sections], idx, j)
-    const nextPlans = arrayMove([...cfg.sections], idx, j)
-    const sectionOrder = nextSections.map((x) => x.type)
-    set({
-      document: { ...doc, sections: nextSections },
-      designConfig: {
-        ...cfg,
-        sections: nextPlans,
-        layout: { ...cfg.layout, sectionOrder },
-      },
-    })
-  },
+    setSectionSurfaceOverride: (sectionId, patch) =>
+      set((s) => {
+        const next = { ...s.sectionSurfaceOverrides }
+        const merged = patch === null ? {} : { ...next[sectionId], ...patch }
+        if (!merged.bg?.trim()) delete next[sectionId]
+        else next[sectionId] = merged
+        return { sectionSurfaceOverrides: next }
+      }),
 
-  addSection: (type, variant) => {
-    const doc = get().document
-    const cfg = get().designConfig
-    if (!doc || !cfg) return
-    const section = createEmptySection(type)
-    const plan = { type, variant }
-    const nextSections = [...doc.sections, section]
-    const nextPlans = [...cfg.sections, plan]
-    const sectionOrder = nextSections.map((x) => x.type)
-    set({
-      document: { ...doc, sections: nextSections },
-      designConfig: {
-        ...cfg,
-        sections: nextPlans,
-        layout: { ...cfg.layout, sectionOrder },
-      },
-    })
-  },
+    reorderSections: (activeSectionId, overSectionId) => {
+      const doc = get().document
+      const cfg = get().designConfig
+      if (!doc || !cfg || activeSectionId === overSectionId) return
+      const ids = doc.sections.map((x) => x.id)
+      const from = ids.indexOf(activeSectionId)
+      const to = ids.indexOf(overSectionId)
+      if (from < 0 || to < 0) return
+      setOrder(arrayMove([...doc.sections], from, to), arrayMove([...cfg.sections], from, to))
+    },
 
-  mockRegenerateSection: (sectionId) => {
-    const doc = get().document
-    if (!doc) return
-    const idx = doc.sections.findIndex((s) => s.id === sectionId)
-    if (idx < 0) return
-    const s = doc.sections[idx]!
-    let nextSection: PortfolioSection = s
-    if (s.type === "hero") {
-      const tag = s.data.tagline.replace(/\s*·\s*mock refresh\s*$/i, "")
-      nextSection = { ...s, data: { ...s.data, tagline: `${tag} · mock refresh` } }
-    } else if (s.type === "skills") {
-      const items = [...s.data.items].sort(() => Math.random() - 0.5)
-      nextSection = { ...s, data: { items } }
-    } else if (s.type === "about") {
-      const body = s.data.body.endsWith("\n\n— refreshed") ? s.data.body : `${s.data.body}\n\n— refreshed`
-      nextSection = { ...s, data: { body } }
-    } else if (s.type === "projects") {
-      nextSection = {
-        ...s,
-        data: {
-          items: s.data.items.map((p) => ({
-            ...p,
-            description: p.description.endsWith(" (variation)") ? p.description : `${p.description} (variation)`,
-          })),
+    moveSectionById: (sectionId, direction) => {
+      const doc = get().document
+      const cfg = get().designConfig
+      if (!doc || !cfg) return
+      const i = doc.sections.findIndex((s) => s.id === sectionId)
+      const j = i + direction
+      if (i < 0 || j < 0 || j >= doc.sections.length) return
+      setOrder(arrayMove([...doc.sections], i, j), arrayMove([...cfg.sections], i, j))
+    },
+
+    deleteSection: (sectionId) => {
+      const doc = get().document
+      const cfg = get().designConfig
+      if (!doc || !cfg) return
+      const idx = doc.sections.findIndex((s) => s.id === sectionId)
+      if (idx < 0 || doc.sections.length <= 1) return
+      const drop = <T,>(m: Record<string, T>) => Object.fromEntries(Object.entries(m).filter(([k]) => k !== sectionId))
+      setOrder(
+        doc.sections.filter((s) => s.id !== sectionId),
+        cfg.sections.filter((_, i) => i !== idx)
+      )
+      set((s) => ({
+        hiddenSectionIds: drop(s.hiddenSectionIds),
+        sectionSurfaceOverrides: drop(s.sectionSurfaceOverrides),
+        sectionNicknames: drop(s.sectionNicknames),
+      }))
+    },
+
+    cycleSectionVariant: (sectionId) => setVariant(sectionId, nextVariant),
+
+    setSectionVariantBySectionId: (sectionId, variant) => setVariant(sectionId, () => variant),
+
+    mockRegenerateSection: (sectionId) => setVariant(sectionId, nextVariant),
+
+    updateMeta: (patch) => editDoc((doc) => ({ ...doc, meta: { ...doc.meta, ...patch } })),
+
+    updateSectionById: (sectionId, patch) => editDoc((doc) => patchSectionData(doc, sectionId, patch)),
+
+    updateSectionItem: (sectionId, index, patch) => editDoc((doc) => patchSectionItem(doc, sectionId, index, patch)),
+
+    updateSectionField: (path, value) => editDoc((doc) => setTextField(doc, path, value)),
+
+    addSectionItem: (sectionId, item) =>
+      editDoc((doc) => {
+        const s = doc.sections.find((x) => x.id === sectionId)
+        const items = (s?.data as { items?: unknown[] } | undefined)?.items
+        return Array.isArray(items) ? patchSectionData(doc, sectionId, { items: [...items, item] }) : doc
+      }),
+
+    removeSectionItem: (sectionId, index) =>
+      editDoc((doc) => {
+        const s = doc.sections.find((x) => x.id === sectionId)
+        const items = (s?.data as { items?: unknown[] } | undefined)?.items
+        return Array.isArray(items) ? patchSectionData(doc, sectionId, { items: items.filter((_, i) => i !== index) }) : doc
+      }),
+
+    updateSection: (type, patch) =>
+      editDoc((doc) => {
+        const id = firstIdOf(doc, type)
+        return id ? patchSectionData(doc, id, patch as Record<string, unknown>) : doc
+      }),
+
+    updateExperienceItem: (index, patch) =>
+      editDoc((doc) => {
+        const id = firstIdOf(doc, "experience")
+        return id ? patchSectionItem(doc, id, index, patch) : doc
+      }),
+
+    updateProjectItem: (index, patch) =>
+      editDoc((doc) => {
+        const id = firstIdOf(doc, "projects")
+        return id ? patchSectionItem(doc, id, index, patch) : doc
+      }),
+
+    setSkillItems: (items) =>
+      editDoc((doc) => {
+        const id = firstIdOf(doc, "skills")
+        return id ? patchSectionData(doc, id, { items }) : doc
+      }),
+
+    updateSkillItem: (index, value) =>
+      editDoc((doc) => {
+        const id = firstIdOf(doc, "skills")
+        return id && value.trim() ? setTextField(doc, { sectionId: id, field: "item", index }, value.trim()) : doc
+      }),
+
+    setSectionNickname: (sectionId, name) =>
+      set((s) => {
+        const next = { ...s.sectionNicknames }
+        const t = name.trim()
+        if (!t) delete next[sectionId]
+        else next[sectionId] = t
+        return { sectionNicknames: next }
+      }),
+
+    addSection: (type, variantOrOptions) => {
+      const doc = get().document
+      const cfg = get().designConfig
+      if (!doc || !cfg) return null
+      if (type === "hero" && doc.sections.some((s) => s.type === "hero")) return null
+      const opts: AddSectionOptions = typeof variantOrOptions === "string" ? { variant: variantOrOptions } : (variantOrOptions ?? {})
+      const section = createEmptySection(type)
+      const variant = resolveVariant(type, opts.variant, templateVariant(cfg, type))
+      const at = insertIndex(doc, type, opts.afterId)
+      const sections = [...doc.sections]
+      const plans = [...cfg.sections]
+      sections.splice(at, 0, section)
+      plans.splice(Math.min(at, plans.length), 0, { type, variant })
+      setOrder(sections, plans)
+      return section.id
+    },
+
+    patchDesignTokens: (patch) => {
+      const cfg = get().designConfig
+      if (!cfg) return
+      const t = cfg.tokens
+      const colors = patch.colors
+        ? (() => {
+            const { gradients: pg, ...rest } = patch.colors
+            return { ...t.colors, ...rest, gradients: { ...t.colors.gradients, ...(pg ?? {}) } } as DesignColorTokens
+          })()
+        : t.colors
+      const pt = patch.typography
+      const typography = pt
+        ? {
+            ...t.typography,
+            ...pt,
+            scale: { ...t.typography.scale, ...(pt.scale ?? {}) },
+            weights: { ...t.typography.weights, ...(pt.weights ?? {}) },
+            letterSpacing: { ...t.typography.letterSpacing, ...(pt.letterSpacing ?? {}) },
+            lineHeight: { ...t.typography.lineHeight, ...(pt.lineHeight ?? {}) },
+          }
+        : t.typography
+      set({
+        designConfig: {
+          ...cfg,
+          tokens: {
+            ...t,
+            colors,
+            typography,
+            effects: patch.effects ? { ...t.effects, ...patch.effects } : t.effects,
+            spacing: patch.spacing ? { ...t.spacing, ...patch.spacing } : t.spacing,
+          },
         },
-      }
-    } else if (s.type === "experience") {
-      nextSection = {
-        ...s,
-        data: {
-          items: [...s.data.items].reverse(),
-        },
-      }
-    } else if (s.type === "contact") {
-      nextSection = {
-        ...s,
-        data: {
-          ...s.data,
-          headline: s.data.headline?.includes("refresh") ? s.data.headline : `${s.data.headline ?? "Contact"} · refresh`,
-        },
-      }
-    }
-    set({ document: { ...doc, sections: replaceSection(doc.sections, nextSection) } })
-  },
+      })
+    },
 
-  patchDesignTokens: (patch) => {
-    const cfg = get().designConfig
-    if (!cfg) return
-    const t = cfg.tokens
-    const nextColors = patch.colors
-      ? (() => {
-          const { gradients: pg, ...rest } = patch.colors
-          return {
-            ...t.colors,
-            ...rest,
-            gradients: { ...t.colors.gradients, ...(pg ?? {}) },
-          } as DesignColorTokens
-        })()
-      : t.colors
-    const nextTypography = patch.typography
-      ? {
-          ...t.typography,
-          ...patch.typography,
-          scale: patch.typography.scale
-            ? { ...t.typography.scale, ...patch.typography.scale }
-            : t.typography.scale,
-          weights: patch.typography.weights
-            ? { ...t.typography.weights, ...patch.typography.weights }
-            : t.typography.weights,
-          letterSpacing: patch.typography.letterSpacing
-            ? { ...t.typography.letterSpacing, ...patch.typography.letterSpacing }
-            : t.typography.letterSpacing,
-          lineHeight: patch.typography.lineHeight
-            ? { ...t.typography.lineHeight, ...patch.typography.lineHeight }
-            : t.typography.lineHeight,
-        }
-      : t.typography
-    const nextEffects = patch.effects ? { ...t.effects, ...patch.effects } : t.effects
-    const nextSpacing = patch.spacing ? { ...t.spacing, ...patch.spacing } : t.spacing
-    set({
-      designConfig: {
-        ...cfg,
-        tokens: {
-          ...t,
-          colors: nextColors,
-          typography: nextTypography,
-          effects: nextEffects,
-          spacing: nextSpacing,
+    applyDesignPreset: (preset) => {
+      const cfg = get().designConfig
+      if (!cfg) return
+      const p = STUDIO_DESIGN_PRESETS[preset]
+      const { gradients: pg, ...colorRest } = p.colors
+      set({
+        designConfig: {
+          ...cfg,
+          tokens: {
+            ...cfg.tokens,
+            colors: { ...cfg.tokens.colors, ...colorRest, gradients: { ...cfg.tokens.colors.gradients, ...(pg ?? {}) } },
+            typography: { ...cfg.tokens.typography, ...(p.typography ?? {}) },
+            effects: { ...cfg.tokens.effects, ...(p.effects ?? {}) },
+          },
         },
-      },
-    })
-  },
-
-  applyDesignPreset: (preset) => {
-    const cfg = get().designConfig
-    if (!cfg) return
-    const p = STUDIO_DESIGN_PRESETS[preset]
-    const { gradients: pg, ...colorRest } = p.colors
-    const mergedColors: DesignColorTokens = {
-      ...cfg.tokens.colors,
-      ...colorRest,
-      gradients: { ...cfg.tokens.colors.gradients, ...(pg ?? {}) },
-    }
-    const mergedTypography: DesignTypographyTokens = {
-      ...cfg.tokens.typography,
-      ...(p.typography ?? {}),
-    }
-    const mergedEffects: DesignEffectsTokens = {
-      ...cfg.tokens.effects,
-      ...(p.effects ?? {}),
-    }
-    set({
-      designConfig: {
-        ...cfg,
-        tokens: {
-          ...cfg.tokens,
-          colors: mergedColors,
-          typography: mergedTypography,
-          effects: mergedEffects,
-        },
-      },
-    })
-  },
-}))
+      })
+    },
+  }
+})

@@ -1,85 +1,74 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { Check, FileCheck2, Palette, WandSparkles, type LucideIcon } from "lucide-react"
+import { useRef } from "react"
 
+import { gsap, MOTION_OK, useGSAP } from "@/components/marketing/motion/gsap"
+import { messages } from "@/config/messages"
 import { cn } from "@/lib/utils"
 
 export type BuildVisualStep = 0 | 1 | 2
 
 type PortfolioBuildStepperProps = {
-  /** 0 = need file, 1 = configure style, 2 = parsing */
+  /** 0 = need file, 1 = pick a look, 2 = building */
   visualStep: BuildVisualStep
+  /** 0..1 progress through the current step. Used while building. */
+  progress?: number
   className?: string
 }
 
-const steps: { label: string; Icon: LucideIcon }[] = [
-  { label: "Resume", Icon: FileCheck2 },
-  { label: "Style", Icon: Palette },
-  { label: "Build", Icon: WandSparkles },
-]
+/** A slim track cut into three segments. Finished segments are solid, the current one fills as work happens. */
+export function PortfolioBuildStepper({ visualStep, progress, className }: PortfolioBuildStepperProps) {
+  const names = messages.build.stepNames
+  const root = useRef<HTMLElement>(null)
+  const fillFor = (i: number) => (i < visualStep ? 1 : i === visualStep ? Math.max(0.12, progress ?? 0.5) : 0)
 
-export function PortfolioBuildStepper({ visualStep, className }: PortfolioBuildStepperProps) {
-  const progress = visualStep === 0 ? "12%" : visualStep === 1 ? "50%" : "100%"
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia()
+      mm.add(MOTION_OK, () => {
+        gsap.to("[data-fill]", {
+          scaleX: (i: number) => fillFor(i),
+          duration: 0.7,
+          ease: "power3.out",
+        })
+      })
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.set("[data-fill]", { scaleX: (i: number) => fillFor(i) })
+      })
+    },
+    { scope: root, dependencies: [visualStep, progress] }
+  )
 
   return (
-    <div className={cn("relative w-full px-1 pb-1 pt-2", className)} aria-label="Build progress">
-      <div className="absolute left-[12%] right-[12%] top-[1.95rem] h-1 overflow-hidden rounded-full bg-black/[0.07]">
-        <motion.div
-          className="h-full rounded-full bg-[linear-gradient(90deg,#101114,#31333a,#101114)] shadow-[0_0_22px_rgba(16,17,20,0.26)]"
-          initial={false}
-          animate={{ width: progress }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        />
-        <motion.div
-          className="absolute inset-y-0 w-24 rounded-full bg-white/45 blur-sm"
-          initial={{ x: "-120%" }}
-          animate={{ x: ["-120%", "520%"] }}
-          transition={{ duration: 2.2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-        />
-      </div>
-
-      <ol className="relative z-10 grid grid-cols-3 gap-2 text-center">
-        {steps.map(({ label, Icon }, index) => {
-          const done = index < visualStep
-          const active = index === visualStep
+    <nav ref={root} aria-label="Build progress" className={cn("w-full", className)}>
+      <p className="mb-1.5 text-xs font-semibold text-[var(--site-ink-2)] sm:hidden">
+        <span className="text-[var(--site-ink)]">{names[visualStep]}</span> · Step {visualStep + 1} of {names.length}
+      </p>
+      <ol className="flex gap-1.5 sm:gap-2">
+        {names.map((name, i) => {
+          const active = i === visualStep
           return (
-            <li key={label} className="flex flex-col items-center">
-              <motion.span
-                className={cn(
-                  "relative grid size-12 place-items-center rounded-2xl border shadow-[0_14px_34px_rgba(23,24,31,0.08)] transition-colors",
-                  active && "border-[#101114] bg-[#101114] text-white",
-                  done && "border-[#101114] bg-white text-[#101114]",
-                  !active && !done && "border-black/[0.10] bg-white/82 text-muted-foreground"
-                )}
-                initial={false}
-                animate={{ scale: active ? 1.06 : 1 }}
-                transition={{ type: "spring", stiffness: 380, damping: 24 }}
-              >
-                {done ? <Check className="size-5" strokeWidth={2.6} aria-hidden /> : <Icon className="size-5" aria-hidden />}
-                {active ? (
-                  <motion.span
-                    className="absolute size-12 rounded-2xl border border-black/25"
-                    initial={{ opacity: 0.4, scale: 1 }}
-                    animate={{ opacity: 0, scale: 1.42 }}
-                    transition={{ duration: 1.45, repeat: Number.POSITIVE_INFINITY, ease: "easeOut" }}
-                  />
-                ) : null}
-              </motion.span>
+            <li key={name} className="min-w-0 flex-1" aria-current={active ? "step" : undefined}>
+              <span className="block h-1 overflow-hidden rounded-full bg-[var(--site-rule-strong)]" aria-hidden>
+                <span
+                  data-fill
+                  className={cn("block h-full origin-left rounded-full", active ? "bg-[var(--site-accent)]" : "bg-[var(--site-ink)]")}
+                  style={{ transform: `scaleX(${fillFor(i)})` }}
+                />
+              </span>
               <span
                 className={cn(
-                  "mt-3 text-xs font-semibold",
-                  active && "text-foreground",
-                  done && "text-foreground/70",
-                  !active && !done && "text-muted-foreground"
+                  "mt-1.5 hidden truncate text-xs font-semibold transition-colors duration-300 sm:block",
+                  active ? "text-[var(--site-ink)]" : i < visualStep ? "text-[var(--site-ink-2)]" : "text-[var(--site-ink-2)]/60"
                 )}
               >
-                {label}
+                {name}
               </span>
+              <span className="sr-only">{i < visualStep ? " done" : active ? " current step" : " upcoming"}</span>
             </li>
           )
         })}
       </ol>
-    </div>
+    </nav>
   )
 }

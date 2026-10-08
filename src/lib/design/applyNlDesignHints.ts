@@ -6,7 +6,6 @@ import type { DesignConfig } from "@/types/designEngine"
  */
 export function applyNlDesignHints(config: DesignConfig, raw: string): DesignConfig {
   const cfg = structuredClone(config)
-  const msg = raw.toLowerCase()
   const c = cfg.tokens.colors
   const t = cfg.tokens.typography.scale
 

@@ -130,3 +130,64 @@
 
   --marketing-nav-height: clamp(3.75rem, 8vw, 4.5rem);
 }
+
+
+/* ------------------------------------------------------------------
+   App surfaces (dashboard, auth): buttons and fields on the site palette.
+   Additive. Tokens (--site-*) come from the `.site` wrapper.
+   ------------------------------------------------------------------ */
+@layer components {
+  .dx-btn {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    padding: 0 1.125rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 120ms ease;
+  }
+  .dx-btn:active:not(:disabled):not([aria-disabled="true"]) { transform: translateY(1px); }
+  .dx-btn:disabled,
+  .dx-btn[aria-disabled="true"] { cursor: not-allowed; opacity: 0.55; }
+  .dx-btn:focus-visible { outline: 2px solid var(--site-accent-ink); outline-offset: 2px; }
+  .dx-btn-sm { min-height: 2.25rem; padding: 0 0.75rem; font-size: 0.875rem; border-radius: 0.625rem; }
+  .dx-btn-primary { background: var(--site-ink); color: var(--site-paper); }
+  .dx-btn-primary:hover:not(:disabled):not([aria-disabled="true"]) { background: #2a2c36; }
+  .dx-btn-accent { background: var(--site-accent-ink); color: #fff; }
+  .dx-btn-accent:hover:not(:disabled):not([aria-disabled="true"]) { background: #4838d0; }
+  .dx-btn-outline { background: #fff; border-color: var(--site-rule-strong); color: var(--site-ink); }
+  .dx-btn-outline:hover:not(:disabled):not([aria-disabled="true"]) { border-color: var(--site-ink); background: #fcfbf8; }
+  .dx-btn-ghost { background: transparent; color: var(--site-ink-2); }
+  .dx-btn-ghost:hover:not(:disabled):not([aria-disabled="true"]) { background: rgba(16, 17, 20, 0.06); color: var(--site-ink); }
+
+  .dx-field {
+    height: 3rem;
+    width: 100%;
+    border: 1px solid var(--site-rule-strong);
+    border-radius: 0.75rem;
+    background: #fff;
+    padding: 0 1rem;
+    font-size: 1rem;
+    color: var(--site-ink);
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+  }
+  .dx-field::placeholder { color: #767b87; }
+  .dx-field:hover:not(:disabled) { border-color: rgba(16, 17, 20, 0.4); }
+  .dx-field:focus-visible { outline: none; border-color: var(--site-accent-ink); box-shadow: 0 0 0 3px rgba(109, 92, 246, 0.28); }
+  .dx-field:disabled { opacity: 0.6; }
+  .dx-field[aria-invalid="true"] { border-color: #b42318; }
+  .dx-field[aria-invalid="true"]:focus-visible { box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.2); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dx-btn, .dx-field { transition: none; }
+    .dx-btn:active:not(:disabled) { transform: none; }
+  }
+}

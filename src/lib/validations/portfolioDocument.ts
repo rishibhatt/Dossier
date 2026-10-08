@@ -1,80 +1,39 @@
 import { z } from "zod"
 
+/** Mirrors src/types/dossier.ts. Optional fields are kept (zod strips unknown keys, so every field must be listed). */
+
+const str = z.string()
+const url = z.string().max(2048)
+const s = <T extends string, D extends z.ZodRawShape>(type: T, data: D) =>
+  z.object({ id: z.string(), type: z.literal(type), data: z.object(data) })
+
 const experienceEntrySchema = z.object({
-  company: z.string(),
-  role: z.string(),
-  duration: z.string(),
-  description: z.string(),
+  company: str,
+  role: str,
+  duration: str,
+  description: str,
+  highlights: z.array(str).max(40).optional(),
+  location: str.optional(),
 })
 
 const projectEntrySchema = z.object({
-  name: z.string(),
-  description: z.string(),
-  tech: z.array(z.string()),
-  imageUrl: z.string().max(2048).optional().nullable(),
-})
-
-const heroSection = z.object({
-  id: z.string(),
-  type: z.literal("hero"),
-  data: z.object({
-    name: z.string(),
-    title: z.string(),
-    tagline: z.string(),
-    imageUrl: z.string().max(2048).optional().nullable(),
-  }),
-})
-
-const aboutSection = z.object({
-  id: z.string(),
-  type: z.literal("about"),
-  data: z.object({
-    body: z.string(),
-  }),
-})
-
-const skillsSection = z.object({
-  id: z.string(),
-  type: z.literal("skills"),
-  data: z.object({
-    items: z.array(z.string()),
-  }),
-})
-
-const experienceSection = z.object({
-  id: z.string(),
-  type: z.literal("experience"),
-  data: z.object({
-    items: z.array(experienceEntrySchema),
-  }),
-})
-
-const projectsSection = z.object({
-  id: z.string(),
-  type: z.literal("projects"),
-  data: z.object({
-    items: z.array(projectEntrySchema),
-  }),
-})
-
-const contactSection = z.object({
-  id: z.string(),
-  type: z.literal("contact"),
-  data: z.object({
-    email: z.string(),
-    phone: z.string(),
-    links: z.array(z.string()),
-    headline: z.string().optional(),
-  }),
+  name: str,
+  description: str,
+  tech: z.array(str),
+  imageUrl: url.optional().nullable(),
+  link: url.optional().nullable(),
 })
 
 const sectionSchema = z.discriminatedUnion("type", [
-  heroSection,
-  aboutSection,
-  skillsSection,
-  experienceSection,
-  projectsSection,
-  contactSection,
+  s("hero", { name: str, title: str, tagline: str, imageUrl: url.optional().nullable() }),
+  s("about", { body: str }),
+  s("skills", { items: z.array(str) }),
+  s("experience", { items: z.array(experienceEntrySchema) }),
+  s("projects", { items: z.array(projectEntrySchema) }),
+  s("contact", { email: str, phone: str, links: z.array(str), headline: str.optional(), location: str.optional() }),
+  s("education", { items: z.array(z.object({ institution: str, degree: str, period: str, details: str })) }),
+  s("highlights", { items: z.array(z.object({ value: str, label: str })).max(12) }),
+  s("certifications", { items: z.array(z.object({ name: str, issuer: str, year: str })) }),
 ])
 
 const portfolioMetaSchema = z
@@ -86,12 +45,23 @@ const portfolioMetaSchema = z
   .optional()
 
 export const portfolioDocumentSchema = z.object({
-  meta: z.object({
-    title: z.string(),
-    description: z.string(),
-  }),
+  meta: z.object({ title: str, description: str }),
   portfolioMeta: portfolioMetaSchema,
   sections: z.array(sectionSchema),
 })
 
 export type PortfolioDocumentParsed = z.infer<typeof portfolioDocumentSchema>
+
+/** Owner view settings sent with publish / preview / export. Size-capped. */
+export const portfolioViewSchema = z.object({
+  hiddenSectionIds: z.array(z.string().max(80)).max(64).optional(),
+  sectionSurfaceOverrides: z
+    .record(
+      z.string().max(80),
+      z.object({ bg: z.string().max(40).regex(/^(#[0-9a-fA-F]{3,8}|rgba?\([\d\s.,%]+\)|transparent)$/).optional() })
+    )
+    .refine((r) => Object.keys(r).length <= 64, "too_many_overrides")
+    .optional(),
+})
+
+export type PortfolioViewParsed = z.infer<typeof portfolioViewSchema>

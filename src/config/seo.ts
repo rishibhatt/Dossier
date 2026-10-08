@@ -12,11 +12,16 @@ export type PageSeoInput = {
   }
   /** When false, robots noindex — useful for authed-only pages if needed */
   indexable?: boolean
+  /** Path of a route-specific share image (file-based opengraph-image). Defaults to the site card. */
+  image?: string
 }
 
 export function buildPageMetadata(input: PageSeoInput): Metadata {
-  const { title, description, path, indexable = true, openGraph } = input
+  const { title, description, path, indexable = true, openGraph, image: imagePath = "/opengraph-image" } = input
   const url = `${siteConfig.url}${path.startsWith("/") ? path : `/${path}`}`
+
+  // Pages that set their own `openGraph` replace the one from the file-based image, so the image is named here too.
+  const image = { url: imagePath, width: 1200, height: 630, alt: openGraph?.title ?? title }
 
   return {
     metadataBase: new URL(siteConfig.url),
@@ -31,11 +36,13 @@ export function buildPageMetadata(input: PageSeoInput): Metadata {
       title: openGraph?.title ?? title,
       description: openGraph?.description ?? description,
       locale: siteConfig.locale,
+      images: [image],
     },
     twitter: {
       card: "summary_large_image",
-      title,
-      description,
+      title: openGraph?.title ?? title,
+      description: openGraph?.description ?? description,
+      images: [image.url],
     },
   }
 }

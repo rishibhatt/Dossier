@@ -3,14 +3,8 @@
 @import "shadcn/tailwind.css";
 @import "./theme.css";
 @import "./typography.css";
-@import "./portfolio-design-tokens.css";
-@import "./portfolio-typography.css";
-@import "./design-engine.css";
-@import "./portfolio-effects.css";
-@import "./portfolio-canvas-utilities.css";
-@import "./landing.css";
-@import "./marketing-redesign.css";
 @import "./workspace-redesign.css";
+@import "./site.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -21,7 +15,6 @@
   --spacing-stack-md: 1rem;
   --spacing-stack-lg: 2rem;
   --spacing-margin-page: 2.5rem;
-  --container-landing: 80rem;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
@@ -130,13 +123,6 @@
     );
     background-size: 200% 100%;
     animation: dossier-skeleton-pulse 1.5s linear infinite;
-  }
-
-  .dossier-portfolio-canvas {
-    position: relative;
-    isolation: isolate;
-    /* Base fill only — patterns live in CanvasAmbientBackground at low opacity */
-    background-color: var(--color-bg, var(--de-bg));
   }
 }
 

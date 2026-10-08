@@ -4,31 +4,25 @@ import type { PortfolioDocument, StructuredResume } from "@/types/dossier"
 
 export type DossierParseState = {
   file: File | null
-  rawText: string | null
   structuredData: StructuredResume | null
   portfolioData: PortfolioDocument | null
+  /** Who read the resume: the AI model, or the offline reader when the AI was unavailable. */
+  source: "ai" | "fallback" | null
   loading: boolean
   error: string | null
   setFile: (file: File | null) => void
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
-  setFromParseResult: (payload: {
-    rawText: string
-    structuredData: StructuredResume
-    portfolioData: PortfolioDocument
-  }) => void
+  setFromParseResult: (payload: { structuredData: StructuredResume; portfolioData: PortfolioDocument; source?: "ai" | "fallback" }) => void
   updatePortfolio: (next: PortfolioDocument) => void
   reset: () => void
 }
 
-const initial: Pick<
-  DossierParseState,
-  "file" | "rawText" | "structuredData" | "portfolioData" | "loading" | "error"
-> = {
+const initial: Pick<DossierParseState, "file" | "structuredData" | "portfolioData" | "source" | "loading" | "error"> = {
   file: null,
-  rawText: null,
   structuredData: null,
   portfolioData: null,
+  source: null,
   loading: false,
   error: null,
 }
@@ -40,9 +34,9 @@ export const useDossierStore = create<DossierParseState>((set) => ({
   setError: (error) => set({ error }),
   setFromParseResult: (payload) =>
     set({
-      rawText: payload.rawText,
       structuredData: payload.structuredData,
       portfolioData: payload.portfolioData,
+      source: payload.source ?? null,
       loading: false,
       error: null,
     }),

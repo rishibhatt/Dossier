@@ -8,6 +8,10 @@ const TTL_MS = 1000 * 60 * 30
 export type PreviewSessionPayload = {
   document: PortfolioDocument
   designConfig: DesignConfig
+  hiddenSectionIds?: string[]
+  sectionSurfaceOverrides?: Record<string, { bg?: string }>
+  /** "none" for paid plans; anything else shows "Made with Dossier". */
+  credit?: "free" | "none"
 }
 
 type StoredEnvelope = {
@@ -43,8 +47,7 @@ export function readPreviewSession(id: string): PreviewSessionPayload | null {
       window.localStorage.removeItem(`${PREVIEW_SESSION_PREFIX}${id}`)
       return null
     }
-    const { document, designConfig } = envelope.payload
-    return { document, designConfig }
+    return envelope.payload
   } catch {
     return null
   }

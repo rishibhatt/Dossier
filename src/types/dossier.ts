@@ -3,6 +3,9 @@ export type ExperienceEntry = {
   role: string
   duration: string
   description: string
+  /** Individual resume bullets, kept separate so templates can list them. `description` stays as the joined fallback. */
+  highlights?: string[]
+  location?: string
 }
 
 export type ProjectEntry = {
@@ -11,6 +14,8 @@ export type ProjectEntry = {
   tech: string[]
   /** Optional cover image — enables bento / spotlight layouts when any project has one */
   imageUrl?: string | null
+  /** Live site, repo or case study found next to the project in the resume. */
+  link?: string | null
 }
 
 export type EducationEntry = {
@@ -88,6 +93,36 @@ export type PortfolioContactSection = {
     phone: string
     links: string[]
     headline?: string
+    location?: string
+  }
+}
+
+export type PortfolioEducationSection = {
+  id: string
+  type: "education"
+  data: {
+    items: EducationEntry[]
+  }
+}
+
+/** A number from the resume and what it measures, e.g. { value: "14", label: "clients closed each month" }. Never invented. */
+export type HighlightEntry = { value: string; label: string }
+
+export type PortfolioHighlightsSection = {
+  id: string
+  type: "highlights"
+  data: {
+    items: HighlightEntry[]
+  }
+}
+
+export type CertificationEntry = { name: string; issuer: string; year: string }
+
+export type PortfolioCertificationsSection = {
+  id: string
+  type: "certifications"
+  data: {
+    items: CertificationEntry[]
   }
 }
 
@@ -98,6 +133,9 @@ export type PortfolioSection =
   | PortfolioExperienceSection
   | PortfolioProjectsSection
   | PortfolioContactSection
+  | PortfolioEducationSection
+  | PortfolioHighlightsSection
+  | PortfolioCertificationsSection
 
 export type PortfolioSectionType = PortfolioSection["type"]
 

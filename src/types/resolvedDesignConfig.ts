@@ -24,6 +24,8 @@ export type DesignConfigMeta = {
   profession: string
   variationSeed: number
   generatedAt: string
+  /** Curated template this config was built from (absent on legacy/random configs). */
+  templateId?: string
 }
 
 export type DesignGradientTokens = {

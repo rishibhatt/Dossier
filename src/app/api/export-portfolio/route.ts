@@ -1,7 +1,8 @@
 import { z } from "zod"
 
+import { apiError, consumeQuota, resolveCaller } from "@/lib/api/guard"
 import { buildPortfolioExportZip } from "@/lib/export/buildPortfolioExportZip"
-import { portfolioDocumentSchema } from "@/lib/validations/portfolioDocument"
+import { portfolioDocumentSchema, portfolioViewSchema } from "@/lib/validations/portfolioDocument"
 import { designConfigSchema } from "@/lib/validations/designConfig"
 import type { DesignConfig } from "@/types/designEngine"
 import type { PortfolioDocument } from "@/types/dossier"
@@ -12,9 +13,17 @@ const bodySchema = z.object({
   portfolioData: z.unknown(),
   designConfig: z.unknown(),
   variationSeed: z.number().int().optional(),
+  hiddenSectionIds: z.unknown().optional(),
+  sectionSurfaceOverrides: z.unknown().optional(),
 })
 
 export async function POST(request: Request) {
+  const caller = await resolveCaller()
+  if (!caller.user) return apiError("unauthorized", 401, { message: "Sign in to export." })
+  if (!caller.limits.zipExport) {
+    return apiError("plan_required", 402, { message: "ZIP export needs the Starter or Pro plan.", plan: caller.plan })
+  }
+
   let json: unknown
   try {
     json = await request.json()
@@ -37,10 +46,20 @@ export async function POST(request: Request) {
   const designConfig = cfgParsed.data as DesignConfig
   const variationSeed = parsed.data.variationSeed ?? 0
 
+  const blocked = await consumeQuota(request, caller, "export")
+  if (blocked) return blocked
+
+  const view = portfolioViewSchema.safeParse({
+    hiddenSectionIds: parsed.data.hiddenSectionIds,
+    sectionSurfaceOverrides: parsed.data.sectionSurfaceOverrides,
+  })
+
   const blob = await buildPortfolioExportZip({
     document,
     designConfig,
     variationSeed,
+    hiddenSectionIds: view.success ? view.data.hiddenSectionIds : undefined,
+    sectionSurfaceOverrides: view.success ? view.data.sectionSurfaceOverrides : undefined,
   })
 
   const buf = Buffer.from(await blob.arrayBuffer())

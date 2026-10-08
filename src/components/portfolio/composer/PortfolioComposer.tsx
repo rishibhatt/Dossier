@@ -1,45 +1,30 @@
 "use client"
 
-import { useMemo } from "react"
+import type { ReactNode } from "react"
 
-import { DesignEngineProvider } from "@/context/DesignEngineContext"
 import { PortfolioDesignSurface } from "@/components/portfolio/composer/PortfolioDesignSurface"
+import type { CreditMode } from "@/components/portfolio/DossierCredit"
+import { DesignEngineProvider } from "@/context/DesignEngineContext"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
 
 type PortfolioComposerProps = {
   standalone?: boolean
+  /** Legacy slot after the last section. Prefer `credit`. */
+  footer?: ReactNode
+  /** "free" (default) shows "Made with Dossier"; "none" hides it (paid plans). */
+  credit?: CreditMode
+  /** Studio: open the upgrade sheet when the credit is clicked. */
+  onCreditClick?: () => void
 }
 
-export function PortfolioComposer({ standalone }: PortfolioComposerProps) {
+/** Store-bound portfolio renderer used by the studio canvas. */
+export function PortfolioComposer({ standalone, footer, credit, onCreditClick }: PortfolioComposerProps) {
   const document = usePortfolioStore((s) => s.document)
   const designConfig = usePortfolioStore((s) => s.designConfig)
-  const generationVariation = usePortfolioStore((s) => s.generationVariation)
-
-  const surfaceKey = useMemo(() => {
-    if (!designConfig) return ""
-    return [
-      designConfig.meta.direction,
-      designConfig.meta.variationSeed,
-      designConfig.layout.type,
-      designConfig.layout.heroVariant,
-      designConfig.tokens.colors.bg,
-      designConfig.tokens.typography.displayFont,
-      designConfig.motion.preset,
-      ...designConfig.sections.map((s) => `${s.type}:${s.variant}`),
-    ].join("|")
-  }, [designConfig])
-
-  if (!document || !designConfig) {
-    return null
-  }
-
+  if (!document || !designConfig) return null
   return (
     <DesignEngineProvider value={{ document, designConfig }}>
-      <PortfolioDesignSurface
-        key={surfaceKey}
-        standalone={standalone}
-        variationSeed={generationVariation}
-      />
+      <PortfolioDesignSurface standalone={standalone} footer={footer} credit={credit} onCreditClick={onCreditClick} />
     </DesignEngineProvider>
   )
 }

@@ -17,16 +17,11 @@ export const loginSchema = z.object({
   password: z.string().min(1, messages.auth.errors.generic),
 })
 
-export const signupSchema = z
-  .object({
-    email: emailSchema,
-    password: passwordSchema,
-    confirmPassword: z.string().min(1, messages.auth.errors.generic),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    path: ["confirmPassword"],
-    message: messages.auth.errors.passwordMismatch,
-  })
+/** One password field with a show toggle: no confirm field to retype. */
+export const signupSchema = z.object({
+  email: emailSchema,
+  password: passwordSchema,
+})
 
 export type LoginInput = z.infer<typeof loginSchema>
 export type SignupInput = z.infer<typeof signupSchema>

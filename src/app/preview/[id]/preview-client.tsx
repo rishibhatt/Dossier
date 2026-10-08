@@ -3,11 +3,9 @@
 import { useParams } from "next/navigation"
 import { startTransition, useEffect, useState } from "react"
 
-import { DesignEngineProvider } from "@/context/DesignEngineContext"
-import { PortfolioDesignSurface } from "@/components/portfolio/composer/PortfolioDesignSurface"
+import { PortfolioView } from "@/components/portfolio/page/PortfolioView"
 import { messages } from "@/config/messages"
-import { readPreviewSession } from "@/lib/portfolio/previewSession"
-import type { PreviewSessionPayload } from "@/lib/portfolio/previewSession"
+import { readPreviewSession, type PreviewSessionPayload } from "@/lib/portfolio/previewSession"
 
 export function PreviewPageClient() {
   const params = useParams()
@@ -16,26 +14,21 @@ export function PreviewPageClient() {
 
   useEffect(() => {
     if (!id) return
-    startTransition(() => {
-      setPayload(readPreviewSession(id) ?? null)
-    })
+    startTransition(() => setPayload(readPreviewSession(id) ?? null))
   }, [id])
 
-  if (!id) {
-    return <p className="p-8 text-center text-sm text-neutral-500">{messages.dossier.studio.previewInvalid}</p>
-  }
-
-  if (payload === undefined) {
-    return <p className="p-8 text-center text-sm text-neutral-500">{messages.common.loading}</p>
-  }
-
-  if (payload === null || !payload.document || !payload.designConfig) {
-    return <p className="p-8 text-center text-sm text-neutral-500">{messages.dossier.studio.previewMissing}</p>
-  }
+  const note = (text: string) => <p className="p-8 text-center text-sm text-neutral-500">{text}</p>
+  if (!id) return note(messages.dossier.studio.previewInvalid)
+  if (payload === undefined) return note(messages.common.loading)
+  if (!payload?.document || !payload.designConfig) return note(messages.dossier.studio.previewMissing)
 
   return (
-    <DesignEngineProvider value={{ document: payload.document, designConfig: payload.designConfig }}>
-      <PortfolioDesignSurface standalone />
-    </DesignEngineProvider>
+    <PortfolioView
+      document={payload.document}
+      config={payload.designConfig}
+      hidden={payload.hiddenSectionIds ?? []}
+      surfaces={payload.sectionSurfaceOverrides}
+      credit={{ show: payload.credit !== "none" }}
+    />
   )
 }

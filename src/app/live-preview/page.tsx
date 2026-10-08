@@ -1,11 +1,8 @@
-import { Suspense } from "react"
+import { redirect } from "next/navigation"
 
-import { LivePreviewClient } from "@/app/live-preview/live-preview-client"
+import { ROUTES } from "@/lib/constants/routes"
 
+/** Retired with the JSX engine. Kept as a redirect so old bookmarks do not 404. */
 export default function LivePreviewPage() {
-  return (
-    <Suspense fallback={<p className="p-8 text-center text-sm text-muted-foreground">Loading…</p>}>
-      <LivePreviewClient />
-    </Suspense>
-  )
+  redirect(ROUTES.build)
 }

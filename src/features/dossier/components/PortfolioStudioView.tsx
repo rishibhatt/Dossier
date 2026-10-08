@@ -2,50 +2,21 @@
 
 import { useEffect } from "react"
 
-import { NLEditor } from "@/components/NLEditor"
-import { StudioTopNav } from "@/components/studio/StudioTopNav"
-import { StudioWorkspaceColumns } from "@/components/studio/StudioWorkspaceColumns"
+import { StudioShell } from "@/features/studio/StudioShell"
+import { useStudioStatus } from "@/features/studio/studioStatus"
 import { buildFallbackDesignConfig } from "@/lib/design/fallbackDesignConfig"
 import { inferUserType } from "@/lib/design/inferType"
 import { portfolioDocumentToParsedResume } from "@/lib/parseResume"
 import { loadEditorDraft, saveEditorDraft } from "@/lib/portfolio/editorPersistence"
 import { ensurePortfolioMeta } from "@/lib/portfolio/ensurePortfolioMeta"
+import { saveLastSession } from "@/lib/portfolio/lastSession"
 import { useDossierStore } from "@/store/useDossierStore"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
-import { useStudioShellStore } from "@/store/useStudioShellStore"
+import { useStudioUiStore } from "@/store/useStudioUiStore"
 
-function applyStudioStepLayout(step: number) {
-  const shell = useStudioShellStore.getState()
-  if (step === 0) {
-    shell.setLeftCollapsed(true)
-    shell.setRightCollapsed(true)
-  } else if (step === 1) {
-    shell.setLeftCollapsed(true)
-    shell.setRightCollapsed(false)
-  } else if (step === 2) {
-    shell.setLeftCollapsed(false)
-    shell.setRightCollapsed(true)
-    shell.setActiveSidebarSection("hero")
-  } else if (step === 3) {
-    shell.setRightCollapsed(false)
-    shell.setLeftCollapsed(true)
-    shell.setActiveSidebarSection("site-seo")
-  }
-}
-
-export function PortfolioStudioView() {
+/** Hydrates the editor stores from the parse result, autosaves while you work, then shows the studio. */
+export function PortfolioStudioView({ onStartOver }: { onStartOver: () => void }) {
   const portfolioData = useDossierStore((s) => s.portfolioData)
-
-  useEffect(() => {
-    applyStudioStepLayout(useStudioShellStore.getState().currentStep)
-    let prevStep = useStudioShellStore.getState().currentStep
-    const unsub = useStudioShellStore.subscribe((s) => {
-      if (s.currentStep === prevStep) return
-      prevStep = s.currentStep
-      applyStudioStepLayout(s.currentStep)
-    })
-    return unsub
-  }, [])
 
   useEffect(() => {
     if (!portfolioData) return
@@ -61,7 +32,6 @@ export function PortfolioStudioView() {
         },
         portfolioDocumentToParsedResume(portfolioData, inferUserType(portfolioData))
       )
-      useStudioShellStore.getState().setCurrentStep(1)
       const d = usePortfolioStore.getState().document
       const c = usePortfolioStore.getState().designConfig
       if (d && c) {
@@ -78,27 +48,29 @@ export function PortfolioStudioView() {
       return
     }
     if (!ps.designConfig) {
-      usePortfolioStore.getState().setDesignConfig(
-        buildFallbackDesignConfig(inferUserType(ps.document), ps.document)
-      )
+      usePortfolioStore.getState().setDesignConfig(buildFallbackDesignConfig(inferUserType(ps.document), ps.document))
     }
   }, [portfolioData])
 
+  // Autosave 500 ms after the last change, to this device only.
   useEffect(() => {
     let t: ReturnType<typeof setTimeout> | undefined
+    const first = usePortfolioStore.getState()
+    let seen = [first.document, first.designConfig, first.hiddenSectionIds, first.sectionSurfaceOverrides]
     const unsub = usePortfolioStore.subscribe(() => {
-      const st = usePortfolioStore.getState()
-      const { document: doc, designConfig: cfg, hiddenSectionIds, sectionSurfaceOverrides } = st
+      const { document: doc, designConfig: cfg, hiddenSectionIds, sectionSurfaceOverrides, parsedResume } = usePortfolioStore.getState()
       if (!doc || !cfg) return
+      // Only real edits count: store updates such as toggling edit mode do not dirty the page.
+      const now = [doc, cfg, hiddenSectionIds, sectionSurfaceOverrides]
+      if (now.every((v, i) => v === seen[i])) return
+      seen = now
+      useStudioStatus.getState().markChanged()
       if (t) clearTimeout(t)
       t = setTimeout(() => {
-        saveEditorDraft({
-          document: doc,
-          designConfig: cfg,
-          hiddenSectionIds,
-          sectionSurfaceOverrides,
-          savedAt: new Date().toISOString(),
-        })
+        saveEditorDraft({ document: doc, designConfig: cfg, hiddenSectionIds, sectionSurfaceOverrides, savedAt: new Date().toISOString() })
+        saveLastSession({ document: doc, designConfig: cfg, parsedResume, hiddenSectionIds })
+        useStudioUiStore.getState().markSaved()
+        useStudioStatus.getState().markSaved()
       }, 500)
     })
     return () => {
@@ -107,13 +79,5 @@ export function PortfolioStudioView() {
     }
   }, [])
 
-  return (
-    <>
-      <NLEditor />
-      <div className="flex h-[min(100dvh,100vh)] max-h-[100dvh] flex-col overflow-hidden bg-[#F7F5F0] text-foreground">
-        <StudioTopNav />
-        <StudioWorkspaceColumns />
-      </div>
-    </>
-  )
+  return <StudioShell onStartOver={onStartOver} />
 }

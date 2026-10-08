@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function PreviewPortfolioPage() {
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-50">
+    <main className="min-h-screen">
       <PreviewPageClient />
     </main>
   )

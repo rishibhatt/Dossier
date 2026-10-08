@@ -8,6 +8,7 @@ function isResolvedDesign(v: unknown): v is DesignConfig {
     c &&
       typeof c === "object" &&
       typeof c.meta?.direction === "string" &&
+      (c.meta.templateId === undefined || typeof c.meta.templateId === "string") &&
       typeof c.tokens?.colors?.bg === "string" &&
       Array.isArray(c.sections)
   )

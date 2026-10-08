@@ -1,4 +1,4 @@
-import { devUser } from "@/config/devUser"
+import { consumeQuota, resolveCaller } from "@/lib/api/guard"
 import { refineDesignFromPrompt } from "@/lib/design/refineDesignFromPrompt"
 import { designConfigSchema } from "@/lib/validations/designConfig"
 import type { DesignConfig } from "@/types/designEngine"
@@ -19,6 +19,10 @@ function isPortfolioDocument(value: unknown): value is PortfolioDocument {
 }
 
 export async function POST(request: Request) {
+  const caller = await resolveCaller()
+  const blocked = await consumeQuota(request, caller, "refine")
+  if (blocked) return blocked
+
   let body: unknown
   try {
     body = await request.json()
@@ -50,7 +54,7 @@ export async function POST(request: Request) {
       designConfig,
       message,
     })
-    return Response.json({ designConfig: next, user: devUser })
+    return Response.json({ designConfig: next })
   } catch (err) {
     const msg = err instanceof Error ? err.message : "unknown_error"
     const code =

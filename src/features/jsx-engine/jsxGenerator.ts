@@ -1,7 +1,6 @@
 import "server-only"
 
 import { designSpecToGenerationIntent } from "@/features/design-intelligence/designSpecAdapter"
-import { runLLMTask } from "@/lib/llm/router"
 import {
   buildDesignSpecSectionPayload,
   buildSectionJsxSystemPrompt,
@@ -57,13 +56,10 @@ export async function generatePortfolioSectionJsx(input: GenerateJsxInput): Prom
 
     const system = `${systemBase}\n\n${hints.join("\n\n")}`
 
-    const rawRes = await runLLMTask("code", user, {
-      systemPrompt: system,
-      temperature: attempt === 1 ? 0.54 : attempt === 2 ? 0.38 : 0.28,
-      jsonMode: false,
-      mode: "balanced",
-    })
-    const raw = rawRes.content
+    // Retired (dead code awaiting deletion): the AI no longer writes JSX, so this never reaches a model.
+    void system
+    void user
+    const raw = ""
 
     const sanitized = sanitizeGeneratedJsx(raw)
     if (!sanitized.ok) {

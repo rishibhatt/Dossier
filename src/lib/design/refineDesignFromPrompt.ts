@@ -1,7 +1,8 @@
 import { applyNlDesignHints } from "@/lib/design/applyNlDesignHints"
+import { TEMPLATES, buildConfigForDirection, buildConfigFromTemplate } from "@/lib/design/templates"
 import { inferUserType } from "@/lib/design/inferType"
 import { mergeDesignWithPattern } from "@/lib/design/mergeDesignConfig"
-import { backgroundTypeForDirection, buildDesignConfig } from "@/lib/designEngine"
+import { backgroundTypeForDirection } from "@/lib/designEngine"
 import type { DesignConfig } from "@/types/designEngine"
 import type { PortfolioDocument } from "@/types/dossier"
 import { portfolioDocumentToParsedResume } from "@/lib/parseResume"
@@ -19,7 +20,20 @@ export async function refineDesignFromPrompt(input: {
   const userType = inferUserType(input.portfolioData)
   const msg = input.message.toLowerCase()
 
-  let cfg = applyNlDesignHints(input.designConfig, input.message)
+  // "use the Ledger look" / "switch to chalkboard template": cheap, deterministic template switch.
+  const named = TEMPLATES.find((t) => {
+    const names = [t.name.toLowerCase(), t.id]
+    return names.some((n) => new RegExp(`\\b${n.replace(/[^a-z0-9 -]/g, "")}\\b`).test(msg))
+  })
+  if (named && (/\b(look|template|style|theme|layout|design)\b/.test(msg) || /^\s*(use|switch|apply|try|go)\b/.test(msg))) {
+    const parsed = portfolioDocumentToParsedResume(input.portfolioData, userType)
+    const next = buildConfigFromTemplate(parsed, named.id, input.designConfig.meta.variationSeed, {
+      sectionTypes: input.portfolioData.sections.map((s) => s.type),
+    })
+    return applyNlDesignHints(next, input.message.replace(new RegExp(named.name, "ig"), ""))
+  }
+
+  const cfg = applyNlDesignHints(input.designConfig, input.message)
 
   let direction: DesignDirectionId = cfg.meta.direction
   if (/(brutal|grid|raw)/i.test(msg)) direction = "BRUTALIST_GRID"
@@ -31,7 +45,9 @@ export async function refineDesignFromPrompt(input: {
 
   if (direction !== cfg.meta.direction) {
     const parsed = portfolioDocumentToParsedResume(input.portfolioData, userType)
-    let next = buildDesignConfig(parsed, direction, cfg.meta.variationSeed + 17)
+    let next = buildConfigForDirection(parsed, direction, cfg.meta.variationSeed, {
+      sectionTypes: input.portfolioData.sections.map((s) => s.type),
+    })
     next = applyNlDesignHints(next, input.message)
     return next
   }
