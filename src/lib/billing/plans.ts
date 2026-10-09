@@ -12,10 +12,10 @@ export type PlanLimits = {
   zipExport: boolean
 }
 
-/** Limits for callers with no session (preview-first flow). Keep tight: they cost LLM quota. */
+/** Limits for callers with no session. The builder needs an account, so every build action is closed (401). */
 export const ANONYMOUS_LIMITS: PlanLimits = {
   portfolios: 0,
-  daily: { parse: 2, regenerate: 3, refine: 5, export: 0, publish: 0 },
+  daily: { parse: 0, regenerate: 0, refine: 0, export: 0, publish: 0 },
   zipExport: false,
 }
 
@@ -37,14 +37,15 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
   },
 }
 
-/** Local development only: no caps, so builders can test freely. Never active in production builds. */
+/** Local development only, and only when asked for: no caps, so you can test the builder freely. Never active in production builds. */
 export const DEV_UNLIMITED_LIMITS: PlanLimits = {
   portfolios: 9999,
   daily: { parse: 99999, regenerate: 99999, refine: 99999, export: 99999, publish: 99999 },
   zipExport: true,
 }
 
-export const IS_DEV_UNLIMITED = process.env.NODE_ENV !== "production"
+// Plan limits and credits are enforced everywhere by default, including `next dev`. Set DEV_UNLIMITED=1 in .env.local to lift them while testing.
+export const IS_DEV_UNLIMITED = process.env.NODE_ENV !== "production" && process.env.DEV_UNLIMITED === "1"
 
 /** A plan with an expiry date (Pro, yearly) falls back to free once it passes. */
 export function resolveEffectivePlan(plan: PlanId, planExpiresAt: string | null): PlanId {

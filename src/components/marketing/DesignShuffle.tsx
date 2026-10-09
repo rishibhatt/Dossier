@@ -319,6 +319,8 @@ export function DesignShuffle() {
 
   // Autoplay is off for people who ask for reduced motion.
   useEffect(() => {
+    // The media query only exists in the browser, so it is read after mount to keep server and client markup identical.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setPlaying(false)
   }, [])
 

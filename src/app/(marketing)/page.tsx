@@ -9,7 +9,7 @@ import { ROUTES } from "@/lib/constants/routes"
 export const metadata: Metadata = buildPageMetadata({
   title: "Dossier: your resume, set as a portfolio website",
   description:
-    "Upload the resume PDF you already have and Dossier sets it as a portfolio website. Try more than twenty looks without losing a word, then publish a link. Works on a phone. Free to start.",
+    "Upload your resume PDF and Dossier sets it as a portfolio website. Try 20+ looks without losing a word, then publish a link. Free to start.",
   path: ROUTES.home,
   openGraph: {
     title: "Your resume, set as a website.",
@@ -42,9 +42,23 @@ const faqLd = {
   })),
 }
 
+const orgLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Dossier",
+    url: siteConfig.url,
+    logo: `${siteConfig.url}/brand/email-logo.png`,
+    email: siteConfig.supportEmail,
+    founder: { "@type": "Person", name: "Rishab Bhatt", url: "https://rishieee.netlify.app" },
+  },
+  { "@context": "https://schema.org", "@type": "WebSite", name: "Dossier", url: siteConfig.url },
+]
+
 export default function MarketingHomePage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <MarketingPage />

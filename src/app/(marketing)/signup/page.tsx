@@ -21,8 +21,8 @@ type PageProps = { searchParams: Promise<{ next?: string; plan?: string }> }
 function contextNote(plan: string | undefined, invited: boolean, next: string | undefined): string | undefined {
   if (next === ROUTES.build) {
     return invited
-      ? "Your site is saved on this device. Create an account, press Publish, and you and the friend who invited you each get a credit."
-      : "Your site is saved on this device. Create an account and you come straight back to press Publish."
+      ? "Create a free account and the builder opens with your resume ready. Publish your first site and you and the friend who invited you each get a credit."
+      : "Create a free account and the builder opens with your resume ready. No card needed."
   }
   if (plan === "starter" || plan === "pro") {
     const name = plan === "starter" ? "Starter" : "Pro"

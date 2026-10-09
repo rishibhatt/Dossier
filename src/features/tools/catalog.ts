@@ -2,7 +2,7 @@
  * Free tools: small, ungated, run in the browser (no AI calls, no cost per use).
  * Each one solves a job a job seeker searches for, then hands off to the builder.
  */
-export type FreeToolSlug = "resume-to-website" | "resume-checker" | "headline-writer" | "linkedin-about" | "link-in-bio"
+export type FreeToolSlug = "ats-checker" | "resume-to-website" | "headline-writer" | "linkedin-about" | "link-in-bio"
 
 export type FreeTool = {
   slug: FreeToolSlug
@@ -22,16 +22,16 @@ export type FreeTool = {
 
 export const FREE_TOOLS: readonly FreeTool[] = [
   {
-    slug: "resume-checker",
+    slug: "ats-checker",
     no: "001",
-    name: "Resume checker",
-    title: "Free resume checker: 10 checks in your browser | Dossier",
+    name: "ATS resume scanner",
+    title: "Free ATS resume checker with job keyword match | Dossier",
     description:
-      "Paste your resume and get a plain-language report: contact details, numbers in your bullets, weak phrases, length and missing sections. Free, nothing is uploaded.",
-    query: "free resume checker",
-    h1: "Check your resume before anyone else reads it.",
-    intro: "Paste the text of your resume. Ten checks run in your browser and tell you what to fix first. Nothing is sent anywhere.",
-    output: "A score out of 100 and a fix list, most important first",
+      "Paste your resume and a job post. See missing keywords, what an ATS cannot parse and which bullets to rewrite. Free, runs in your browser.",
+    query: "free ats resume checker",
+    h1: "See your resume the way an ATS does.",
+    intro: "Paste your resume and the job post. The scan matches the job's keywords, checks that the text would parse, and rewrites your weakest bullets. Nothing leaves this tab.",
+    output: "A score, the missing keywords and a fix list, most important first",
     cta: "See this resume as a website",
   },
   {
@@ -79,10 +79,10 @@ export const FREE_TOOLS: readonly FreeTool[] = [
     name: "Resume to website",
     title: "Turn your resume into a website, free | Dossier",
     description:
-      "Upload a resume PDF and see it as a portfolio website before you sign up. Try different looks, then publish a link. Free to start.",
+      "Upload a resume PDF and turn it into a portfolio website. Try different looks, then publish a link. Free account, no card.",
     query: "resume to website",
-    h1: "See your resume as a website before you sign up.",
-    intro: "This one is the whole product, free to try. Upload a PDF, pick a look, and you will see your own site before you are asked to sign up.",
+    h1: "Turn your resume into a website in minutes.",
+    intro: "This one is the whole product, free to start. Create a free account, upload a PDF and pick a look. Your resume is kept in this browser while you sign up.",
     output: "Your resume as a live portfolio preview",
     cta: "Upload my resume",
   },

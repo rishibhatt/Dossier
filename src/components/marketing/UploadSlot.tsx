@@ -78,7 +78,7 @@ export function UploadSlot({ className, label = "Upload your resume", id = "uplo
         </button>
         <p id={`${id}-hint`} className="sp-data flex flex-wrap justify-between gap-x-4 gap-y-1 px-1 pt-2">
           <span>PDF up to {MAX_MB} MB</span>
-          <span>Free, no card</span>
+          <span>Free account, no card</span>
         </p>
       </div>
       {problem ? (

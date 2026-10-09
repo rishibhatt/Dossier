@@ -1,0 +1,15 @@
+[build]
+  command = "npm run build"
+
+# The default Netlify address sends everyone to the real domain. The same rule also runs in src/proxy.ts.
+[[redirects]]
+  from = "https://dossier-cv.netlify.app/*"
+  to = "https://dossier-cv.com/:splat"
+  status = 301
+  force = true
+
+[build.environment]
+  NODE_VERSION = "22"
+  # These values are public by design (they ship in the browser bundle). Netlify's secret scanner would
+  # otherwise flag them if they are marked secret. Real secrets are never listed here.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_SITE_URL,NEXT_PUBLIC_GA_ID,NEXT_PUBLIC_CLARITY_ID,NEXT_PUBLIC_POSTHOG_KEY,NEXT_PUBLIC_POSTHOG_HOST,NEXT_PUBLIC_GSC_VERIFICATION,NEXT_PUBLIC_SUPPORT_EMAIL"

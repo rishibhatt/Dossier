@@ -13,6 +13,8 @@ export const ROUTES = {
   features: "/features",
   faq: "/faq",
   tools: "/tools",
+  blog: "/blog",
+  resumeKeywords: "/resume-keywords",
   invite: "/invite",
   forgotPassword: "/forgot-password",
   resetPassword: "/reset-password",

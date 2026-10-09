@@ -4,11 +4,13 @@ import type { User } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
 import { cookies, headers } from "next/headers"
 import { redirect } from "next/navigation"
+import { after } from "next/server"
 
 import { messages } from "@/config/messages"
 import { siteConfig } from "@/config/site"
 import { clientIpFromHeaders } from "@/lib/api/guard"
 import { safeNextPath } from "@/lib/auth/safeNext"
+import { notifyAfterAuth, notifyPasswordChanged } from "@/lib/email/events"
 import { captureReferralAfterAuth } from "@/lib/referrals/server"
 import { ROUTES } from "@/lib/constants/routes"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
@@ -98,7 +100,10 @@ export async function signInWithCredentialsAction(
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (user) await captureReferral(user)
+  if (user) {
+    await captureReferral(user)
+    after(() => notifyAfterAuth(user))
+  }
 
   revalidatePath(ROUTES.dashboard, "layout")
   redirect(next)
@@ -136,6 +141,7 @@ export async function signUpWithCredentialsAction(
   }
 
   await captureReferral(user)
+  after(() => notifyAfterAuth(user))
   revalidatePath(ROUTES.dashboard, "layout")
   redirect(next)
 }
@@ -199,6 +205,7 @@ export async function updatePasswordAction(
     return { error: e.network, nonce: Date.now() }
   }
 
+  after(() => notifyPasswordChanged(user))
   revalidatePath(ROUTES.dashboard, "layout")
   redirect(ROUTES.dashboard)
 }

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Bricolage_Grotesque, Geist_Mono, Inter, Inter_Tight, Mr_Dafoe } from "next/font/google"
 
+import { Analytics } from "@/components/analytics/Analytics"
 import { AppProviders } from "@/components/providers/app-providers"
 import { buildPageMetadata } from "@/config/seo"
 import { messages } from "@/config/messages"
@@ -40,11 +41,15 @@ const wmScript = Mr_Dafoe({
   display: "swap",
 })
 
-export const metadata: Metadata = buildPageMetadata({
-  title: messages.seo.defaultTitle,
-  description: messages.seo.defaultDescription,
-  path: "/",
-})
+export const metadata: Metadata = {
+  ...buildPageMetadata({
+    title: messages.seo.defaultTitle,
+    description: messages.seo.defaultDescription,
+    path: "/",
+  }),
+  // Google Search Console: paste the token from "HTML tag" verification into NEXT_PUBLIC_GSC_VERIFICATION.
+  verification: process.env.NEXT_PUBLIC_GSC_VERIFICATION ? { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION } : undefined,
+}
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -64,6 +69,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${interTight.variable} ${geistMono.variable} ${bricolage.variable} ${wmScript.variable} h-full`}>
       <body className="min-h-full" suppressHydrationWarning>
         <AppProviders>{children}</AppProviders>
+        <Analytics />
       </body>
     </html>
   )

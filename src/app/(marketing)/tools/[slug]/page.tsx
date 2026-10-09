@@ -7,10 +7,10 @@ import { UploadSlot } from "@/components/marketing/UploadSlot"
 import { buildPageMetadata } from "@/config/seo"
 import { siteConfig } from "@/config/site"
 import { AboutBuilder } from "@/features/tools/AboutBuilder"
+import { AtsChecker } from "@/features/tools/AtsChecker"
 import { FREE_TOOLS, getFreeTool, type FreeToolSlug } from "@/features/tools/catalog"
 import { HeadlineWriter } from "@/features/tools/HeadlineWriter"
 import { LinkInBio } from "@/features/tools/LinkInBio"
-import { ResumeChecker } from "@/features/tools/ResumeChecker"
 import { ROUTES } from "@/lib/constants/routes"
 
 export const dynamicParams = false
@@ -29,15 +29,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: tool.title,
     description: tool.description,
     path: `${ROUTES.tools}/${tool.slug}`,
-    image: `${ROUTES.tools}/${tool.slug}/opengraph-image`,
+    image: `/og/tools/${tool.slug}`,
   })
 }
 
 const HOW: Record<FreeToolSlug, string[]> = {
-  "resume-checker": [
-    "Each check looks for one thing a recruiter notices in the first read: how to reach you, proof in numbers, verbs, filler phrases, sections, length, links, dates, voice and line length.",
-    "Checks are weighted. Missing contact details and bullets with no numbers cost the most, because a recruiter notices them first.",
-    "The checker reads text only. It cannot see layout, fonts or columns, so a high score does not mean the PDF looks good.",
+  "ats-checker": [
+    "The scan splits your resume into sections the way a parser does, then checks the job post's keywords against it. Aliases count, so \"JS\" matches \"JavaScript\" and \"k8s\" matches \"Kubernetes\".",
+    "Keywords in the requirements part of the post weigh more than nice-to-haves. A keyword used in a bullet under a role counts in full. A keyword that only sits in a skills list counts 70%.",
+    "It also looks for what breaks parsing: columns, tables, symbols, mixed date formats and contact details outside the header. Treat the score as a guide to what to fix. No tool can promise how a given employer's system will rank you.",
   ],
   "headline-writer": [
     "A headline answers three questions quickly: what you do, what you are good at, and why someone should believe it.",
@@ -56,15 +56,15 @@ const HOW: Record<FreeToolSlug, string[]> = {
   ],
   "resume-to-website": [
     "Upload a PDF up to 10 MB. Dossier reads it into sections and suggests a look from your profession.",
-    "You see your own site before you sign up. You only need an account to publish.",
+    "Building needs a free account, with no card. Your PDF waits in this browser while you sign up, then the builder opens.",
     "Free includes one published portfolio with a small Dossier badge.",
   ],
 }
 
 function ToolBody({ slug }: { slug: FreeToolSlug }) {
   switch (slug) {
-    case "resume-checker":
-      return <ResumeChecker />
+    case "ats-checker":
+      return <AtsChecker />
     case "headline-writer":
       return <HeadlineWriter />
     case "linkedin-about":

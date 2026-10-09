@@ -9,7 +9,7 @@ import { TEMPLATES } from "@/lib/design/templates"
 export const metadata: Metadata = buildPageMetadata({
   title: "Features: what Dossier does with your resume",
   description:
-    "Resume reading, a rules-based design engine with more than twenty looks, line-by-line editing, phone-first publishing, private by default, and a ZIP download on paid plans.",
+    "Resume reading, a design engine with 20+ looks, line-by-line editing, phone-first publishing and a ZIP download on paid plans.",
   path: ROUTES.features,
 })
 

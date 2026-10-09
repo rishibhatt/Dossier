@@ -11,7 +11,7 @@ import { ROUTES } from "@/lib/constants/routes"
 export const metadata: Metadata = buildPageMetadata({
   title: "Free resume and portfolio tools | Dossier",
   description:
-    "Free tools for job seekers: a resume checker, a headline writer, a LinkedIn About builder and a link-in-bio page. They run in your browser and need no sign-up.",
+    "Free tools for job seekers: an ATS resume scanner, a headline writer, a LinkedIn About builder and a link-in-bio page. They run in your browser and need no sign-up.",
   path: ROUTES.tools,
 })
 

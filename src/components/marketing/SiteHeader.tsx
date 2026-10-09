@@ -16,6 +16,7 @@ const NAV = [
   { id: "how", label: "How it works", href: ROUTES.howItWorks, path: ROUTES.howItWorks },
   { id: "specimens", label: "Looks", href: `${ROUTES.home}#specimens`, path: null },
   { id: "tools", label: "Free tools", href: ROUTES.tools, path: ROUTES.tools },
+  { id: "blog", label: "Blog", href: ROUTES.blog, path: ROUTES.blog },
   { id: "pricing", label: "Pricing", href: ROUTES.pricing, path: ROUTES.pricing },
 ] as const
 

@@ -35,7 +35,7 @@ export function Pricing({ as: Heading = "h2", full = false }: { as?: "h1" | "h2"
             Free to publish. Pay once to make it yours.
           </Heading>
           <p className="site-lead self-end lg:col-span-5">
-            You see your own site before anyone asks for money. Paid plans remove the badge and give you the files.
+            Start with a free account, no card. Paid plans remove the badge and give you the files.
           </p>
         </div>
 

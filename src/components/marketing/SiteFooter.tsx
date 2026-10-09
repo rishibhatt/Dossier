@@ -22,16 +22,26 @@ const COLUMNS = [
       { label: "Every look", href: `${ROUTES.home}#specimens` },
       { label: "Pricing", href: ROUTES.pricing },
       { label: "Questions", href: ROUTES.faq },
+      { label: "Blog", href: ROUTES.blog },
+      { label: "Resume keywords by role", href: ROUTES.resumeKeywords },
     ],
   },
   {
     title: "Free tools",
     links: [
-      { label: "Resume checker", href: `${ROUTES.tools}/resume-checker` },
+      { label: "ATS resume scanner", href: `${ROUTES.tools}/ats-checker` },
       { label: "Headline writer", href: `${ROUTES.tools}/headline-writer` },
       { label: "LinkedIn About builder", href: `${ROUTES.tools}/linkedin-about` },
       { label: "Link-in-bio page", href: `${ROUTES.tools}/link-in-bio` },
       { label: "All tools", href: ROUTES.tools },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "Contact", href: "/contact" },
+      { label: "Privacy", href: "/privacy" },
+      { label: "Terms", href: "/terms" },
     ],
   },
   {
@@ -48,7 +58,7 @@ const COLUMNS = [
 export function SiteFooter() {
   return (
     <footer className="border-t border-[var(--site-ink)] bg-[var(--site-paper)] pt-14 sm:pt-20">
-      <div className="site-wrap grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="site-wrap grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
         <div className="max-w-sm">
           <Logo />
           <p className="mt-5 text-[0.9375rem] leading-relaxed text-[var(--site-ink-2)]">

@@ -1,9 +1,10 @@
-﻿import { type NextRequest, NextResponse } from "next/server"
+﻿import { after, type NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 
 import { clientIpFromHeaders } from "@/lib/api/guard"
 import { safeNextPath } from "@/lib/auth/safeNext"
+import { notifyAfterAuth } from "@/lib/email/events"
 import { captureReferralAfterAuth } from "@/lib/referrals/server"
 import { ROUTES } from "@/lib/constants/routes"
 import type { Database } from "@/types/database"
@@ -44,6 +45,7 @@ export async function GET(request: NextRequest) {
   } = await supabase.auth.getUser()
   if (user) {
     await captureReferralAfterAuth({ user, cookies: cookieStore, ip: clientIpFromHeaders(request.headers) })
+    after(() => notifyAfterAuth(user))
   }
 
   return NextResponse.redirect(new URL(nextPath, url.origin))

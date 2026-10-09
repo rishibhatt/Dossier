@@ -12,6 +12,7 @@ export const metadata: Metadata = buildPageMetadata({
   title: messages.seo.loginTitle,
   description: messages.seo.loginDescription,
   path: ROUTES.login,
+  indexable: false,
 })
 
 const NOTICES: Record<string, string> = {

@@ -9,7 +9,7 @@ import { ROUTES } from "@/lib/constants/routes"
 export const metadata: Metadata = buildPageMetadata({
   title: "Pricing: free, $9 once, or $39 a year | Dossier",
   description:
-    "Dossier is free to publish one portfolio. Starter is $9 once and removes the badge, unlocks unlimited shuffles and the ZIP download. Pro is $39 a year for up to five portfolios.",
+    "Free to publish one portfolio. Starter is $9 once: no badge, unlimited shuffles, ZIP download. Pro is $39 a year for up to five portfolios.",
   path: ROUTES.pricing,
 })
 

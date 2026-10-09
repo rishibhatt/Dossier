@@ -1,7 +1,9 @@
 import { nanoid } from "nanoid"
+import { after } from "next/server"
 import { z } from "zod"
 
 import { apiError, consumeQuota, resolveCaller } from "@/lib/api/guard"
+import { notifyCreditsEarned } from "@/lib/email/events"
 import { qualifyReferralAfterFirstPublish } from "@/lib/referrals/server"
 import { designConfigSchema } from "@/lib/validations/designConfig"
 import { portfolioDocumentSchema, portfolioViewSchema } from "@/lib/validations/portfolioDocument"
@@ -62,6 +64,10 @@ export async function POST(request: Request) {
 
   const { supabase, user, limits } = caller
 
+  // A person with a username gets a readable link (/u/name). Otherwise the random /p/ link is used.
+  const { data: profile } = await supabase.from("users").select("username").eq("id", user.id).maybeSingle()
+  const linkFor = (slug: string) => (profile?.username ? `/u/${profile.username}` : `/p/${slug}`)
+
   const { data: owned, error: ownedError } = await supabase
     .from("published_portfolios")
     .select("id, slug")
@@ -82,7 +88,7 @@ export async function POST(request: Request) {
         .single()
 
       if (error) return apiError("publish_failed", 503, { message: error.message })
-      return Response.json({ slug: data.slug, url: `/p/${data.slug}`, updated: true })
+      return Response.json({ slug: data.slug, url: linkFor(data.slug), updated: true })
     }
 
     return apiError("portfolio_limit", 403, {
@@ -102,7 +108,10 @@ export async function POST(request: Request) {
 
   // First portfolio ever for this account: an invite that brought them here now counts. Idempotent.
   const firstPublish = owned.length === 0
-  if (firstPublish) await qualifyReferralAfterFirstPublish(user.id)
+  if (firstPublish) {
+    await qualifyReferralAfterFirstPublish(user.id)
+    after(() => notifyCreditsEarned(user.id))
+  }
 
-  return Response.json({ slug: data.slug, url: `/p/${data.slug}`, updated: false, firstPublish })
+  return Response.json({ slug: data.slug, url: linkFor(data.slug), updated: false, firstPublish })
 }

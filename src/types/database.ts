@@ -384,6 +384,24 @@ export type Database = {
         }
         Relationships: []
       }
+      email_log: {
+        Row: { id: number; user_id: string; kind: string; created_at: string }
+        Insert: { id?: number; user_id: string; kind: string; created_at?: string }
+        Update: { id?: number; user_id?: string; kind?: string; created_at?: string }
+        Relationships: []
+      }
+      contact_messages: {
+        Row: { id: string; name: string; email: string; message: string; user_id: string | null; ip_hash: string | null; status: "new" | "handled"; created_at: string }
+        Insert: { id?: string; name: string; email: string; message: string; user_id?: string | null; ip_hash?: string | null; status?: "new" | "handled"; created_at?: string }
+        Update: { id?: string; name?: string; email?: string; message?: string; user_id?: string | null; ip_hash?: string | null; status?: "new" | "handled"; created_at?: string }
+        Relationships: []
+      }
+      admin_audit: {
+        Row: { id: number; admin_id: string; action: string; target_user: string | null; details: Json; created_at: string }
+        Insert: { id?: number; admin_id: string; action: string; target_user?: string | null; details?: Json; created_at?: string }
+        Update: { id?: number; admin_id?: string; action?: string; target_user?: string | null; details?: Json; created_at?: string }
+        Relationships: []
+      }
     }
     Views: {
       credit_balances: {
@@ -401,6 +419,10 @@ export type Database = {
       }
       spend_credits: {
         Args: { p_user: string; p_item: string }
+        Returns: Json
+      }
+      admin_overview: {
+        Args: { p_days?: number }
         Returns: Json
       }
       prune_usage_events: {

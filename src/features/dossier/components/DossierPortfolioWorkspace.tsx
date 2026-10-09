@@ -16,7 +16,7 @@ import { useStudioStatus } from "@/features/studio/studioStatus"
 import { ResumeSessionCard } from "@/features/dossier/components/ResumeSessionCard"
 import { UploadZone } from "@/features/dossier/components/UploadZone"
 import { usePortfolioParse } from "@/features/dossier/hooks/usePortfolioParse"
-import { clearPendingUpload, peekPendingUpload } from "@/features/dossier/lib/pendingUpload"
+import { clearPendingUpload, peekPendingUpload, restorePendingUpload } from "@/features/dossier/lib/pendingUpload"
 import { messages } from "@/config/messages"
 import { ROUTES } from "@/lib/constants/routes"
 import { clearLastSession } from "@/lib/portfolio/lastSession"
@@ -160,7 +160,23 @@ export function DossierPortfolioWorkspace() {
   const { submit, cancel, retry } = usePortfolioParse()
   // A file picked on the home page or a free tool skips straight to the look step.
   const [draftFile, setDraftFile] = useState<File | null>(() => (typeof window === "undefined" ? null : peekPendingUpload()))
-  useEffect(() => clearPendingUpload(), [])
+  useEffect(() => {
+    // A file in memory is consumed now. After a sign-up or Google round trip memory is empty, so restore the saved copy.
+    if (peekPendingUpload()) {
+      clearPendingUpload()
+      return
+    }
+    let alive = true
+    void restorePendingUpload().then((f) => {
+      if (alive && f) {
+        setDraftFile(f)
+        clearPendingUpload()
+      }
+    })
+    return () => {
+      alive = false
+    }
+  }, [])
 
   const visualStep: BuildVisualStep = loading ? 2 : draftFile ? 1 : 0
   const progress = loading ? buildProgress(stageIndex) : undefined

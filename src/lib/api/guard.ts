@@ -70,7 +70,8 @@ export function clientIpFromHeaders(h: Pick<Headers, "get">): string {
 
 /** Salted, truncated SHA-256 of an IP. The raw IP is never stored. */
 export function hashIp(ip: string): string {
-  const salt = process.env.RATE_LIMIT_SALT ?? "dossier-default-salt"
+  // No public default: without RATE_LIMIT_SALT, derive the salt from a server secret so hashes cannot be precomputed.
+  const salt = process.env.RATE_LIMIT_SALT ?? (process.env.SUPABASE_SERVICE_ROLE_KEY ? createHash("sha256").update(process.env.SUPABASE_SERVICE_ROLE_KEY).digest("hex") : "dev-only-salt")
   return createHash("sha256").update(`${salt}:${ip}`).digest("hex").slice(0, 32)
 }
 
