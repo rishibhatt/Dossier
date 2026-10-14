@@ -45,9 +45,10 @@ export default async function PostPage({ params }: Props) {
   const url = `${siteConfig.url}${ROUTES.blog}/${post.slug}`
   const heroSrc = post.hero ?? `/og/blog/${post.slug}`
   const tool = getFreeTool(post.tool)
-  const related = POSTS.filter((p) => p.slug !== post.slug).slice(0, 3)
+  const others = POSTS.filter((p) => p.slug !== post.slug)
+  const related = [...others.filter((p) => p.category === post.category), ...others.filter((p) => p.category !== post.category)].slice(0, 3)
 
-  const ld = [
+  const ld: Record<string, unknown>[] = [
     {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -70,6 +71,13 @@ export default async function PostPage({ params }: Props) {
       ],
     },
   ]
+  if (post.faq?.length) {
+    ld.push({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: post.faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+    })
+  }
 
   return (
     <>
@@ -85,6 +93,21 @@ export default async function PostPage({ params }: Props) {
         <div className="grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-8">
             <Prose blocks={post.body} />
+            {post.faq?.length ? (
+              <section aria-labelledby="post-faq" className="mt-14 max-w-[40rem] border-t border-[var(--site-rule)] pt-8">
+                <h2 id="post-faq" className="site-h3">
+                  Questions people ask
+                </h2>
+                <dl className="mt-4">
+                  {post.faq.map((f) => (
+                    <div key={f.q} className="border-b border-[var(--site-rule)] py-5">
+                      <dt className="font-semibold">{f.q}</dt>
+                      <dd className="mt-2 text-[1.0625rem] leading-[1.75] text-[var(--site-ink-2)]">{f.a}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+            ) : null}
           </div>
           {tool ? (
             <aside className="lg:col-span-4" aria-label="Free tool">
