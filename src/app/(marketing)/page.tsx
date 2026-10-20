@@ -7,13 +7,13 @@ import { siteConfig } from "@/config/site"
 import { ROUTES } from "@/lib/constants/routes"
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Dossier: your resume, set as a portfolio website",
+  title: "Dossier: build your resume PDF and turn it into a website",
   description:
-    "Upload your resume PDF and Dossier sets it as a portfolio website. Try 20+ looks without losing a word, then publish a link. Free to start.",
+    "Build a resume from tested templates and download the PDF free, or upload the resume you have and Dossier sets it as a portfolio website. Free to start.",
   path: ROUTES.home,
   openGraph: {
-    title: "Your resume, set as a website.",
-    description: "Upload a PDF. Get a portfolio site you can restyle and publish. Free to start.",
+    title: "One resume. A PDF and a website.",
+    description: "Tested resume templates with a free PDF download, and a portfolio site from the same resume. Free to start.",
   },
 })
 
@@ -24,7 +24,7 @@ const jsonLd = {
   url: siteConfig.url,
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
-  description: "Turns a resume PDF into a portfolio website.",
+  description: "Builds a resume PDF from tested templates and turns a resume into a portfolio website.",
   offers: [
     { "@type": "Offer", name: "Free", price: "0", priceCurrency: "USD" },
     { "@type": "Offer", name: "Starter", price: "9", priceCurrency: "USD" },

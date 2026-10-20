@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next"
 
 import { siteConfig } from "@/config/site"
 import { POSTS } from "@/content/blog/posts"
+import { exampleEntries, EXAMPLES_UPDATED } from "@/content/resume/examples"
+import { TEMPLATE_PAGES, TEMPLATES_UPDATED } from "@/content/resume/templates"
 import { ROLES } from "@/content/roles"
 import { FREE_TOOLS } from "@/features/tools/catalog"
 import { ROUTES } from "@/lib/constants/routes"
@@ -21,6 +23,12 @@ function buildEntries(): Entry[] {
     ...FREE_TOOLS.map((t) => ({ path: `${ROUTES.tools}/${t.slug}`, priority: t.slug === "ats-checker" ? 0.9 : 0.7 })),
     { path: ROUTES.blog, priority: 0.8 },
     ...POSTS.map((p) => ({ path: `${ROUTES.blog}/${p.slug}`, priority: 0.7, updated: p.updated ?? p.published })),
+    { path: ROUTES.looks, priority: 0.7 },
+    { path: ROUTES.resume, priority: 0.9, updated: TEMPLATES_UPDATED },
+    { path: ROUTES.resumeTemplates, priority: 0.8, updated: TEMPLATES_UPDATED },
+    ...TEMPLATE_PAGES.map((t) => ({ path: `${ROUTES.resumeTemplates}/${t.slug}`, priority: 0.7, updated: TEMPLATES_UPDATED })),
+    { path: ROUTES.resumeExamples, priority: 0.7, updated: EXAMPLES_UPDATED },
+    ...exampleEntries().map((e) => ({ path: `${ROUTES.resumeExamples}/${e.slug}`, priority: 0.6, updated: EXAMPLES_UPDATED })),
     { path: ROUTES.resumeKeywords, priority: 0.7 },
     ...ROLES.map((r) => ({ path: `${ROUTES.resumeKeywords}/${r.slug}`, priority: 0.6 })),
     { path: ROUTES.faq, priority: 0.6 },

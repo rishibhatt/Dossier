@@ -6,6 +6,7 @@ import { ChevronDown, CreditCard, LogOut, Settings } from "lucide-react"
 
 import { messages } from "@/config/messages"
 import { signOutAction } from "@/features/auth/actions/auth.actions"
+import { clearResumeDrafts } from "@/features/resume/lib/drafts"
 import { ROUTES } from "@/lib/constants/routes"
 
 const itemClass =
@@ -74,7 +75,8 @@ export function AccountMenu({ email, planName }: { email: string | null; planNam
               <CreditCard className="size-4 text-[var(--site-ink-2)]" aria-hidden />
               {messages.dashboard.nav.billing}
             </Link>
-            <form action={signOutAction}>
+            {/* Resumes kept on this device go with the account, so a shared computer doesn't keep them. */}
+            <form action={signOutAction} onSubmit={() => clearResumeDrafts()}>
               <button type="submit" className={itemClass}>
                 <LogOut className="size-4 text-[var(--site-ink-2)]" aria-hidden />
                 {messages.common.signOut}

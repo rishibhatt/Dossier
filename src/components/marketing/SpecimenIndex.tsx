@@ -22,7 +22,7 @@ type FilterId = (typeof FILTERS)[number]["id"]
  * Every look in the engine, as a specimen catalogue: number, name set in its own display face, palette,
  * and who it suits. Ruled cells, dense on purpose. Filtering is instant and keeps numbering stable.
  */
-export function SpecimenIndex({ specimens, sample }: { specimens: Specimen[]; sample: string }) {
+export function SpecimenIndex({ specimens, sample, head = true }: { specimens: Specimen[]; sample: string; head?: boolean }) {
   const root = useRef<HTMLElement>(null)
   const [filter, setFilter] = useState<FilterId>("all")
   const shown = useMemo(() => {
@@ -41,9 +41,11 @@ export function SpecimenIndex({ specimens, sample }: { specimens: Specimen[]; sa
   )
 
   return (
-    <section ref={root} id="specimens" aria-labelledby="specimens-title" className="scroll-mt-20 bg-[var(--site-paper-deep)] py-20 sm:py-28">
+    <section ref={root} id="specimens" aria-labelledby={head ? "specimens-title" : undefined} aria-label={head ? undefined : "Every look"} className={`scroll-mt-20 bg-[var(--site-paper-deep)] ${head ? "py-20 sm:py-28" : "pb-20 pt-8 sm:pb-28"}`}>
       <div className="site-wrap">
-        <RunningHead label="Every look" no="003" />
+        {head ? (
+          <>
+        <RunningHead label="Every look" no="004" />
         <div className="grid gap-6 lg:grid-cols-12">
           <h2 id="specimens-title" className="site-h2 lg:col-span-7">
             {specimens.length} looks. Same words in every one.
@@ -53,8 +55,10 @@ export function SpecimenIndex({ specimens, sample }: { specimens: Specimen[]; sa
             You can switch at any time without retyping anything.
           </p>
         </div>
+          </>
+        ) : null}
 
-        <div role="toolbar" aria-label="Filter looks" className="-mx-1 mt-10 flex gap-2 overflow-x-auto px-1 pb-2 [scrollbar-width:none]">
+        <div role="toolbar" aria-label="Filter looks" className={`-mx-1 flex ${head ? "mt-10" : ""} gap-2 overflow-x-auto px-1 pb-2 [scrollbar-width:none]`}>
           {FILTERS.map((f) => (
             <button key={f.id} type="button" aria-pressed={filter === f.id} onClick={() => setFilter(f.id)} className="sp-chip shrink-0">
               {f.label}

@@ -63,7 +63,7 @@ export function HowItWorks({ person, headingLevel: H = "h2" }: { person: SampleP
   return (
     <section ref={root} id="how" aria-labelledby="how-title" className="scroll-mt-20 pb-20 pt-16 sm:pb-28 sm:pt-24">
       <div className="site-wrap">
-        <RunningHead label="How it works" no="002" />
+        <RunningHead label="How it works" no="003" />
         <div className="grid gap-6 border-b border-[var(--site-rule-strong)] pb-10 lg:grid-cols-12">
           <H id="how-title" className="site-h2 lg:col-span-7">
             From a PDF to a link in four steps.

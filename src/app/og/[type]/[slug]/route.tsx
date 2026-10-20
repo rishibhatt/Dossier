@@ -1,9 +1,11 @@
 import { getPost, POSTS } from "@/content/blog/posts"
+import { TEMPLATE_PAGES } from "@/content/resume/templates"
 import { FREE_TOOLS, getFreeTool } from "@/features/tools/catalog"
 import { specimenCard } from "@/lib/og/specimenCard"
+import { templateCard } from "@/lib/og/templateCard"
 
 /**
- * Share cards at a stable URL (/og/blog/<slug>, /og/tools/<slug>). File-based opengraph-image routes under a
+ * Share cards at a stable URL (/og/blog/<slug>, /og/tools/<slug>, /og/resume-templates/<slug>). File-based opengraph-image routes under a
  * dynamic segment get a hashed URL, so an explicit og:image path pointing at them returns 404.
  */
 export const dynamicParams = false
@@ -12,6 +14,7 @@ export function generateStaticParams() {
   return [
     ...POSTS.map((p) => ({ type: "blog", slug: p.slug })),
     ...FREE_TOOLS.map((t) => ({ type: "tools", slug: t.slug })),
+    ...TEMPLATE_PAGES.map((t) => ({ type: "resume-templates", slug: t.slug })),
   ]
 }
 
@@ -26,6 +29,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ type: s
       no: String(POSTS.findIndex((p) => p.slug === slug) + 1).padStart(3, "0"),
       footnote: "By Rishab Bhatt",
     })
+  }
+  if (type === "resume-templates") {
+    if (!TEMPLATE_PAGES.some((t) => t.slug === slug)) return new Response("Not found", { status: 404 })
+    return templateCard(slug)
   }
   const tool = type === "tools" ? getFreeTool(slug) : undefined
   if (!tool) return new Response("Not found", { status: 404 })

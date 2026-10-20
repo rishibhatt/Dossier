@@ -59,6 +59,18 @@ export default async function DashboardHomePage() {
           .order("updated_at", { ascending: false })
       : { data: [] }
 
+  const { data: resumeRows } =
+    ctx.supabase && ctx.userId
+      ? await ctx.supabase
+          .from("resumes")
+          .select("id, title, template_id, updated_at")
+          .eq("user_id", ctx.userId)
+          .order("updated_at", { ascending: false })
+          .limit(50)
+      : { data: [] }
+  const resumes = resumeRows ?? []
+  const resumeLimit = ctx.plan === "free" ? 2 : null
+
   const rows = portfolios ?? []
   const limit = ctx.limits.portfolios
   const atLimit = rows.length >= limit
@@ -158,7 +170,39 @@ export default async function DashboardHomePage() {
           ) : null}
         </section>
 
-        <aside aria-labelledby="plan-h" className="rounded-2xl border border-[var(--site-rule-strong)] bg-white p-5">
+        <section aria-labelledby="resumes-h" className="lg:col-start-1">
+          <div className="flex items-end justify-between gap-4 border-b border-[var(--site-ink)] pb-2">
+            <h2 id="resumes-h" className="text-xl font-bold tracking-[-0.03em]" style={display}>
+              Resumes
+            </h2>
+            <Link href={ROUTES.resumeNew} className="dx-btn dx-btn-outline dx-btn-sm">
+              <FilePlus2 className="size-4" aria-hidden />
+              New resume
+            </Link>
+          </div>
+          {resumes.length === 0 ? (
+            <p className="mt-4 text-sm text-[var(--site-ink-2)]">
+              Build a resume and download the PDF for free. Resumes you make while signed in are saved here.
+            </p>
+          ) : (
+            <ul className="divide-y divide-[var(--site-rule)]">
+              {resumes.map((r) => (
+                <li key={r.id} className="flex items-center justify-between gap-4 py-3">
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold">{r.title || "Untitled resume"}</p>
+                    <p className="site-mono text-xs text-[var(--site-ink-2)]">Updated {dateFormat.format(new Date(r.updated_at))}</p>
+                  </div>
+                  <Link href={`${ROUTES.resumeEdit}?id=${r.id}`} className="dx-btn dx-btn-outline dx-btn-sm">
+                    <Pencil className="size-4" aria-hidden />
+                    Edit
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <aside aria-labelledby="plan-h" className="lg:col-start-2 lg:row-span-2 lg:row-start-1 rounded-2xl border border-[var(--site-rule-strong)] bg-white p-5">
           <h2 id="plan-h" className="text-sm font-semibold text-[var(--site-ink-2)]">
             Your plan
           </h2>
@@ -174,6 +218,10 @@ export default async function DashboardHomePage() {
               <dd className="font-semibold tabular-nums">
                 {rows.length} of {limit}
               </dd>
+            </div>
+            <div className="flex justify-between gap-3">
+              <dt className="text-[var(--site-ink-2)]">Saved resumes</dt>
+              <dd className="font-semibold tabular-nums">{resumeLimit ? `${resumes.length} of ${resumeLimit}` : resumes.length}</dd>
             </div>
             <div className="flex justify-between gap-3">
               <dt className="text-[var(--site-ink-2)]">Regenerations today</dt>

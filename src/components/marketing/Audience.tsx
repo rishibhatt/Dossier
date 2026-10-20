@@ -11,7 +11,7 @@ export function Audience({ people, specimens }: { people: readonly SamplePerson[
   return (
     <section id="who" aria-labelledby="who-title" className="scroll-mt-20 py-20 sm:py-28">
       <div className="site-wrap">
-        <RunningHead label="Who it is for" no="004" />
+        <RunningHead label="Who it is for" no="005" />
         <div className="grid gap-6 lg:grid-cols-12">
           <h2 id="who-title" className="site-h2 lg:col-span-7">
             For people whose job is not making websites.

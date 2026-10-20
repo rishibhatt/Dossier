@@ -1,0 +1,1253 @@
+{
+  "format": "webp",
+  "templates": {
+    "r001-ledger": {
+      "hash": "1f10a10a4b707b5a",
+      "renders": [
+        {
+          "sample": "meera",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r001-ledger/meera-a4-p1-600.webp",
+            "resume-templates/r001-ledger/meera-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r001-ledger/meera-a4-og.png"
+        },
+        {
+          "sample": "meera",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r001-ledger/meera-us-letter-p1-600.webp",
+            "resume-templates/r001-ledger/meera-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r001-ledger/meera-us-letter-og.png"
+        },
+        {
+          "sample": "daniel",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r001-ledger/daniel-a4-p1-600.webp",
+            "resume-templates/r001-ledger/daniel-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r001-ledger/daniel-a4-og.png"
+        },
+        {
+          "sample": "daniel",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r001-ledger/daniel-us-letter-p1-600.webp",
+            "resume-templates/r001-ledger/daniel-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r001-ledger/daniel-us-letter-og.png"
+        },
+        {
+          "sample": "chloe",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r001-ledger/chloe-a4-p1-600.webp",
+            "resume-templates/r001-ledger/chloe-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r001-ledger/chloe-a4-og.png"
+        },
+        {
+          "sample": "chloe",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r001-ledger/chloe-us-letter-p1-600.webp",
+            "resume-templates/r001-ledger/chloe-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r001-ledger/chloe-us-letter-og.png"
+        },
+        {
+          "sample": "fatima",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r001-ledger/fatima-a4-p1-600.webp",
+            "resume-templates/r001-ledger/fatima-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r001-ledger/fatima-a4-og.png"
+        },
+        {
+          "sample": "fatima",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r001-ledger/fatima-us-letter-p1-600.webp",
+            "resume-templates/r001-ledger/fatima-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r001-ledger/fatima-us-letter-og.png"
+        },
+        {
+          "sample": "ananya",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r001-ledger/ananya-a4-p1-600.webp",
+            "resume-templates/r001-ledger/ananya-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r001-ledger/ananya-a4-og.png"
+        },
+        {
+          "sample": "ananya",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r001-ledger/ananya-us-letter-p1-600.webp",
+            "resume-templates/r001-ledger/ananya-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r001-ledger/ananya-us-letter-og.png"
+        },
+        {
+          "sample": "jake",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r001-ledger/jake-a4-p1-600.webp",
+            "resume-templates/r001-ledger/jake-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r001-ledger/jake-a4-og.png"
+        },
+        {
+          "sample": "jake",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r001-ledger/jake-us-letter-p1-600.webp",
+            "resume-templates/r001-ledger/jake-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r001-ledger/jake-us-letter-og.png"
+        },
+        {
+          "sample": "aoife",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r001-ledger/aoife-a4-p1-600.webp",
+            "resume-templates/r001-ledger/aoife-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r001-ledger/aoife-a4-og.png"
+        },
+        {
+          "sample": "aoife",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r001-ledger/aoife-us-letter-p1-600.webp",
+            "resume-templates/r001-ledger/aoife-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r001-ledger/aoife-us-letter-og.png"
+        }
+      ]
+    },
+    "r002-plain": {
+      "hash": "49c31172a15a5f63",
+      "renders": [
+        {
+          "sample": "arjun",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r002-plain/arjun-a4-p1-600.webp",
+            "resume-templates/r002-plain/arjun-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r002-plain/arjun-a4-og.png"
+        },
+        {
+          "sample": "arjun",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r002-plain/arjun-us-letter-p1-600.webp",
+            "resume-templates/r002-plain/arjun-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r002-plain/arjun-us-letter-og.png"
+        },
+        {
+          "sample": "priya",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r002-plain/priya-a4-p1-600.webp",
+            "resume-templates/r002-plain/priya-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r002-plain/priya-a4-og.png"
+        },
+        {
+          "sample": "priya",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r002-plain/priya-us-letter-p1-600.webp",
+            "resume-templates/r002-plain/priya-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r002-plain/priya-us-letter-og.png"
+        },
+        {
+          "sample": "daniel",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r002-plain/daniel-a4-p1-600.webp",
+            "resume-templates/r002-plain/daniel-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r002-plain/daniel-a4-og.png"
+        },
+        {
+          "sample": "daniel",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r002-plain/daniel-us-letter-p1-600.webp",
+            "resume-templates/r002-plain/daniel-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r002-plain/daniel-us-letter-og.png"
+        },
+        {
+          "sample": "kwame",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r002-plain/kwame-a4-p1-600.webp",
+            "resume-templates/r002-plain/kwame-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r002-plain/kwame-a4-og.png"
+        },
+        {
+          "sample": "kwame",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r002-plain/kwame-us-letter-p1-600.webp",
+            "resume-templates/r002-plain/kwame-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r002-plain/kwame-us-letter-og.png"
+        },
+        {
+          "sample": "sneha",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r002-plain/sneha-a4-p1-600.webp",
+            "resume-templates/r002-plain/sneha-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r002-plain/sneha-a4-og.png"
+        },
+        {
+          "sample": "sneha",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r002-plain/sneha-us-letter-p1-600.webp",
+            "resume-templates/r002-plain/sneha-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r002-plain/sneha-us-letter-og.png"
+        }
+      ]
+    },
+    "r003-column": {
+      "hash": "3f83e83fdeacb290",
+      "renders": [
+        {
+          "sample": "lena",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r003-column/lena-a4-p1-600.webp",
+            "resume-templates/r003-column/lena-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r003-column/lena-a4-og.png"
+        },
+        {
+          "sample": "lena",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r003-column/lena-us-letter-p1-600.webp",
+            "resume-templates/r003-column/lena-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r003-column/lena-us-letter-og.png"
+        },
+        {
+          "sample": "kwame",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r003-column/kwame-a4-p1-600.webp",
+            "resume-templates/r003-column/kwame-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r003-column/kwame-a4-og.png"
+        },
+        {
+          "sample": "kwame",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r003-column/kwame-us-letter-p1-600.webp",
+            "resume-templates/r003-column/kwame-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r003-column/kwame-us-letter-og.png"
+        },
+        {
+          "sample": "tomas",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r003-column/tomas-a4-p1-600.webp",
+            "resume-templates/r003-column/tomas-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r003-column/tomas-a4-og.png"
+        },
+        {
+          "sample": "tomas",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r003-column/tomas-us-letter-p1-600.webp",
+            "resume-templates/r003-column/tomas-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r003-column/tomas-us-letter-og.png"
+        },
+        {
+          "sample": "rahul",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r003-column/rahul-a4-p1-600.webp",
+            "resume-templates/r003-column/rahul-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r003-column/rahul-a4-og.png"
+        },
+        {
+          "sample": "rahul",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r003-column/rahul-us-letter-p1-600.webp",
+            "resume-templates/r003-column/rahul-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r003-column/rahul-us-letter-og.png"
+        },
+        {
+          "sample": "omar",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r003-column/omar-a4-p1-600.webp",
+            "resume-templates/r003-column/omar-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r003-column/omar-a4-og.png"
+        },
+        {
+          "sample": "omar",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r003-column/omar-us-letter-p1-600.webp",
+            "resume-templates/r003-column/omar-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r003-column/omar-us-letter-og.png"
+        },
+        {
+          "sample": "meera",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r003-column/meera-a4-p1-600.webp",
+            "resume-templates/r003-column/meera-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r003-column/meera-a4-og.png"
+        },
+        {
+          "sample": "meera",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r003-column/meera-us-letter-p1-600.webp",
+            "resume-templates/r003-column/meera-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r003-column/meera-us-letter-og.png"
+        }
+      ]
+    },
+    "r004-scholar": {
+      "hash": "2df7784863d7414c",
+      "renders": [
+        {
+          "sample": "mei",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r004-scholar/mei-a4-p1-600.webp",
+            "resume-templates/r004-scholar/mei-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r004-scholar/mei-a4-og.png"
+        },
+        {
+          "sample": "mei",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r004-scholar/mei-us-letter-p1-600.webp",
+            "resume-templates/r004-scholar/mei-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r004-scholar/mei-us-letter-og.png"
+        },
+        {
+          "sample": "emily",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r004-scholar/emily-a4-p1-600.webp",
+            "resume-templates/r004-scholar/emily-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r004-scholar/emily-a4-og.png"
+        },
+        {
+          "sample": "emily",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r004-scholar/emily-us-letter-p1-600.webp",
+            "resume-templates/r004-scholar/emily-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r004-scholar/emily-us-letter-og.png"
+        },
+        {
+          "sample": "lena",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r004-scholar/lena-a4-p1-600.webp",
+            "resume-templates/r004-scholar/lena-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r004-scholar/lena-a4-og.png"
+        },
+        {
+          "sample": "lena",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r004-scholar/lena-us-letter-p1-600.webp",
+            "resume-templates/r004-scholar/lena-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r004-scholar/lena-us-letter-og.png"
+        }
+      ]
+    },
+    "r005-compact": {
+      "hash": "90faf10c83710b34",
+      "renders": [
+        {
+          "sample": "robert",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r005-compact/robert-a4-p1-600.webp",
+            "resume-templates/r005-compact/robert-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r005-compact/robert-a4-og.png"
+        },
+        {
+          "sample": "robert",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r005-compact/robert-us-letter-p1-600.webp",
+            "resume-templates/r005-compact/robert-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r005-compact/robert-us-letter-og.png"
+        },
+        {
+          "sample": "rahul",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r005-compact/rahul-a4-p1-600.webp",
+            "resume-templates/r005-compact/rahul-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r005-compact/rahul-a4-og.png"
+        },
+        {
+          "sample": "rahul",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r005-compact/rahul-us-letter-p1-600.webp",
+            "resume-templates/r005-compact/rahul-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r005-compact/rahul-us-letter-og.png"
+        },
+        {
+          "sample": "sarah",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r005-compact/sarah-a4-p1-600.webp",
+            "resume-templates/r005-compact/sarah-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r005-compact/sarah-a4-og.png"
+        },
+        {
+          "sample": "sarah",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r005-compact/sarah-us-letter-p1-600.webp",
+            "resume-templates/r005-compact/sarah-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r005-compact/sarah-us-letter-og.png"
+        },
+        {
+          "sample": "carlos",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r005-compact/carlos-a4-p1-600.webp",
+            "resume-templates/r005-compact/carlos-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r005-compact/carlos-a4-og.png"
+        },
+        {
+          "sample": "carlos",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r005-compact/carlos-us-letter-p1-600.webp",
+            "resume-templates/r005-compact/carlos-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r005-compact/carlos-us-letter-og.png"
+        },
+        {
+          "sample": "daniel",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r005-compact/daniel-a4-p1-600.webp",
+            "resume-templates/r005-compact/daniel-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r005-compact/daniel-a4-og.png"
+        },
+        {
+          "sample": "daniel",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r005-compact/daniel-us-letter-p1-600.webp",
+            "resume-templates/r005-compact/daniel-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r005-compact/daniel-us-letter-og.png"
+        }
+      ]
+    },
+    "r006-modern": {
+      "hash": "8a9675bf278f68dd",
+      "renders": [
+        {
+          "sample": "sofia",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r006-modern/sofia-a4-p1-600.webp",
+            "resume-templates/r006-modern/sofia-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r006-modern/sofia-a4-og.png"
+        },
+        {
+          "sample": "sofia",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r006-modern/sofia-us-letter-p1-600.webp",
+            "resume-templates/r006-modern/sofia-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r006-modern/sofia-us-letter-og.png"
+        },
+        {
+          "sample": "hannah",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r006-modern/hannah-a4-p1-600.webp",
+            "resume-templates/r006-modern/hannah-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r006-modern/hannah-a4-og.png"
+        },
+        {
+          "sample": "hannah",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r006-modern/hannah-us-letter-p1-600.webp",
+            "resume-templates/r006-modern/hannah-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r006-modern/hannah-us-letter-og.png"
+        },
+        {
+          "sample": "nina",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r006-modern/nina-a4-p1-600.webp",
+            "resume-templates/r006-modern/nina-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r006-modern/nina-a4-og.png"
+        },
+        {
+          "sample": "nina",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r006-modern/nina-us-letter-p1-600.webp",
+            "resume-templates/r006-modern/nina-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r006-modern/nina-us-letter-og.png"
+        },
+        {
+          "sample": "jake",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r006-modern/jake-a4-p1-600.webp",
+            "resume-templates/r006-modern/jake-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r006-modern/jake-a4-og.png"
+        },
+        {
+          "sample": "jake",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r006-modern/jake-us-letter-p1-600.webp",
+            "resume-templates/r006-modern/jake-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r006-modern/jake-us-letter-og.png"
+        },
+        {
+          "sample": "grace",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r006-modern/grace-a4-p1-600.webp",
+            "resume-templates/r006-modern/grace-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r006-modern/grace-a4-og.png"
+        },
+        {
+          "sample": "grace",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r006-modern/grace-us-letter-p1-600.webp",
+            "resume-templates/r006-modern/grace-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r006-modern/grace-us-letter-og.png"
+        },
+        {
+          "sample": "meera",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r006-modern/meera-a4-p1-600.webp",
+            "resume-templates/r006-modern/meera-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r006-modern/meera-a4-og.png"
+        },
+        {
+          "sample": "meera",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r006-modern/meera-us-letter-p1-600.webp",
+            "resume-templates/r006-modern/meera-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r006-modern/meera-us-letter-og.png"
+        }
+      ]
+    },
+    "r007-executive": {
+      "hash": "defb4b3cd9512339",
+      "renders": [
+        {
+          "sample": "robert",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r007-executive/robert-a4-p1-600.webp",
+            "resume-templates/r007-executive/robert-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r007-executive/robert-a4-og.png"
+        },
+        {
+          "sample": "robert",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r007-executive/robert-us-letter-p1-600.webp",
+            "resume-templates/r007-executive/robert-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r007-executive/robert-us-letter-og.png"
+        },
+        {
+          "sample": "fatima",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r007-executive/fatima-a4-p1-600.webp",
+            "resume-templates/r007-executive/fatima-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r007-executive/fatima-a4-og.png"
+        },
+        {
+          "sample": "fatima",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r007-executive/fatima-us-letter-p1-600.webp",
+            "resume-templates/r007-executive/fatima-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r007-executive/fatima-us-letter-og.png"
+        },
+        {
+          "sample": "sarah",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r007-executive/sarah-a4-p1-600.webp",
+            "resume-templates/r007-executive/sarah-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r007-executive/sarah-a4-og.png"
+        },
+        {
+          "sample": "sarah",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r007-executive/sarah-us-letter-p1-600.webp",
+            "resume-templates/r007-executive/sarah-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r007-executive/sarah-us-letter-og.png"
+        },
+        {
+          "sample": "carlos",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r007-executive/carlos-a4-p1-600.webp",
+            "resume-templates/r007-executive/carlos-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r007-executive/carlos-a4-og.png"
+        },
+        {
+          "sample": "carlos",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r007-executive/carlos-us-letter-p1-600.webp",
+            "resume-templates/r007-executive/carlos-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r007-executive/carlos-us-letter-og.png"
+        }
+      ]
+    },
+    "r008-fresher": {
+      "hash": "91a1476c349a1012",
+      "renders": [
+        {
+          "sample": "sneha",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r008-fresher/sneha-a4-p1-600.webp",
+            "resume-templates/r008-fresher/sneha-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r008-fresher/sneha-a4-og.png"
+        },
+        {
+          "sample": "sneha",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r008-fresher/sneha-us-letter-p1-600.webp",
+            "resume-templates/r008-fresher/sneha-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r008-fresher/sneha-us-letter-og.png"
+        },
+        {
+          "sample": "arjun",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r008-fresher/arjun-a4-p1-600.webp",
+            "resume-templates/r008-fresher/arjun-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r008-fresher/arjun-a4-og.png"
+        },
+        {
+          "sample": "arjun",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r008-fresher/arjun-us-letter-p1-600.webp",
+            "resume-templates/r008-fresher/arjun-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r008-fresher/arjun-us-letter-og.png"
+        },
+        {
+          "sample": "priya",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r008-fresher/priya-a4-p1-600.webp",
+            "resume-templates/r008-fresher/priya-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r008-fresher/priya-a4-og.png"
+        },
+        {
+          "sample": "priya",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r008-fresher/priya-us-letter-p1-600.webp",
+            "resume-templates/r008-fresher/priya-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r008-fresher/priya-us-letter-og.png"
+        }
+      ]
+    },
+    "r009-switcher": {
+      "hash": "70f1b7833e2be2e4",
+      "renders": [
+        {
+          "sample": "maya",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r009-switcher/maya-a4-p1-600.webp",
+            "resume-templates/r009-switcher/maya-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r009-switcher/maya-a4-og.png"
+        },
+        {
+          "sample": "maya",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r009-switcher/maya-us-letter-p1-600.webp",
+            "resume-templates/r009-switcher/maya-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r009-switcher/maya-us-letter-og.png"
+        },
+        {
+          "sample": "hannah",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r009-switcher/hannah-a4-p1-600.webp",
+            "resume-templates/r009-switcher/hannah-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r009-switcher/hannah-a4-og.png"
+        },
+        {
+          "sample": "hannah",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r009-switcher/hannah-us-letter-p1-600.webp",
+            "resume-templates/r009-switcher/hannah-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r009-switcher/hannah-us-letter-og.png"
+        },
+        {
+          "sample": "grace",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r009-switcher/grace-a4-p1-600.webp",
+            "resume-templates/r009-switcher/grace-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r009-switcher/grace-a4-og.png"
+        },
+        {
+          "sample": "grace",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r009-switcher/grace-us-letter-p1-600.webp",
+            "resume-templates/r009-switcher/grace-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r009-switcher/grace-us-letter-og.png"
+        }
+      ]
+    },
+    "r010-europa": {
+      "hash": "75eaac584c9f08df",
+      "renders": [
+        {
+          "sample": "tomas",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r010-europa/tomas-a4-p1-600.webp",
+            "resume-templates/r010-europa/tomas-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r010-europa/tomas-a4-og.png"
+        },
+        {
+          "sample": "tomas",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r010-europa/tomas-us-letter-p1-600.webp",
+            "resume-templates/r010-europa/tomas-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r010-europa/tomas-us-letter-og.png"
+        },
+        {
+          "sample": "lukas",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r010-europa/lukas-a4-p1-600.webp",
+            "resume-templates/r010-europa/lukas-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r010-europa/lukas-a4-og.png"
+        },
+        {
+          "sample": "lukas",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r010-europa/lukas-us-letter-p1-600.webp",
+            "resume-templates/r010-europa/lukas-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r010-europa/lukas-us-letter-og.png"
+        },
+        {
+          "sample": "nina",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r010-europa/nina-a4-p1-600.webp",
+            "resume-templates/r010-europa/nina-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r010-europa/nina-a4-og.png"
+        },
+        {
+          "sample": "nina",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r010-europa/nina-us-letter-p1-600.webp",
+            "resume-templates/r010-europa/nina-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r010-europa/nina-us-letter-og.png"
+        },
+        {
+          "sample": "mateo",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r010-europa/mateo-a4-p1-600.webp",
+            "resume-templates/r010-europa/mateo-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r010-europa/mateo-a4-og.png"
+        },
+        {
+          "sample": "mateo",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r010-europa/mateo-us-letter-p1-600.webp",
+            "resume-templates/r010-europa/mateo-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r010-europa/mateo-us-letter-og.png"
+        },
+        {
+          "sample": "sofia",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r010-europa/sofia-a4-p1-600.webp",
+            "resume-templates/r010-europa/sofia-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r010-europa/sofia-a4-og.png"
+        },
+        {
+          "sample": "sofia",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r010-europa/sofia-us-letter-p1-600.webp",
+            "resume-templates/r010-europa/sofia-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r010-europa/sofia-us-letter-og.png"
+        }
+      ]
+    },
+    "r011-gulf": {
+      "hash": "e89ab95b6294c7da",
+      "renders": [
+        {
+          "sample": "omar",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r011-gulf/omar-a4-p1-600.webp",
+            "resume-templates/r011-gulf/omar-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r011-gulf/omar-a4-og.png"
+        },
+        {
+          "sample": "omar",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r011-gulf/omar-us-letter-p1-600.webp",
+            "resume-templates/r011-gulf/omar-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r011-gulf/omar-us-letter-og.png"
+        },
+        {
+          "sample": "fatima",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r011-gulf/fatima-a4-p1-600.webp",
+            "resume-templates/r011-gulf/fatima-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r011-gulf/fatima-a4-og.png"
+        },
+        {
+          "sample": "fatima",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r011-gulf/fatima-us-letter-p1-600.webp",
+            "resume-templates/r011-gulf/fatima-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r011-gulf/fatima-us-letter-og.png"
+        },
+        {
+          "sample": "carlos",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r011-gulf/carlos-a4-p1-600.webp",
+            "resume-templates/r011-gulf/carlos-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r011-gulf/carlos-a4-og.png"
+        },
+        {
+          "sample": "carlos",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r011-gulf/carlos-us-letter-p1-600.webp",
+            "resume-templates/r011-gulf/carlos-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r011-gulf/carlos-us-letter-og.png"
+        }
+      ]
+    },
+    "r012-specimen": {
+      "hash": "2612d0fa1c3141f7",
+      "renders": [
+        {
+          "sample": "noor",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r012-specimen/noor-a4-p1-600.webp",
+            "resume-templates/r012-specimen/noor-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r012-specimen/noor-a4-og.png"
+        },
+        {
+          "sample": "noor",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r012-specimen/noor-us-letter-p1-600.webp",
+            "resume-templates/r012-specimen/noor-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r012-specimen/noor-us-letter-og.png"
+        },
+        {
+          "sample": "mateo",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r012-specimen/mateo-a4-p1-600.webp",
+            "resume-templates/r012-specimen/mateo-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r012-specimen/mateo-a4-og.png"
+        },
+        {
+          "sample": "mateo",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r012-specimen/mateo-us-letter-p1-600.webp",
+            "resume-templates/r012-specimen/mateo-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r012-specimen/mateo-us-letter-og.png"
+        },
+        {
+          "sample": "grace",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r012-specimen/grace-a4-p1-600.webp",
+            "resume-templates/r012-specimen/grace-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r012-specimen/grace-a4-og.png"
+        },
+        {
+          "sample": "grace",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r012-specimen/grace-us-letter-p1-600.webp",
+            "resume-templates/r012-specimen/grace-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r012-specimen/grace-us-letter-og.png"
+        },
+        {
+          "sample": "priya",
+          "paper": "a4",
+          "pages": 1,
+          "ratio": 1.4128,
+          "files": [
+            "resume-templates/r012-specimen/priya-a4-p1-600.webp",
+            "resume-templates/r012-specimen/priya-a4-p1-1200.webp"
+          ],
+          "og": "resume-templates/r012-specimen/priya-a4-og.png"
+        },
+        {
+          "sample": "priya",
+          "paper": "us-letter",
+          "pages": 1,
+          "ratio": 1.2941,
+          "files": [
+            "resume-templates/r012-specimen/priya-us-letter-p1-600.webp",
+            "resume-templates/r012-specimen/priya-us-letter-p1-1200.webp"
+          ],
+          "og": "resume-templates/r012-specimen/priya-us-letter-og.png"
+        }
+      ]
+    }
+  }
+}

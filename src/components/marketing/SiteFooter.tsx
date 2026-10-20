@@ -17,9 +17,11 @@ const COLUMNS = [
   {
     title: "Product",
     links: [
+      { label: "Resume builder", href: ROUTES.resume },
+      { label: "Resume templates", href: ROUTES.resumeTemplates },
       { label: "How it works", href: ROUTES.howItWorks },
       { label: "Features", href: ROUTES.features },
-      { label: "Every look", href: `${ROUTES.home}#specimens` },
+      { label: "Every look", href: ROUTES.looks },
       { label: "Pricing", href: ROUTES.pricing },
       { label: "Questions", href: ROUTES.faq },
       { label: "Blog", href: ROUTES.blog },
@@ -48,6 +50,7 @@ const COLUMNS = [
     title: "Get started",
     links: [
       { label: "Upload my resume", href: ROUTES.build },
+      { label: "Build my resume", href: ROUTES.resumeNew },
       { label: "Create account", href: ROUTES.signup },
       { label: "Log in", href: ROUTES.login },
       { label: "Invite a friend", href: ROUTES.invite },

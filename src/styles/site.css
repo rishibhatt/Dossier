@@ -742,7 +742,19 @@
     transition: box-shadow 320ms ease, background-color 320ms ease;
   }
 
-  [data-condensed="true"] .site-nav-bar {
+  /* The masthead is full-bleed paper: on scroll nothing shows beside the bar, and the condensed ink rule
+   * runs edge to edge instead of stopping at the container. */
+  .site-masthead {
+    background: var(--site-paper);
+    border-bottom: 1px solid var(--site-rule-strong);
+    transition: box-shadow 320ms ease;
+  }
+
+  .site-masthead .site-nav-bar {
+    border-bottom-color: transparent;
+  }
+
+  .site-masthead[data-condensed="true"] {
     box-shadow: inset 0 -1px 0 var(--site-ink);
   }
 

@@ -12,7 +12,7 @@ const ACCENT = "#6d5cf6"
  * Fetches a Google font as TrueType for ImageResponse (an old Safari user agent makes Google serve TTF).
  * Any failure returns null and the card falls back to the default sans, so the image always renders.
  */
-async function loadFont(family: string, weight: number, text?: string): Promise<ArrayBuffer | null> {
+export async function loadFont(family: string, weight: number, text?: string): Promise<ArrayBuffer | null> {
   try {
     const q = `family=${family.replace(/\s+/g, "+")}:wght@${weight}${text ? `&text=${encodeURIComponent(text)}` : ""}`
     const css = await (
@@ -28,7 +28,7 @@ async function loadFont(family: string, weight: number, text?: string): Promise<
   }
 }
 
-function Glyph() {
+export function Glyph() {
   return (
     <svg width="52" height="52" viewBox="0 0 40 40">
       <rect width="40" height="40" rx="10" fill="#0b0c11" />

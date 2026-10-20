@@ -4,15 +4,18 @@ import type { NextConfig } from "next";
  * Security headers for every route. The CSP is report-only first: check the browser console on a few pages,
  * then rename the header to `Content-Security-Policy` to enforce it. `unsafe-inline` stays because Next injects
  * inline scripts without a nonce; the allow-lists cover Supabase and the analytics tools in `Analytics.tsx`.
+ * `'wasm-unsafe-eval'` lets the resume builder compile its Typst WebAssembly; it does not allow JS eval.
  */
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.clarity.ms https://scripts.clarity.ms https://pagead2.googlesyndication.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://www.googletagmanager.com https://www.clarity.ms https://scripts.clarity.ms https://pagead2.googlesyndication.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://*.clarity.ms",
   "frame-src 'self' https://googleads.g.doubleclick.net",
+  // The resume typesetter runs in a same-origin module worker.
+  "worker-src 'self'",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

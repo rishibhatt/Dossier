@@ -72,6 +72,11 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
     q: "How do invite credits work?",
     a: "Send a friend your invite link. When they sign up and publish their first portfolio, you both get a credit. One credit adds 20 extra shuffles for a week. Three credits unlock Starter.",
   },
+  {
+    group: "Basics",
+    q: "Can I make just a resume, without a website?",
+    a: "Yes. The resume builder is separate: pick a template, type or import your details, and download the PDF free with a free account. Turning it into a website later is one button.",
+  },
 ] as const
 
 function Item({ item }: { item: FaqItem }) {
@@ -92,11 +97,11 @@ function Item({ item }: { item: FaqItem }) {
 
 /** Short FAQ for the home and pricing pages, linking to the full page. */
 export function Faq({ ids }: { ids?: readonly number[] }) {
-  const items = (ids ?? [0, 3, 6, 4, 10, 8]).map((i) => FAQ_ITEMS[i]!).filter(Boolean)
+  const items = (ids ?? [0, 13, 3, 6, 4, 8]).map((i) => FAQ_ITEMS[i]!).filter(Boolean)
   return (
     <section id="faq" aria-labelledby="faq-title" className="faq scroll-mt-20 border-t border-[var(--site-rule-strong)] py-20 sm:py-28">
       <div className="site-wrap grid grid-cols-1 gap-10 lg:grid-cols-12">
-        <RunningHead label="Questions" no="007" className="!mb-0 lg:col-span-12" />
+        <RunningHead label="Questions" no="008" className="!mb-0 lg:col-span-12" />
         <div className="lg:col-span-4">
           <h2 id="faq-title" className="site-h2">
             Fair questions.

@@ -14,7 +14,7 @@ export function OnPhone({ person }: { person: SamplePerson }) {
   return (
     <section id="phone" aria-labelledby="phone-title" className="scroll-mt-20 bg-[var(--site-ink)] py-20 text-[var(--site-paper)] sm:py-28">
       <div className="site-wrap">
-        <RunningHead label="On your phone" no="005" className="!border-white/40" />
+        <RunningHead label="On your phone" no="006" className="!border-white/40" />
       </div>
       <div className="site-wrap grid gap-12 lg:grid-cols-12 lg:items-center">
         <div className="lg:col-span-7">

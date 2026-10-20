@@ -64,7 +64,7 @@ const GROUPS: { title: string; summary: string; rows: Row[] }[] = [
     summary: "Leave whenever you like and take it with you.",
     rows: [
       { name: "ZIP download", detail: "Plain HTML, CSS and images you can host anywhere.", plan: "Starter" },
-      { name: "PDF copy of your resume", detail: "A clean PDF generated from your edited content.", plan: "Pro", soon: true },
+      { name: "Resume builder", detail: "Tested resume templates with a live preview. The PDF download is free on every plan.", plan: "Free" },
     ],
   },
 ]

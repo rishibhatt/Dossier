@@ -1,4 +1,7 @@
+import Link from "next/link"
+
 import { UploadSlot } from "@/components/marketing/UploadSlot"
+import { ROUTES } from "@/lib/constants/routes"
 
 /** The close: one sheet with crop marks, the headline and the same working upload slot as the hero. */
 export function FinalCta({ title = "Your next application could link to a site." }: { title?: string }) {
@@ -12,6 +15,12 @@ export function FinalCta({ title = "Your next application could link to a site."
                 {title}
               </h2>
               <p className="site-lead mt-5">Upload your resume now and see it set as a site. Sign up only when you want to publish.</p>
+              <p className="mt-4 text-[0.9375rem] text-[var(--site-ink-2)]">
+                Resume needs work first?{" "}
+                <Link href={ROUTES.resumeNew} className="site-link-mark font-medium text-[var(--site-ink)]">
+                  Build the PDF, free
+                </Link>
+              </p>
             </div>
             <UploadSlot id="close-upload" className="lg:col-span-5" />
           </div>

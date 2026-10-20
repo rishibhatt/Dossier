@@ -367,7 +367,7 @@ function offerFor(reason: CancelReason, plan: PlanId, supportEmail: string): Off
     case "missing_feature":
       return {
         title: "Tell us what is missing",
-        body: "Planned for Pro: your own domain, visit counts for each page and a PDF copy of your resume. None of these are built yet. If yours is not on that list, say so below. We read every answer.",
+        body: "Planned for Pro: your own domain and visit counts for each page. Neither is built yet. If yours is not on that list, say so below. We read every answer.",
         actions: [{ kind: "submit", label: `Send and keep ${PLAN_NAME[plan]}`, outcome: "kept_plan", offer: "roadmap_note", doneText: KEPT, primary: true }],
       }
     case "hard_to_use":

@@ -5,11 +5,16 @@ import Link from "next/link"
 import { Pause, Play, Shuffle } from "lucide-react"
 
 import { gsap, MOTION_OK, SplitText, useGSAP } from "@/components/marketing/motion/gsap"
+import { SiteButton } from "@/components/marketing/primitives"
 import type { SamplePerson } from "@/components/marketing/sample"
 import type { Specimen } from "@/components/marketing/specimens"
 import { UploadSlot } from "@/components/marketing/UploadSlot"
+import { ROUTES } from "@/lib/constants/routes"
 
 const HOLD_MS = 3400
+
+/** Page one of the sample person's resume as the builder sets it (a real Typst render, see scripts/resume/thumbnails.ts). */
+export type HeroResumePage = { src: string; srcLarge: string; ratio: number; template: string }
 
 function face(name: string): CSSProperties {
   return { fontFamily: `"${name}", var(--site-display)` }
@@ -20,7 +25,7 @@ function face(name: string): CSSProperties {
  * resume lines and the engine's real data for the current look. It re-sets itself into the next look on a
  * timer (paused on hover, focus, reduced motion, or by the visitor), which is what shuffle does in the builder.
  */
-export function Hero({ specimens, person, total }: { specimens: Specimen[]; person: SamplePerson; total: number }) {
+export function Hero({ specimens, person, total, resumePage }: { specimens: Specimen[]; person: SamplePerson; total: number; resumePage?: HeroResumePage }) {
   const root = useRef<HTMLElement>(null)
   const showing = useRef<HTMLParagraphElement>(null)
   const [i, setI] = useState(0)
@@ -80,7 +85,7 @@ export function Hero({ specimens, person, total }: { specimens: Specimen[]; pers
         {/* Running head of the sheet */}
         <div className="sp-data flex items-center justify-between gap-4 pb-2">
           <span>Dossier specimens</span>
-          <span className="hidden sm:inline">Set from one sample resume</span>
+          <span className="hidden sm:inline">One sample resume, set as a PDF and as a site</span>
           <span className="sp-no">
             {String(total).padStart(3, "0")} looks in the engine
           </span>
@@ -90,18 +95,38 @@ export function Hero({ specimens, person, total }: { specimens: Specimen[]; pers
         <div className="sp-columns grid grid-cols-1 lg:grid-cols-12">
           {/* Copy */}
           <div data-copy className="order-2 flex min-w-0 flex-col justify-center gap-5 pb-8 pt-6 sm:gap-6 sm:py-12 lg:col-span-5 lg:py-14 lg:pl-10 lg:[&>*]:bg-[var(--site-paper)]">
-            <h1 id="hero-title" className="site-h1 max-w-[14ch] lg:text-[clamp(3rem,4.6vw,4.5rem)]">
-              Your resume, set as a website.
+            <h1 id="hero-title" className="site-h1 max-w-[13ch] lg:text-[clamp(3rem,4.6vw,4.5rem)]">
+              One resume. A PDF and a website.
             </h1>
             <p className="site-lead">
-              Upload the PDF you already have. Dossier reads it, lays it out as a portfolio site, and lets you try
-              look after look until one feels like you. Then publish a link, from your phone if you like.
+              Bring the resume you have. Dossier sets it as a PDF that parsers read in order, and as a portfolio site
+              you can publish from your phone. Both are free to start.
             </p>
-            <UploadSlot className="max-w-md" />
+
+            {/* Two outputs, two doors. The upload goes to the website builder; the PDF starts in the resume editor. */}
+            <div className="max-w-md border border-[var(--site-rule-strong)] bg-[var(--site-paper)]">
+              <div className="p-3 pb-2">
+                <p className="mb-2 px-1 text-sm font-semibold">Have a resume? Get the website.</p>
+                <UploadSlot label="Upload my resume" />
+              </div>
+              <div className="flex flex-col gap-3 border-t border-[var(--site-rule-strong)] p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold">Need a better resume? Make the PDF.</p>
+                  <p className="sp-data mt-0.5">Tested templates · free download, no watermark</p>
+                </div>
+                <SiteButton href={ROUTES.resumeNew} variant="secondary" size="sm" arrow className="shrink-0">
+                  Build my resume
+                </SiteButton>
+              </div>
+            </div>
             <p className="text-sm text-[var(--site-ink-2)]">
-              Not ready to upload?{" "}
+              Not ready?{" "}
+              <Link href={ROUTES.resumeTemplates} className="site-link-mark font-medium text-[var(--site-ink)]">
+                See the resume templates
+              </Link>{" "}
+              or{" "}
               <Link href="#specimens" className="site-link-mark font-medium text-[var(--site-ink)]">
-                Browse every look first
+                every website look
               </Link>
             </p>
           </div>
@@ -178,9 +203,21 @@ export function Hero({ specimens, person, total }: { specimens: Specimen[]; pers
                 </tbody>
               </table>
             </figure>
+            {resumePage ? (
+              <figure
+                className="pointer-events-none absolute -bottom-14 -right-2 z-10 hidden w-[27%] max-w-[11rem] rotate-[3deg] sm:block lg:-right-5"
+                aria-label={`The same sample resume as a PDF, template ${resumePage.template}`}
+              >
+                <div className="overflow-hidden border border-[var(--site-rule-strong)] bg-white shadow-[0_1px_1px_rgba(16,17,20,0.04),0_18px_34px_-14px_rgba(16,17,20,0.45)]" style={{ aspectRatio: `1 / ${(resumePage.ratio * 0.5).toFixed(3)}`, borderRadius: 2 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- static pre-rendered WebP with explicit sizes */}
+                  <img src={resumePage.src} width={600} height={Math.round(600 * resumePage.ratio)} alt="" className="block w-full" loading="eager" />
+                </div>
+                <figcaption className="sp-data mt-1.5 rounded-[2px] bg-[var(--site-paper)] px-1.5 py-0.5">PDF · {resumePage.template}</figcaption>
+              </figure>
+            ) : null}
             </div>
 
-            <div className="mt-3 flex items-center justify-between gap-3">
+            <div className={`mt-3 flex items-center justify-between gap-3 ${resumePage ? "sm:pr-[30%]" : ""}`}>
               <p className="text-xs text-[var(--site-ink-2)]">Sample person and resume, made up for this page.</p>
               <div className="flex shrink-0 gap-1.5">
                 <button

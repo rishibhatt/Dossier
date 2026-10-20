@@ -15,7 +15,8 @@ const COMPARE: { row: string; free: string | boolean; starter: string | boolean;
   { row: "Download the site as a ZIP", free: false, starter: true, pro: true },
   { row: "Your own domain", free: false, starter: false, pro: true, soon: true },
   { row: "Visit counts", free: false, starter: false, pro: true, soon: true },
-  { row: "PDF copy of your resume", free: false, starter: false, pro: true, soon: true },
+  { row: "Resume PDF download", free: true, starter: true, pro: true },
+  { row: "Saved resumes", free: "2", starter: "200", pro: "200" },
 ]
 
 function Cell({ v }: { v: string | boolean }) {
@@ -29,7 +30,7 @@ export function Pricing({ as: Heading = "h2", full = false }: { as?: "h1" | "h2"
   return (
     <section id="pricing" aria-labelledby="pricing-title" className={cn("scroll-mt-20 pb-20 sm:pb-28", Heading === "h1" ? "pt-6 sm:pt-10" : "pt-20 sm:pt-28")}>
       <div className="site-wrap">
-        <RunningHead label="Pricing" no="006" />
+        <RunningHead label="Pricing" no="007" />
         <div className="grid gap-6 lg:grid-cols-12">
           <Heading id="pricing-title" className="site-h2 lg:col-span-7">
             Free to publish. Pay once to make it yours.

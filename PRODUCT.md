@@ -27,7 +27,8 @@ Free-tier LLMs (Groq, OpenRouter fallback) for resume extraction and copy edits.
 - Plans (confirmed): Free; Starter $9 one-time; Pro $39/year. Paid buttons route to signup until billing ships in Phase 2.
 - Free: 1 portfolio, public link, "Made with Dossier" badge, 3 design regenerations a day, no ZIP export.
 - Starter: badge removed, unlimited regeneration for that portfolio, ZIP export.
-- Pro: 5 portfolios, custom domain or subdomain, analytics, PDF resume export (these Pro extras are planned, not shipped).
+- Pro: 5 portfolios, custom domain or subdomain, analytics (these Pro extras are planned, not shipped).
+- Resume builder (Dossier Resume): 12 tested Typst templates; the PDF download is free on every plan. Free keeps 2 resumes, Starter and Pro up to 200.
 - Published portfolios are noindex by default; owners can opt in.
 - Runtime LLM-written JSX is retired; design variation is config-driven.
 - Billing provider undecided (merchant of record, individual seller, global).

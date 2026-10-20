@@ -1,0 +1,74 @@
+{
+  "template": "r001-ledger",
+  "sample": "Meera Iyer (sample)",
+  "testedAt": "2026-10-20",
+  "extractor": "pdf.js",
+  "pdfTitle": "Meera Iyer – Senior Accountant",
+  "fields": [
+    {
+      "field": "Name",
+      "value": "Meera Iyer",
+      "found": true
+    },
+    {
+      "field": "Headline",
+      "value": "Senior Accountant",
+      "found": true
+    },
+    {
+      "field": "Email",
+      "value": "meera@example.com",
+      "found": true
+    },
+    {
+      "field": "Phone",
+      "value": "+91 98200 00000",
+      "found": true
+    },
+    {
+      "field": "Location",
+      "value": "Pune, India",
+      "found": true
+    },
+    {
+      "field": "Link",
+      "value": "linkedin.com/in/meera-sample",
+      "found": true
+    },
+    {
+      "field": "Latest job title",
+      "value": "Senior Accountant",
+      "found": true
+    },
+    {
+      "field": "Employer",
+      "value": "Kulkarni & Rao LLP",
+      "found": true
+    },
+    {
+      "field": "Dates",
+      "value": "Apr 2021 – Present",
+      "found": true
+    },
+    {
+      "field": "First bullet",
+      "value": "Close month-end for 14 clients in 4 working days, down from 7.",
+      "found": true
+    },
+    {
+      "field": "Degree",
+      "value": "CA Intermediate",
+      "found": true
+    },
+    {
+      "field": "School",
+      "value": "Institute of Chartered Accountants of India",
+      "found": true
+    },
+    {
+      "field": "Skills",
+      "value": "Month-end close, GST filing, TDS, Audit support",
+      "found": true
+    }
+  ]
+}

@@ -4,12 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/check-env.mjs",
+    "prebuild": "node scripts/check-env.mjs && node scripts/resume/sync-typst-assets.mjs && jiti scripts/resume/thumbnails.ts",
     "prepare": "git config core.hooksPath .githooks || exit 0",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "indexnow": "INDEXNOW_KEY=faf64ad717e6887e5fc3fcb5facfdea9 node scripts/indexnow.mjs"
+    "indexnow": "INDEXNOW_KEY=faf64ad717e6887e5fc3fcb5facfdea9 node scripts/indexnow.mjs",
+    "predev": "node scripts/resume/sync-typst-assets.mjs",
+    "resume:verify": "node scripts/resume/sync-typst-assets.mjs && jiti scripts/resume/verify.ts",
+    "resume:thumbs": "jiti scripts/resume/thumbnails.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
@@ -18,6 +21,8 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.2.2",
+    "@myriaddreamin/typst-ts-renderer": "0.7.0",
+    "@myriaddreamin/typst-ts-web-compiler": "0.7.0",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.104.1",
     "class-variance-authority": "^0.7.1",
@@ -34,6 +39,7 @@
     "next": "16.4.0",
     "next-themes": "^0.4.6",
     "pdf-parse": "^2.4.5",
+    "pdfjs-dist": "5.4.296",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-dropzone": "^15.0.0",
@@ -54,6 +60,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
+    "jiti": "2.6.1",
     "shadcn": "^4.4.0",
     "tailwindcss": "^4",
     "typescript": "^5"

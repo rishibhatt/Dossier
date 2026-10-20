@@ -267,6 +267,38 @@ export type Database = {
         }
         Relationships: []
       }
+      resumes: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          template_id: string
+          template_version: number
+          data: Json
+          design: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title?: string
+          template_id: string
+          template_version?: number
+          data: Json
+          design: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          title?: string
+          template_id?: string
+          template_version?: number
+          data?: Json
+          design?: Json
+        }
+        Relationships: []
+      }
       referral_codes: {
         Row: {
           user_id: string

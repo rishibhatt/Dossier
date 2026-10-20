@@ -13,8 +13,9 @@ import { cn } from "@/lib/utils"
 
 /** `id` is the section id on the home page that makes the link "current" while it is on screen. */
 const NAV = [
+  { id: "resume", label: "Resume builder", href: ROUTES.resume, path: ROUTES.resume },
   { id: "how", label: "How it works", href: ROUTES.howItWorks, path: ROUTES.howItWorks },
-  { id: "specimens", label: "Looks", href: `${ROUTES.home}#specimens`, path: null },
+  { id: "specimens", label: "Looks", href: ROUTES.looks, path: ROUTES.looks },
   { id: "tools", label: "Free tools", href: ROUTES.tools, path: ROUTES.tools },
   { id: "blog", label: "Blog", href: ROUTES.blog, path: ROUTES.blog },
   { id: "pricing", label: "Pricing", href: ROUTES.pricing, path: ROUTES.pricing },
@@ -97,7 +98,7 @@ function MobileMenu() {
 }
 
 /** Phone-only CTA that slides up once the hero is behind you and steps aside at the footer. */
-function FloatingCta({ hidden }: { hidden: boolean }) {
+function FloatingCta({ hidden, href = ROUTES.build, label = "Upload my resume" }: { hidden: boolean; href?: string; label?: string }) {
   const [scrolled, setScrolled] = useState(false)
   const [atFooter, setAtFooter] = useState(false)
 
@@ -122,8 +123,8 @@ function FloatingCta({ hidden }: { hidden: boolean }) {
   const show = scrolled && !atFooter && !hidden
   return (
     <div className="site-float-cta" data-show={show} aria-hidden={!show}>
-      <SiteButton href={ROUTES.build} size="lg" arrow className="shadow-[0_12px_28px_-10px_rgba(16,17,20,0.6)]">
-        Upload my resume
+      <SiteButton href={href} size="lg" arrow className="shadow-[0_12px_28px_-10px_rgba(16,17,20,0.6)]">
+        {label}
       </SiteButton>
     </div>
   )
@@ -175,7 +176,10 @@ export function SiteHeader() {
     return () => io.disconnect()
   }, [pathname])
 
-  const current = NAV.find((n) => n.path && pathname?.startsWith(n.path))?.id ?? (pathname === ROUTES.home ? section : null)
+  // A path matches itself and its children, so /resume does not also claim /resume-keywords.
+  const onPath = (p: string) => pathname === p || pathname?.startsWith(`${p}/`)
+  const current =
+    (pathname?.startsWith(ROUTES.resumeTemplates) ? "resume" : NAV.find((n) => n.path && onPath(n.path))?.id) ?? (pathname === ROUTES.home ? section : null)
 
   const moveTo = useCallback((el: HTMLElement, instant = false) => {
     const ind = indicator.current
@@ -203,11 +207,15 @@ export function SiteHeader() {
     void document.fonts?.ready.then(rest)
   }, [current, rest])
 
-  const hideFloating = pathname === ROUTES.login || pathname === ROUTES.signup
+  // Resume pages float their own action: a template detail page has a fixed "Use this template" bar instead.
+  const onTemplatePage = pathname?.startsWith(`${ROUTES.resumeTemplates}/`)
+  const onResumePages = pathname === ROUTES.resume || pathname === ROUTES.resumeTemplates
+  const onResumeSide = pathname === ROUTES.resume || pathname?.startsWith(ROUTES.resumeTemplates)
+  const hideFloating = pathname === ROUTES.login || pathname === ROUTES.signup || onTemplatePage
 
   return (
     <>
-      <header ref={root} data-condensed="false" className="sticky top-0 z-50">
+      <header ref={root} data-condensed="false" className="site-masthead sticky top-0 z-50">
         <div className="site-wrap">
           <div className="site-nav-bar">
             <Link href={ROUTES.home} aria-label="Dossier home" className="py-1">
@@ -235,10 +243,18 @@ export function SiteHeader() {
               <SiteButton href={ROUTES.login} variant="quiet" size="sm" className="hidden sm:inline-flex">
                 Log in
               </SiteButton>
-              <SiteButton href={ROUTES.build} size="sm" arrow className="hidden sm:inline-flex">
-                <span className="xl:hidden">Build mine</span>
-                <span className="hidden xl:inline">Build my portfolio</span>
-              </SiteButton>
+              {/* On resume pages the main action is the resume; everywhere else it is the website. */}
+              {onResumeSide ? (
+                <SiteButton href={ROUTES.resumeNew} size="sm" arrow className="hidden sm:inline-flex">
+                  <span className="xl:hidden">Build mine</span>
+                  <span className="hidden xl:inline">Build my resume</span>
+                </SiteButton>
+              ) : (
+                <SiteButton href={ROUTES.build} size="sm" arrow className="hidden sm:inline-flex">
+                  <span className="xl:hidden">Build mine</span>
+                  <span className="hidden xl:inline">Build my portfolio</span>
+                </SiteButton>
+              )}
 
               <Sheet>
                 <SheetTrigger aria-label="Open menu" className={siteBtnClass({ variant: "primary", size: "sm", className: "!px-0 aspect-square lg:hidden" })}>
@@ -255,7 +271,10 @@ export function SiteHeader() {
           </div>
         </div>
       </header>
-      <FloatingCta hidden={hideFloating} />
+      <FloatingCta
+        hidden={hideFloating}
+        {...(onResumePages ? { href: pathname === ROUTES.resume ? ROUTES.resumeTemplates : ROUTES.resumeNew, label: pathname === ROUTES.resume ? "Pick a template" : "Start my resume" } : {})}
+      />
     </>
   )
 }

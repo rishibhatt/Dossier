@@ -13,3 +13,20 @@
   # These values are public by design (they ship in the browser bundle). Netlify's secret scanner would
   # otherwise flag them if they are marked secret. Real secrets are never listed here.
   SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_SITE_URL,NEXT_PUBLIC_GA_ID,NEXT_PUBLIC_CLARITY_ID,NEXT_PUBLIC_POSTHOG_KEY,NEXT_PUBLIC_POSTHOG_HOST,NEXT_PUBLIC_GSC_VERIFICATION,NEXT_PUBLIC_SUPPORT_EMAIL"
+
+# Resume engine: content-hashed wasm and templates never change, so the CDN and browser keep them forever.
+[[headers]]
+  for = "/typst/a/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# The manifest names the current hashed files, so it must always be fresh.
+[[headers]]
+  for = "/typst/manifest.json"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/fonts/resume/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

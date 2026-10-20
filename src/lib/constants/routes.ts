@@ -4,6 +4,12 @@
 export const ROUTES = {
   home: "/",
   build: "/build",
+  resume: "/resume",
+  resumeTemplates: "/resume-templates",
+  looks: "/looks",
+  resumeExamples: "/resume-examples",
+  resumeNew: "/resume/new",
+  resumeEdit: "/resume/edit",
   livePreview: "/live-preview",
   authCallback: "/auth/callback",
   login: "/login",
