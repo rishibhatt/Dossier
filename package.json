@@ -8,7 +8,8 @@
     "prepare": "git config core.hooksPath .githooks || exit 0",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "indexnow": "INDEXNOW_KEY=faf64ad717e6887e5fc3fcb5facfdea9 node scripts/indexnow.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
