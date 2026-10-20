@@ -7,7 +7,7 @@ import { FREE_TOOLS } from "@/features/tools/catalog"
 import { ROUTES } from "@/lib/constants/routes"
 
 /** Bump when the static pages change in a way worth recrawling. Real dates beat a fresh timestamp on every build. */
-const SITE_UPDATED = "2026-10-14"
+const SITE_UPDATED = "2026-10-20"
 
 type Entry = { path: string; priority: number; updated?: string }
 
