@@ -1,0 +1,170 @@
+{
+  "r001-ledger": {
+    "src": "/resume-templates/r001-ledger/meera-a4-p1-600.webp",
+    "sample": "meera"
+  },
+  "r002-plain": {
+    "src": "/resume-templates/r002-plain/arjun-a4-p1-600.webp",
+    "sample": "arjun"
+  },
+  "r003-column": {
+    "src": "/resume-templates/r003-column/lena-a4-p1-600.webp",
+    "sample": "lena"
+  },
+  "r004-scholar": {
+    "src": "/resume-templates/r004-scholar/mei-a4-p1-600.webp",
+    "sample": "mei"
+  },
+  "r005-compact": {
+    "src": "/resume-templates/r005-compact/robert-a4-p1-600.webp",
+    "sample": "robert"
+  },
+  "r006-modern": {
+    "src": "/resume-templates/r006-modern/sofia-a4-p1-600.webp",
+    "sample": "sofia"
+  },
+  "r007-executive": {
+    "src": "/resume-templates/r007-executive/robert-a4-p1-600.webp",
+    "sample": "robert"
+  },
+  "r008-fresher": {
+    "src": "/resume-templates/r008-fresher/sneha-a4-p1-600.webp",
+    "sample": "sneha"
+  },
+  "r009-switcher": {
+    "src": "/resume-templates/r009-switcher/maya-a4-p1-600.webp",
+    "sample": "maya"
+  },
+  "r010-europa": {
+    "src": "/resume-templates/r010-europa/tomas-a4-p1-600.webp",
+    "sample": "tomas"
+  },
+  "r011-gulf": {
+    "src": "/resume-templates/r011-gulf/omar-a4-p1-600.webp",
+    "sample": "omar"
+  },
+  "r012-specimen": {
+    "src": "/resume-templates/r012-specimen/noor-a4-p1-600.webp",
+    "sample": "noor"
+  },
+  "r013-margin": {
+    "src": "/resume-templates/r013-margin/lukas-a4-p1-600.webp",
+    "sample": "lukas"
+  },
+  "r014-harbor": {
+    "src": "/resume-templates/r014-harbor/priya-a4-p1-600.webp",
+    "sample": "priya"
+  },
+  "r015-bedside": {
+    "src": "/resume-templates/r015-bedside/lena-a4-p1-600.webp",
+    "sample": "lena"
+  },
+  "r016-counter": {
+    "src": "/resume-templates/r016-counter/marcus-a4-p1-600.webp",
+    "sample": "marcus"
+  },
+  "r017-shift": {
+    "src": "/resume-templates/r017-shift/andre-a4-p1-600.webp",
+    "sample": "andre"
+  },
+  "r018-brief": {
+    "src": "/resume-templates/r018-brief/aoife-a4-p1-600.webp",
+    "sample": "aoife"
+  },
+  "r019-folio": {
+    "src": "/resume-templates/r019-folio/ananya-a4-p1-600.webp",
+    "sample": "ananya"
+  },
+  "r020-transit": {
+    "src": "/resume-templates/r020-transit/rahul-a4-p1-600.webp",
+    "sample": "rahul"
+  },
+  "r021-lecture": {
+    "src": "/resume-templates/r021-lecture/emily-a4-p1-600.webp",
+    "sample": "emily"
+  },
+  "r022-atelier": {
+    "src": "/resume-templates/r022-atelier/noor-a4-p1-600.webp",
+    "sample": "noor"
+  },
+  "r023-signal": {
+    "src": "/resume-templates/r023-signal/vikram-a4-p1-600.webp",
+    "sample": "vikram"
+  },
+  "r024-docket": {
+    "src": "/resume-templates/r024-docket/olivia-a4-p1-600.webp",
+    "sample": "olivia"
+  },
+  "r025-ward": {
+    "src": "/resume-templates/r025-ward/rosa-a4-p1-600.webp",
+    "sample": "rosa"
+  },
+  "r026-site": {
+    "src": "/resume-templates/r026-site/ben-a4-p1-600.webp",
+    "sample": "ben"
+  },
+  "r027-quarter": {
+    "src": "/resume-templates/r027-quarter/robert-a4-p1-600.webp",
+    "sample": "robert"
+  },
+  "r028-pitch": {
+    "src": "/resume-templates/r028-pitch/jessica-a4-p1-600.webp",
+    "sample": "jessica"
+  },
+  "r029-campus": {
+    "src": "/resume-templates/r029-campus/sneha-a4-p1-600.webp",
+    "sample": "sneha"
+  },
+  "r030-clinic": {
+    "src": "/resume-templates/r030-clinic/mei-a4-p1-600.webp",
+    "sample": "mei"
+  },
+  "r031-tally": {
+    "src": "/resume-templates/r031-tally/meera-a4-p1-600.webp",
+    "sample": "meera"
+  },
+  "r032-field": {
+    "src": "/resume-templates/r032-field/kwame-a4-p1-600.webp",
+    "sample": "kwame"
+  },
+  "r033-atlas": {
+    "src": "/resume-templates/r033-atlas/nina-a4-p1-600.webp",
+    "sample": "nina"
+  },
+  "r034-notebook": {
+    "src": "/resume-templates/r034-notebook/grace-a4-p1-600.webp",
+    "sample": "grace"
+  },
+  "r035-kernel": {
+    "src": "/resume-templates/r035-kernel/daniel-a4-p1-600.webp",
+    "sample": "daniel"
+  },
+  "r036-cadence": {
+    "src": "/resume-templates/r036-cadence/hannah-a4-p1-600.webp",
+    "sample": "hannah"
+  },
+  "r037-mercy": {
+    "src": "/resume-templates/r037-mercy/rachel-a4-p1-600.webp",
+    "sample": "rachel"
+  },
+  "r038-bench": {
+    "src": "/resume-templates/r038-bench/mei-a4-p1-600.webp",
+    "sample": "mei"
+  },
+  "r039-range": {
+    "src": "/resume-templates/r039-range/sofia-a4-p1-600.webp",
+    "sample": "sofia"
+  },
+  "r040-crew": {
+    "src": "/resume-templates/r040-crew/carlos-a4-p1-600.webp",
+    "sample": "carlos"
+  },
+  "r041-civic": {
+    "src": "/resume-templates/r041-civic/david-a4-p1-600.webp",
+    "sample": "david"
+  },
+  "r042-thread": {
+    "src": "/resume-templates/r042-thread/mateo-a4-p1-600.webp",
+    "sample": "mateo"
+  }
+}

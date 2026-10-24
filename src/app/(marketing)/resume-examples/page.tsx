@@ -14,7 +14,7 @@ import "@/styles/resume-site.css"
 export const metadata: Metadata = buildPageMetadata({
   title: "Resume examples by role, set in tested templates | Dossier",
   description:
-    "Resume examples for accountants, nurses, engineers, teachers, designers and more. Each is a fictional sample set in a real template, with notes on layout and bullets. Start from any of them free.",
+    "Resume examples for accountants, nurses, home health aides, chefs, truck drivers, electricians, engineers and more. Each is a fictional sample set in a real template, with notes on layout and bullets. Start from any of them free.",
   path: ROUTES.resumeExamples,
 })
 
@@ -24,11 +24,14 @@ const DOMAIN_ORDER: SampleDomain[] = [
   "Finance",
   "Business and operations",
   "Marketing and sales",
+  "Retail and service",
   "Design and writing",
   "Healthcare",
   "Education and research",
   "Law and HR",
   "Hospitality",
+  "Trades and transport",
+  "Public services",
 ]
 
 export default function ResumeExamplesPage() {

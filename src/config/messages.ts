@@ -227,7 +227,7 @@ export const messages = {
   seo: {
     defaultTitle: "Dossier",
     defaultDescription:
-      "Dossier turns your resume into a portfolio website. Restyle it with one tap, publish a link, and do it all from a phone.",
+      "Build a resume from tested templates and download the PDF free, or turn the resume you have into a portfolio website. Free to start.",
     homeTitle: "Dossier — Turn your resume into a portfolio website",
     homeDescription:
       "Upload your resume PDF and get a portfolio website you can edit, restyle and publish as a link.",

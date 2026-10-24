@@ -44,7 +44,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Search 
   const base = buildPageMetadata({
     title: "Free resume templates, tested with a PDF parser | Dossier",
     description:
-      "Twelve free resume templates set in Typst, each tested by reading its PDF back with a parser, with the dated results on every page. Filter by role, country format, career stage and style. Download the PDF free.",
+      `${templateEntries().length} free resume templates set in Typst, each tested by reading its PDF back with a parser, with the dated results on every page. Filter by role, country format, career stage and style. Download the PDF free.`,
     path: ROUTES.resumeTemplates,
   })
   // Filtered views are for sharing, not ranking: the canonical stays on the unfiltered hub.

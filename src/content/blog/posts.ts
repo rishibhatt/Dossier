@@ -1,7 +1,9 @@
 /**
  * Blog posts as typed data: no MDX dependency, every post renders to semantic HTML and Article JSON-LD.
- * Inline links use [label](/path). Add a post by appending to POSTS. Keep claims checkable: no invented statistics.
+ * Inline links use [label](/path). Add a post by appending to GUIDES, or to RESUME_BUILDER_POSTS when it hands off to the builder. Keep claims checkable: no invented statistics.
  */
+import { RESUME_BUILDER_POSTS } from "./resume-builder-posts"
+
 export type Block =
   | { t: "h2"; text: string }
   | { t: "p"; text: string }
@@ -22,8 +24,8 @@ export type Post = {
   updated?: string
   /** Optional hand-made or AI-generated image in /public. When absent, an on-brand card is generated. */
   hero?: string
-  /** Slug of the free tool the post hands off to. */
-  tool: "ats-checker" | "headline-writer" | "linkedin-about" | "resume-to-website"
+  /** Slug of the free tool the post hands off to, or the resume builder. */
+  tool: "ats-checker" | "headline-writer" | "linkedin-about" | "resume-to-website" | "resume-builder"
   toolPitch: string
   body: Block[]
   /** Questions people also search. Rendered under the post and as FAQPage JSON-LD. Answers are plain text. */
@@ -38,7 +40,7 @@ export const AUTHOR = {
   url: "https://rishieee.netlify.app",
 } as const
 
-export const POSTS: readonly Post[] = [
+const GUIDES: readonly Post[] = [
   {
     slug: "how-to-pass-ats-resume-scan",
     title: "How to pass an ATS resume scan",
@@ -619,7 +621,9 @@ export const POSTS: readonly Post[] = [
       { q: "Can I add my portfolio to LinkedIn from the phone app?", a: "Yes. The Featured section and Contact info can be edited in the app. If an option is missing, open linkedin.com in your phone's browser." },
     ],
   },
-] as const
+]
+
+export const POSTS: readonly Post[] = [...GUIDES, ...RESUME_BUILDER_POSTS]
 
 export function getPost(slug: string): Post | undefined {
   return POSTS.find((p) => p.slug === slug)

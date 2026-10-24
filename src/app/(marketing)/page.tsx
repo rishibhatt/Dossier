@@ -7,7 +7,7 @@ import { siteConfig } from "@/config/site"
 import { ROUTES } from "@/lib/constants/routes"
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Dossier: build your resume PDF and turn it into a website",
+  title: "Free Resume Builder and Portfolio Website From Your Resume | Dossier",
   description:
     "Build a resume from tested templates and download the PDF free, or upload the resume you have and Dossier sets it as a portfolio website. Free to start.",
   path: ROUTES.home,

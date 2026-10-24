@@ -9,6 +9,7 @@
  * Writes content/resume-templates/verification/<template>.json. Exit code 1 on any failure.
  * Run: npm run resume:verify
  */
+import { spawnSync } from "node:child_process"
 import fs from "node:fs"
 import path from "node:path"
 
@@ -21,6 +22,8 @@ import { loadEngine } from "./nodeEngine"
 const root = process.cwd()
 const outDir = path.join(root, "content/resume-templates/verification")
 const keepPdfs = process.argv.includes("--keep")
+// --only=r042,r013 checks just those templates (ids or id prefixes) and leaves the other reports untouched.
+const only = process.argv.find((a) => a.startsWith("--only="))?.slice(7).split(",").filter(Boolean)
 
 const norm = (s: string) =>
   s
@@ -66,18 +69,24 @@ function inOrder(haystack: string, needles: string[]) {
 }
 
 async function main() {
-  const engine = await loadEngine()
   fs.mkdirSync(outDir, { recursive: true })
   let failures = 0
 
-  for (const t of RESUME_TEMPLATES) {
+  for (const t of RESUME_TEMPLATES.filter((x) => !only || only.some((o) => x.id.startsWith(o)))) {
+    // A fresh compiler per template: one wasm instance driven through thousands of compiles can panic, and a
+    // panicked instance fails every later compile. A panic mid-template gets one retry on a new instance.
+    let engine = await loadEngine()
     const runs: { sample: string; density: string; paper: string; pages: number; ms: number; checks: Check[] }[] = []
     for (const sample of SAMPLE_RESUMES) {
       for (const density of DENSITIES) {
         for (const paper of ["a4", "us-letter"] as const) {
           const design: ResumeDesign = { templateId: t.id, preset: "eu", paper, density, accent: "ink" }
           const model = toRenderModel(sample.doc, design)
-          const r = engine.pdf(`/${t.id}.typ`, JSON.stringify(model))
+          let r = engine.pdf(`/${t.id}.typ`, JSON.stringify(model))
+          if (!r.ok && /unreachable|recursive use of an object/i.test(r.error)) {
+            engine = await loadEngine()
+            r = engine.pdf(`/${t.id}.typ`, JSON.stringify(model))
+          }
           const checks: Check[] = []
           if (!r.ok) {
             checks.push({ name: "compiles", pass: false, detail: r.error })
@@ -97,16 +106,17 @@ async function main() {
           // sets them. Two-column templates read the main column first, then the sidebar, matching their source.
           const d = model.doc
           const side = ["skills", "languages", "certifications", "awards"]
+          // Each template declares the order it sets an entry's fields in (templates.ts `order`), so the check
+          // follows the template rather than a list of special cases.
           const entryFields = (e: RenderEntry, type: string, inSide: boolean) => {
             const bullets = e.bullets.map((b) => b.text)
-            if (t.id === "r002-plain") {
-              const orgFirst = ["experience", "volunteering", "education"].includes(type) && e.subtitle
+            if (t.id === "r004-scholar" && type === "publications") return [e.title, e.subtitle, e.date, e.detail]
+            const order = (inSide ? t.sideOrder : undefined) ?? t.order ?? "role-date-org"
+            if (order === "org-role-date") {
+              const orgFirst = e.subtitle && (!t.orgFirstTypes || t.orgFirstTypes.includes(type))
               return orgFirst ? [e.subtitle, e.title, e.date, ...bullets, e.detail] : [e.title, e.subtitle, e.date, ...bullets, e.detail]
             }
-            if (inSide) return [e.title, e.subtitle, e.date, e.detail]
-            // One-line roles ("Title, Company ... dates") and numbered references set the subtitle before the date.
-            if (t.id === "r005-compact") return [e.title, e.subtitle, e.date, e.detail, ...bullets]
-            if (t.id === "r004-scholar" && type === "publications") return [e.title, e.subtitle, e.date, e.detail]
+            if (order === "role-org-date") return [e.title, e.subtitle, e.date, e.detail, ...bullets]
             return [e.title, e.date, e.subtitle, ...bullets, e.detail]
           }
           const ordered = (sections: typeof d.sections, inSide = false) =>
@@ -169,7 +179,27 @@ async function main() {
   }
 }
 
-main().catch((e) => {
+/**
+ * Without --only, each template is checked in its own child process. The Typst wasm compiler's memory only
+ * grows, and a single process setting every template with every sample runs out and panics part way through.
+ */
+function runAll() {
+  let failed = 0
+  for (const t of RESUME_TEMPLATES) {
+    // Run the child through jiti, like the npm script, so it can load the TypeScript sources.
+    const jiti = path.join(root, "node_modules/.bin/jiti")
+    const r = spawnSync(jiti, [process.argv[1]!, ...process.argv.slice(2), `--only=${t.id}`], { stdio: "inherit" })
+    if (r.status !== 0) failed++
+  }
+  if (failed) {
+    console.error(`\n${failed} template(s) failed.`)
+    process.exit(1)
+  }
+}
+
+if (!only) {
+  runAll()
+} else main().catch((e) => {
   console.error(e)
   process.exit(1)
 })

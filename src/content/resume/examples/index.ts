@@ -5,14 +5,15 @@ import { SAMPLE_RESUMES, type SampleResume } from "@/lib/resume/samples"
 import { EXAMPLES_A } from "./a"
 import { EXAMPLES_B } from "./b"
 import { EXAMPLES_C } from "./c"
+import { EXAMPLES_D } from "./d"
 import type { ResumeExample } from "./types"
 
 export type { ResumeExample } from "./types"
 
 /** Bump when the example copy changes in a way worth recrawling. */
-export const EXAMPLES_UPDATED = "2026-10-20"
+export const EXAMPLES_UPDATED = "2026-10-23"
 
-export const RESUME_EXAMPLES: readonly ResumeExample[] = [...EXAMPLES_A, ...EXAMPLES_B, ...EXAMPLES_C]
+export const RESUME_EXAMPLES: readonly ResumeExample[] = [...EXAMPLES_A, ...EXAMPLES_B, ...EXAMPLES_C, ...EXAMPLES_D]
 
 export type ExampleEntry = ResumeExample & { person: SampleResume }
 

@@ -18,7 +18,6 @@ import { DEFAULT_TEMPLATE_ID, getTemplate, RESUME_TEMPLATES } from "@/lib/resume
 
 import { getTypstClient } from "../engine/client"
 import { createDraft, listDrafts, type DraftSummary } from "../lib/drafts"
-import { useTemplateThumbs } from "../lib/useTemplateThumbs"
 import { TemplateGrid } from "./DesignPanel"
 
 /** A sensible first guess at the country format from the browser's language. The person can change it. */
@@ -93,9 +92,6 @@ export function StartScreen() {
   }, [])
 
   const design = useMemo<ResumeDesign>(() => ({ templateId, preset, paper: null, density: "standard", accent: "ink" }), [templateId, preset])
-  // Thumbnails depend on the format only; each one sets its own template.
-  const thumbDesign = useMemo<ResumeDesign>(() => ({ templateId: DEFAULT_TEMPLATE_ID, preset, paper: null, density: "standard", accent: "ink" }), [preset])
-  const thumbs = useTemplateThumbs(SAMPLE_RESUMES[0].doc, thumbDesign, true, 0)
 
   const start = (doc: ResumeDocument, how: "import" | "sample" | "blank", title = "", sampleId: string | null = null) => {
     const id = createDraft({ doc, design, title, sampleId, templateChosen })
@@ -253,9 +249,9 @@ export function StartScreen() {
         <h2>Template</h2>
         <span className="rz-mono">Pick one now or later in Design</span>
       </div>
-      <TemplateGrid thumbs={thumbs} value={templateId} onChange={setTemplateId} className="rz-start-templates" chosenLabel={templateChosen ? "Chosen" : "Default"} />
+      <TemplateGrid value={templateId} onChange={setTemplateId} className="rz-start-templates" chosenLabel={templateChosen ? "Chosen" : "Default"} />
       <p className="rz-hint rz-mono" style={{ marginTop: "0.625rem" }}>
-        Shown with {SAMPLE_RESUMES[0].label}. Not a real person.
+        Each template is shown with a sample person suited to it. None of them are real.
       </p>
 
       {recent.length ? (

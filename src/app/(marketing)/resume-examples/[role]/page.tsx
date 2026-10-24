@@ -6,9 +6,8 @@ import { Plus } from "lucide-react"
 import { SiteButton } from "@/components/marketing/primitives"
 import { buildPageMetadata } from "@/config/seo"
 import { siteConfig } from "@/config/site"
-import { getThumb } from "@/content/resume/evidence"
+import { getThumb, getVerification } from "@/content/resume/evidence"
 import { exampleEntries, getExample, rendersFor } from "@/content/resume/examples"
-import { getAnyVerification } from "@/content/resume/examples/evidence"
 import { FORMAT_FACETS, STAGE_FACETS, TEMPLATE_PAGES } from "@/content/resume/templates"
 import { getRole } from "@/content/roles"
 import { ExampleCard } from "@/features/resume/marketing/ExampleCard"
@@ -19,6 +18,7 @@ import { PRESETS } from "@/lib/resume/presets"
 import { getTemplate } from "@/lib/resume/templates"
 
 import "@/styles/resume-site.css"
+import { ThumbBar } from "@/features/resume/marketing/ThumbBar"
 
 export const dynamicParams = false
 
@@ -50,7 +50,7 @@ export default async function ExamplePage({ params }: Props) {
 
   const template = getTemplate(e.templateId)
   const templatePage = TEMPLATE_PAGES.find((t) => t.templateId === e.templateId)
-  const v = getAnyVerification(e.templateId)
+  const v = getVerification(e.templateId)
   const preset = PRESETS[e.person.preset]
   const stage = STAGE_FACETS.find((s) => s.id === e.person.stage)?.label ?? e.person.stage
   const format = FORMAT_FACETS.find((f) => f.id === e.person.preset)?.label ?? preset.label
@@ -246,11 +246,11 @@ export default async function ExamplePage({ params }: Props) {
       </nav>
 
       {/* Phones: the action stays in the thumb zone. */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--site-ink)] bg-[var(--site-paper)] px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 lg:hidden">
+      <ThumbBar>
         <SiteButton href={startHref} size="lg" arrow className="w-full">
           Start from this sample
         </SiteButton>
-      </div>
+      </ThumbBar>
     </>
   )
 }

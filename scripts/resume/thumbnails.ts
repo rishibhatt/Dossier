@@ -9,7 +9,8 @@
  * Skips a template whose inputs (its .typ file, lib.typ, samples, render model, presets) hash the same as last
  * time and whose files are all present. Pass --force to redo everything.
  *
- * Also writes content/resume-templates/parse-sample.json: the fields pdf.js reads back out of one sample PDF
+ * Also writes content/resume-templates/covers.json (one page-one image per template, for the editor's picker) and
+ * content/resume-templates/parse-sample.json: the fields pdf.js reads back out of one sample PDF
  * (R-001 Ledger, Meera Iyer), which the /resume landing page prints as a table.
  * Run: npm run resume:thumbs (also runs before `next build`).
  */
@@ -142,6 +143,15 @@ async function main() {
 
   fs.mkdirSync(path.dirname(indexFile), { recursive: true })
   fs.writeFileSync(indexFile, JSON.stringify(index, null, 2) + "\n")
+
+  // A small id -> cover map for the editor's template picker, so the client bundle never carries the full index.
+  const covers: Record<string, { src: string; sample: string }> = {}
+  for (const t of RESUME_TEMPLATES) {
+    const r = index.templates[t.id]?.renders.find((x) => x.paper === "a4" && x.sample === t.showcase[0])
+    const src = r?.files.find((f) => f.includes("-p1-600")) ?? r?.files[0]
+    if (r && src) covers[t.id] = { src: `/${src}`, sample: r.sample }
+  }
+  fs.writeFileSync(path.join(path.dirname(indexFile), "covers.json"), JSON.stringify(covers, null, 2) + "\n")
 
   engine ??= await loadEngine({ renderer: true })
   await writeParseSample(engine)

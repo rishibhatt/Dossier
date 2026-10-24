@@ -1,5 +1,8 @@
 "use client"
 
+import { useEffect, useRef, useState } from "react"
+
+import { TEMPLATE_COVERS } from "@/lib/resume/covers"
 import { PRESETS } from "@/lib/resume/presets"
 import { ACCENT_HEX } from "@/lib/resume/renderModel"
 import { ACCENTS, DENSITIES, PRESET_IDS, type Accent, type Density } from "@/lib/resume/schema"
@@ -19,29 +22,61 @@ const ACCENT_NAMES: Record<Accent, string> = {
 
 const DENSITY_NAMES: Record<Density, string> = { comfortable: "Roomy", standard: "Standard", compact: "Compact" }
 
+/**
+ * Every template as a tile. A live thumbnail (the person's own resume, from the typesetter) wins; until it
+ * arrives, or where none is asked for, the tile shows the template's build-time cover with a sample person.
+ * `onVisible` reports which tiles are on screen, so callers can compile only those.
+ */
 export function TemplateGrid({
-  thumbs,
+  thumbs = {},
   value,
   onChange,
+  onVisible,
   className = "rz-templates",
   chosenLabel = "In use",
 }: {
-  thumbs: Record<string, string>
+  thumbs?: Record<string, string>
   value: string
   onChange: (id: string) => void
+  onVisible?: (ids: ReadonlySet<string>) => void
   className?: string
   chosenLabel?: string
 }) {
+  const root = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = root.current
+    if (!el || !onVisible) return
+    const seen = new Set<string>()
+    const io = new IntersectionObserver(
+      (items) => {
+        let changed = false
+        for (const it of items) {
+          const id = (it.target as HTMLElement).dataset.template
+          if (id && it.isIntersecting && !seen.has(id)) {
+            seen.add(id)
+            changed = true
+          }
+        }
+        if (changed) onVisible(new Set(seen))
+      },
+      { rootMargin: "200px" },
+    )
+    el.querySelectorAll<HTMLElement>("[data-template]").forEach((n) => io.observe(n))
+    return () => io.disconnect()
+  }, [onVisible])
+
   return (
-    <div className={className} role="radiogroup" aria-label="Template">
+    <div ref={root} className={className} role="radiogroup" aria-label="Template">
       {RESUME_TEMPLATES.map((t) => {
         const chosen = t.id === value
+        const cover = TEMPLATE_COVERS[t.id]?.src
+        const src = thumbs[t.id] ?? cover
         return (
-          <button key={t.id} type="button" role="radio" aria-checked={chosen} className="rz-tpl" onClick={() => onChange(t.id)}>
+          <button key={t.id} type="button" role="radio" aria-checked={chosen} className="rz-tpl" data-template={t.id} onClick={() => onChange(t.id)}>
             <span className="rz-tpl-plate">
-              {thumbs[t.id] ? (
-                // eslint-disable-next-line @next/next/no-img-element -- local blob: SVG from the typesetter
-                <img src={thumbs[t.id]} alt={`${t.name} template, page one`} />
+              {src ? (
+                // eslint-disable-next-line @next/next/no-img-element -- local blob: SVG from the typesetter, or a static cover
+                <img src={src} alt={`${t.name} template, page one`} loading="lazy" />
               ) : null}
             </span>
             <span className="rz-tpl-name">
@@ -59,7 +94,9 @@ export function TemplateGrid({
 export function DesignPanel({ active }: { active: boolean }) {
   const draft = useResumeEditor((s) => s.draft)
   const setDesign = useResumeEditor((s) => s.setDesign)
-  const thumbs = useTemplateThumbs(draft?.doc ?? null, draft?.design ?? null, active)
+  // Only the tiles that have been on screen are set with the person's resume; the rest show their covers.
+  const [visible, setVisible] = useState<ReadonlySet<string>>(() => new Set())
+  const thumbs = useTemplateThumbs(draft?.doc ?? null, draft?.design ?? null, active && visible.size > 0, 600, visible)
   if (!draft) return null
   const { design } = draft
   const preset = PRESETS[design.preset]
@@ -71,7 +108,7 @@ export function DesignPanel({ active }: { active: boolean }) {
           <h2 className="rz-h">Template</h2>
           <p className="rz-hint">Your own resume in each layout. Switching never changes what you wrote.</p>
         </div>
-        <TemplateGrid thumbs={thumbs} value={design.templateId} onChange={(templateId) => setDesign({ templateId })} />
+        <TemplateGrid thumbs={thumbs} value={design.templateId} onChange={(templateId) => setDesign({ templateId })} onVisible={setVisible} />
       </section>
 
       <section className="rz-block" aria-label="Country format">

@@ -10,8 +10,8 @@ import { formatDate, POSTS, readingMinutes } from "@/content/blog/posts"
 import { ROUTES } from "@/lib/constants/routes"
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Resume, ATS and portfolio guides | Dossier blog",
-  description: "Plain guides on getting past applicant tracking systems, writing stronger resume bullets and turning your resume into a portfolio website.",
+  title: "Resume writing, ATS and portfolio guides | Dossier blog",
+  description: "Plain guides on writing a resume, CV formats by country, getting past applicant tracking systems and turning your resume into a portfolio website.",
   path: ROUTES.blog,
 })
 
@@ -22,7 +22,7 @@ export default function BlogIndex() {
       <PageHead
         running={["Blog", `${String(posts.length).padStart(3, "0")} guides`]}
         title="Guides for getting hired."
-        lead={<p>Short, specific write-ups on resumes, applicant systems and portfolios. Each one ends with a free tool you can try on your own resume.</p>}
+        lead={<p>Short, specific write-ups on resumes, applicant systems and portfolios. Each one ends with a free tool or the resume builder, so you can try it on your own resume.</p>}
       />
       <section aria-label="Posts" className="site-wrap pb-12">
         <ul className="border-t border-[var(--site-ink)]">

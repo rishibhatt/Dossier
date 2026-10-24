@@ -1,7 +1,7 @@
 {
   "template": "r001-ledger",
   "sample": "Meera Iyer (sample)",
-  "testedAt": "2026-10-20",
+  "testedAt": "2026-10-24",
   "extractor": "pdf.js",
   "pdfTitle": "Meera Iyer – Senior Accountant",
   "fields": [

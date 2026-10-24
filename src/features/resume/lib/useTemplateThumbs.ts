@@ -9,10 +9,11 @@ import { RESUME_TEMPLATES } from "@/lib/resume/templates"
 import { getTypstClient } from "../engine/client"
 
 /**
- * The person's own resume set in every template, as page-one thumbnails. Compiles run one after another in
- * the worker (a few milliseconds each) and refresh after a pause in editing.
+ * The person's own resume set in templates, as page-one thumbnails. Compiles run one after another in the
+ * worker (a few milliseconds each) and refresh after a pause in editing. Pass `only` (the tiles on screen) so
+ * a library of 40+ templates doesn't compile every one, or download every font family, up front.
  */
-export function useTemplateThumbs(doc: ResumeDocument | null, design: ResumeDesign | null, enabled: boolean, delay = 600) {
+export function useTemplateThumbs(doc: ResumeDocument | null, design: ResumeDesign | null, enabled: boolean, delay = 600, only?: ReadonlySet<string>) {
   const [thumbs, setThumbs] = useState<Record<string, string>>({})
   const urls = useRef<Record<string, string>>({})
 
@@ -23,6 +24,7 @@ export function useTemplateThumbs(doc: ResumeDocument | null, design: ResumeDesi
       const client = getTypstClient()
       for (const t of RESUME_TEMPLATES) {
         if (cancelled) return
+        if (only && !only.has(t.id)) continue
         try {
           const data = JSON.stringify(toRenderModel(doc, { ...design, templateId: t.id }))
           const res = await client.request({ type: "preview", templateId: t.id, fonts: [...t.fonts], data })
@@ -41,7 +43,7 @@ export function useTemplateThumbs(doc: ResumeDocument | null, design: ResumeDesi
       cancelled = true
       clearTimeout(timer)
     }
-  }, [doc, design, enabled, delay])
+  }, [doc, design, enabled, delay, only])
 
   useEffect(
     () => () => {

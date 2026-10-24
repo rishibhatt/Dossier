@@ -120,14 +120,14 @@ export const EXAMPLES_C: ResumeExample[] = [
   {
     slug: "solicitor",
     sample: "aoife",
-    templateId: "r001-ledger",
+    templateId: "r018-brief",
     title: "Solicitor",
     answer:
       "A solicitor's CV should state your admission, your practice area and the kind of matters you handle, with deal sizes only where you are free to share them.",
     guidance: [
       {
         heading: "Layout and format",
-        body: "Aoife Byrne, a fictional commercial solicitor in Dublin, uses the UK and Ireland format: A4, called a CV, with no photo, date of birth or nationality. Ledger's single column suits legal recruitment, where partners and HR read a CV in order and expect a conventional page. The summary carries the one fact every firm checks first: admitted in Ireland, 2019.",
+        body: "Aoife Byrne, a fictional commercial solicitor in Dublin, uses the UK and Ireland format: A4, called a CV, with no photo, date of birth or nationality. Brief is a single serif column with centred capital headings and the firm named before the role, which is how legal recruiters and partners compare candidates: by where you trained and practise first. The summary carries the one fact every firm checks first: admitted in Ireland, 2019.",
       },
       {
         heading: "How the bullets are built",

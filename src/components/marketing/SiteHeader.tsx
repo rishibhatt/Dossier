@@ -208,10 +208,11 @@ export function SiteHeader() {
   }, [current, rest])
 
   // Resume pages float their own action: a template detail page has a fixed "Use this template" bar instead.
-  const onTemplatePage = pathname?.startsWith(`${ROUTES.resumeTemplates}/`)
-  const onResumePages = pathname === ROUTES.resume || pathname === ROUTES.resumeTemplates
-  const onResumeSide = pathname === ROUTES.resume || pathname?.startsWith(ROUTES.resumeTemplates)
-  const hideFloating = pathname === ROUTES.login || pathname === ROUTES.signup || onTemplatePage
+  // Template and example detail pages carry their own fixed action bar, so the floating button would stack on it.
+  const onDetailWithBar = pathname?.startsWith(`${ROUTES.resumeTemplates}/`) || pathname?.startsWith(`${ROUTES.resumeExamples}/`)
+  const onResumePages = pathname === ROUTES.resume || pathname === ROUTES.resumeTemplates || pathname === ROUTES.resumeExamples
+  const onResumeSide = pathname === ROUTES.resume || pathname?.startsWith(ROUTES.resumeTemplates) || pathname?.startsWith(ROUTES.resumeExamples)
+  const hideFloating = pathname === ROUTES.login || pathname === ROUTES.signup || onDetailWithBar
 
   return (
     <>

@@ -32,6 +32,13 @@ const HERO_TEMPLATES = ["ledger", "column", "modern"]
 const SITUATIONS: [string, string][] = [
   ["Not sure. I want the safest choice for any job", "ledger"],
   ["Student or fresher, first proper resume", "fresher"],
+  ["Retail, cashier or customer service", "counter"],
+  ["Warehouse, kitchen or other shift work", "shift"],
+  ["Nurse, carer or healthcare assistant", "bedside"],
+  ["Electrician, builder or another trade", "site"],
+  ["Office, admin or reception", "docket"],
+  ["Data, IT or analytics", "signal"],
+  ["Sales, with numbers to show", "pitch"],
   ["Software engineer, everything on one page", "plain"],
   ["A long list of skills, tools or certifications", "column"],
   ["Product, marketing or business role", "modern"],
@@ -144,10 +151,10 @@ export default function ResumeLandingPage() {
 
               <div className="border border-dashed border-[var(--site-ink)] bg-[var(--site-sheet)] p-2">
                 <div className="flex flex-col gap-2 sm:flex-row">
-                  <SiteButton href={ROUTES.resumeTemplates} size="lg" arrow className="flex-1">
+                  <SiteButton href={ROUTES.resumeTemplates} size="lg" arrow className="sm:flex-1">
                     Pick a template
                   </SiteButton>
-                  <SiteButton href={ROUTES.resumeNew} variant="secondary" size="lg" className="flex-1">
+                  <SiteButton href={ROUTES.resumeNew} variant="secondary" size="lg" className="sm:flex-1">
                     Import my old resume
                   </SiteButton>
                 </div>

@@ -16,6 +16,7 @@ import { ACCENTS } from "@/lib/resume/schema"
 import { SAMPLE_RESUMES } from "@/lib/resume/samples"
 
 import "@/styles/resume-site.css"
+import { ThumbBar } from "@/features/resume/marketing/ThumbBar"
 
 export const dynamicParams = false
 
@@ -313,11 +314,11 @@ export default async function TemplatePage({ params }: Props) {
       </nav>
 
       {/* Phones: the action stays in the thumb zone. */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--site-ink)] bg-[var(--site-paper)] px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 lg:hidden">
+      <ThumbBar>
         <SiteButton href={useHref} size="lg" arrow className="w-full">
           Use {t.engine.name}
         </SiteButton>
-      </div>
+      </ThumbBar>
     </>
   )
 }

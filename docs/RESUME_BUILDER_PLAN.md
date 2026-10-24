@@ -4,7 +4,8 @@ Status: Phase 0 and most of Phase 1 built on 2026-10-20 (engine, 4 templates, ve
 
 Build notes (what shipped differs from the plan in these places):
 - Templates shipped: all 12 (R-001 to R-012). Verified with `npm run resume:verify` (12 templates x 28 fictional samples x 3 densities x 2 paper sizes = 2,016 runs, all passing). Pattern study: `docs/resume/OVERLEAF_PATTERNS.md`.
-- Sample library: 28 fictional people across tech, finance, healthcare, marketing and sales, design and writing, operations, education and research, engineering, law and HR, hospitality (`src/lib/resume/sampleLibrary.ts`). Each template lists its showcase samples in `templates.ts`.
+- 2026-10-23: 30 more templates (R-013 to R-042) on a shared renderer, `src/resume/typst/kit.typ`, aimed at the segments in `docs/resume/MARKET_RESEARCH.md`; 18 more samples (`sampleLibrary2.ts`, 46 in total); six more OFL faces (IBM Plex Serif, Lato, PT Serif, PT Sans, Fira Sans, Crimson Text). Verify runs a fresh compiler per template.
+- Sample library (first round): 28 fictional people across tech, finance, healthcare, marketing and sales, design and writing, operations, education and research, engineering, law and HR, hospitality (`src/lib/resume/sampleLibrary.ts`). Each template lists its showcase samples in `templates.ts`.
 - Marketing: `/resume` landing, `/resume-templates` directory and 12 detail pages, home hero "One resume. A PDF and a website."
 - Verification uses the same Typst wasm and fonts as the browser, in Node, with pdf.js as the extractor. Poppler and veraPDF are still to be added in CI.
 - Import runs entirely in the browser (pdf.js in the typesetter worker plus the existing regex reader), so no sign-in and no upload is needed. AI-assisted import for signed-in users is a later improvement.

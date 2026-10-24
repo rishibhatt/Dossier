@@ -1,6 +1,8 @@
 import type { PresetId } from "@/lib/resume/schema"
 import { RESUME_TEMPLATES, type ResumeTemplate } from "@/lib/resume/templates"
 
+import { KIT_PAGES } from "./templatesKit"
+
 /**
  * Marketing copy and directory facets for the shipped resume templates (src/lib/resume/templates.ts holds the
  * engine side). Every template has its own guidance and questions; if two pages would say the same thing,
@@ -16,6 +18,9 @@ export const ROLE_FACETS = [
   { id: "education", label: "Education and research" },
   { id: "design", label: "Design and writing" },
   { id: "hospitality", label: "Hospitality" },
+  { id: "retail", label: "Retail and customer service" },
+  { id: "trades", label: "Trades and transport" },
+  { id: "public", label: "Public sector and law" },
 ] as const
 
 export const STAGE_FACETS = [
@@ -77,13 +82,13 @@ export type TemplatePage = {
 
 const ALL_FORMATS: PresetId[] = ["us", "uk", "eu", "de", "in", "gulf", "au"]
 
-export const TEMPLATE_PAGES: readonly TemplatePage[] = [
+const CORE_PAGES: TemplatePage[] = [
   {
     slug: "ledger",
     templateId: "r001-ledger",
     sample: "meera",
     facets: {
-      role: ["finance", "healthcare", "business", "engineering", "marketing", "education", "hospitality"],
+      role: ["finance", "healthcare", "business", "engineering", "marketing", "education", "hospitality", "retail", "trades", "public"],
       format: ALL_FORMATS,
       stage: ["student", "early", "mid", "senior", "switcher"],
       style: ["simple"],
@@ -496,7 +501,10 @@ export const TEMPLATE_PAGES: readonly TemplatePage[] = [
   },
 ]
 
-export const TEMPLATES_UPDATED = "2026-10-20"
+/** Every template page: the first twelve, then the kit templates (R-013 on). */
+export const TEMPLATE_PAGES: readonly TemplatePage[] = [...CORE_PAGES, ...KIT_PAGES]
+
+export const TEMPLATES_UPDATED = "2026-10-23"
 
 export type TemplateEntry = TemplatePage & { engine: ResumeTemplate }
 

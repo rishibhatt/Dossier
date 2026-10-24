@@ -47,6 +47,9 @@ export const metadata: Metadata = {
     description: messages.seo.defaultDescription,
     path: "/",
   }),
+  // No site-wide canonical: a page that sets none (the 404 page, app screens) must not point search engines
+  // at the home page. Every indexable page sets its own through buildPageMetadata.
+  alternates: undefined,
   // Google Search Console: paste the token from "HTML tag" verification into NEXT_PUBLIC_GSC_VERIFICATION.
   verification: process.env.NEXT_PUBLIC_GSC_VERIFICATION ? { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION } : undefined,
 }

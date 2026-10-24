@@ -44,7 +44,11 @@ export default async function PostPage({ params }: Props) {
 
   const url = `${siteConfig.url}${ROUTES.blog}/${post.slug}`
   const heroSrc = post.hero ?? `/og/blog/${post.slug}`
-  const tool = getFreeTool(post.tool)
+  const freeTool = post.tool === "resume-builder" ? undefined : getFreeTool(post.tool)
+  const tool =
+    post.tool === "resume-builder"
+      ? { name: "Free resume builder", href: ROUTES.resume, cta: "Build your resume free" }
+      : freeTool && { name: freeTool.name, href: `${ROUTES.tools}/${freeTool.slug}`, cta: "Try it free" }
   const others = POSTS.filter((p) => p.slug !== post.slug)
   const related = [...others.filter((p) => p.category === post.category), ...others.filter((p) => p.category !== post.category)].slice(0, 3)
 
@@ -112,11 +116,11 @@ export default async function PostPage({ params }: Props) {
           {tool ? (
             <aside className="lg:col-span-4" aria-label="Free tool">
               <div className="border border-[var(--site-ink)] bg-[var(--site-sheet)] p-5 lg:sticky lg:top-24">
-                <p className="sp-data">Free tool</p>
+                <p className="sp-data">{post.tool === "resume-builder" ? "Dossier Resume" : "Free tool"}</p>
                 <p className="site-h3 mt-1">{tool.name}</p>
                 <p className="mt-2 text-[0.9375rem] text-[var(--site-ink-2)]">{post.toolPitch}</p>
-                <Link href={`${ROUTES.tools}/${tool.slug}`} className="site-btn site-btn-primary mt-5 w-full">
-                  <span className="site-btn-label">Try it free</span>
+                <Link href={tool.href} className="site-btn site-btn-primary mt-5 w-full">
+                  <span className="site-btn-label">{tool.cta}</span>
                 </Link>
               </div>
             </aside>

@@ -1,5 +1,6 @@
 import { b, education, experience, sid, skills } from "./sampleKit"
 import { SAMPLE_LIBRARY } from "./sampleLibrary"
+import { SAMPLE_LIBRARY_2 } from "./sampleLibrary2"
 import type { PresetId, ResumeDocument } from "./schema"
 
 /**
@@ -18,6 +19,9 @@ export type SampleDomain =
   | "Engineering"
   | "Law and HR"
   | "Hospitality"
+  | "Retail and service"
+  | "Trades and transport"
+  | "Public services"
 
 export type SampleResume = {
   id: string
@@ -277,7 +281,7 @@ const CORE_SAMPLES: SampleResume[] = [
 ]
 
 /** Every sample: the four core people first (used as verification fixtures since launch), then the library. */
-export const SAMPLE_RESUMES: SampleResume[] = [...CORE_SAMPLES, ...SAMPLE_LIBRARY]
+export const SAMPLE_RESUMES: SampleResume[] = [...CORE_SAMPLES, ...SAMPLE_LIBRARY, ...SAMPLE_LIBRARY_2]
 
 /** A fresh resume with the usual sections and nothing filled in. */
 export function blankResume(): ResumeDocument {

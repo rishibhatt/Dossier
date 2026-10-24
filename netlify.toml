@@ -8,6 +8,19 @@
   status = 301
   force = true
 
+# http://www and https://www go straight to the apex in one hop (otherwise http://www takes two).
+[[redirects]]
+  from = "http://www.dossier-cv.com/*"
+  to = "https://dossier-cv.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.dossier-cv.com/*"
+  to = "https://dossier-cv.com/:splat"
+  status = 301
+  force = true
+
 [build.environment]
   NODE_VERSION = "22"
   # These values are public by design (they ship in the browser bundle). Netlify's secret scanner would

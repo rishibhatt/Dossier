@@ -4,6 +4,8 @@ Written 2026-10-20. The owner's rule: study the patterns, write original Typst. 
 
 ## Templates studied
 
+Gallery capture (2026-10-23, headless Chrome via REA, evidence ev_cef2ee9b…): the CV tag runs to 83 gallery pages. Overleaf shows no view counts; its only popularity signal is "Top pick", currently Simple Hipster CV, AltaCV and A Customised CurVe CV. Recent additions include Minimal Academic CV, Modified Friggeri CV, ReCeiVe (built on Awesome CV), twentyoneseconds (sidebar with skill bars) and resumes built on Medium Length CV.
+
 The most-used resume and CV templates on Overleaf's gallery fall into a few families. We looked at how each one is built (document structure, font setup, how dates and headings are set) rather than at their files' text.
 
 | Family | Pattern | Why it parses well, or doesn't |
@@ -45,4 +47,13 @@ The most-used resume and CV templates on Overleaf's gallery fall into a few fami
 
 ## How it is checked
 
-`npm run resume:verify` sets every template with 28 fictional sample resumes, at 3 densities and on A4 and US Letter, and reads each PDF back with pdf.js: every field present and in order, no broken glyphs, links clickable, title metadata set, contact near the top. Results go to `content/resume-templates/verification/<template>.json`, which the website reads. Manual tests in commercial ATS products (Textkernel, Affinda, Workday auto-fill) are still to do and are not claimed anywhere.
+`npm run resume:verify` sets every template with every fictional sample resume (46 as of 2026-10-23), at 3 densities and on A4 and US Letter, and reads each PDF back with pdf.js: every field present and in order, no broken glyphs, links clickable, title metadata set, contact near the top. Results go to `content/resume-templates/verification/<template>.json`, which the website reads. Manual tests in commercial ATS products (Textkernel, Affinda, Workday auto-fill) are still to do and are not claimed anywhere.
+
+## The kit (R-013 to R-042)
+
+`src/resume/typst/kit.typ` is one renderer with presentation options (header, heading style, entry style, sidebar, skills layout, faces). Each kit template is a short file of options. Two findings from building it, both caught by the verification script:
+
+- **Typst writes text in on-page order.** A grid that puts the date cell or a sidebar on the left emits it first, whatever order the cells are declared in. Left date columns therefore draw the date with `place()` after the role and organisation; sidebars sit on the right.
+- **The left sidebar of AltaCV and Simple Hipster CV cannot be made parse-safe this way**, so Harbor, Field and Range use a right sidebar. They keep the look of the Overleaf favourites while passing the reading-order check.
+
+Faces added for the kit (OFL, static): IBM Plex Serif, Lato, PT Serif, PT Sans, Fira Sans, Crimson Text.

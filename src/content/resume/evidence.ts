@@ -12,6 +12,36 @@ import r009 from "../../../content/resume-templates/verification/r009-switcher.j
 import r010 from "../../../content/resume-templates/verification/r010-europa.json"
 import r011 from "../../../content/resume-templates/verification/r011-gulf.json"
 import r012 from "../../../content/resume-templates/verification/r012-specimen.json"
+import r013 from "../../../content/resume-templates/verification/r013-margin.json"
+import r014 from "../../../content/resume-templates/verification/r014-harbor.json"
+import r015 from "../../../content/resume-templates/verification/r015-bedside.json"
+import r016 from "../../../content/resume-templates/verification/r016-counter.json"
+import r017 from "../../../content/resume-templates/verification/r017-shift.json"
+import r018 from "../../../content/resume-templates/verification/r018-brief.json"
+import r019 from "../../../content/resume-templates/verification/r019-folio.json"
+import r020 from "../../../content/resume-templates/verification/r020-transit.json"
+import r021 from "../../../content/resume-templates/verification/r021-lecture.json"
+import r022 from "../../../content/resume-templates/verification/r022-atelier.json"
+import r023 from "../../../content/resume-templates/verification/r023-signal.json"
+import r024 from "../../../content/resume-templates/verification/r024-docket.json"
+import r025 from "../../../content/resume-templates/verification/r025-ward.json"
+import r026 from "../../../content/resume-templates/verification/r026-site.json"
+import r027 from "../../../content/resume-templates/verification/r027-quarter.json"
+import r028 from "../../../content/resume-templates/verification/r028-pitch.json"
+import r029 from "../../../content/resume-templates/verification/r029-campus.json"
+import r030 from "../../../content/resume-templates/verification/r030-clinic.json"
+import r031 from "../../../content/resume-templates/verification/r031-tally.json"
+import r032 from "../../../content/resume-templates/verification/r032-field.json"
+import r033 from "../../../content/resume-templates/verification/r033-atlas.json"
+import r034 from "../../../content/resume-templates/verification/r034-notebook.json"
+import r035 from "../../../content/resume-templates/verification/r035-kernel.json"
+import r036 from "../../../content/resume-templates/verification/r036-cadence.json"
+import r037 from "../../../content/resume-templates/verification/r037-mercy.json"
+import r038 from "../../../content/resume-templates/verification/r038-bench.json"
+import r039 from "../../../content/resume-templates/verification/r039-range.json"
+import r040 from "../../../content/resume-templates/verification/r040-crew.json"
+import r041 from "../../../content/resume-templates/verification/r041-civic.json"
+import r042 from "../../../content/resume-templates/verification/r042-thread.json"
 
 /**
  * What the marketing pages may say about a template, read from the files the scripts write:
@@ -36,6 +66,36 @@ const REPORTS: Record<string, Report> = {
   "r010-europa": r010,
   "r011-gulf": r011,
   "r012-specimen": r012,
+  "r013-margin": r013,
+  "r014-harbor": r014,
+  "r015-bedside": r015,
+  "r016-counter": r016,
+  "r017-shift": r017,
+  "r018-brief": r018,
+  "r019-folio": r019,
+  "r020-transit": r020,
+  "r021-lecture": r021,
+  "r022-atelier": r022,
+  "r023-signal": r023,
+  "r024-docket": r024,
+  "r025-ward": r025,
+  "r026-site": r026,
+  "r027-quarter": r027,
+  "r028-pitch": r028,
+  "r029-campus": r029,
+  "r030-clinic": r030,
+  "r031-tally": r031,
+  "r032-field": r032,
+  "r033-atlas": r033,
+  "r034-notebook": r034,
+  "r035-kernel": r035,
+  "r036-cadence": r036,
+  "r037-mercy": r037,
+  "r038-bench": r038,
+  "r039-range": r039,
+  "r040-crew": r040,
+  "r041-civic": r041,
+  "r042-thread": r042,
 }
 
 export type Verification = {

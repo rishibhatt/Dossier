@@ -1,3 +1,7 @@
 Fonts in this folder are licensed under the SIL Open Font License 1.1 (https://openfontlicense.org).
 Inter (Rasmus Andersson), Source Serif 4 (Adobe), Bricolage Grotesque (Mathieu Triay).
 Static instances downloaded from Google Fonts on 2026-10-20. They are embedded (subset) into resume PDFs, which the OFL permits.
+
+Added 2026-10-23 from github.com/google/fonts (static TTFs, OFL 1.1, full licence text in licenses/):
+IBM Plex Serif (IBM), Lato (Łukasz Dziedzic), PT Serif and PT Sans (ParaType), Fira Sans (Mozilla / Carrois),
+Crimson Text (Sebastian Kosch).
