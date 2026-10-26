@@ -11,7 +11,7 @@ import { track } from "@/lib/analytics"
 import { PDF_UPLOAD_MAX_BYTES } from "@/lib/constants/upload"
 import { readResume } from "@/lib/pdf/extractSections"
 import { resumeDataToDocument } from "@/lib/resume/mappers"
-import { PRESETS } from "@/lib/resume/presets"
+import { guessPreset, PRESETS } from "@/lib/resume/presets"
 import { blankResume, SAMPLE_RESUMES, type SampleResume } from "@/lib/resume/samples"
 import { PRESET_IDS, resumeDocumentSchema, type PresetId, type ResumeDesign, type ResumeDocument } from "@/lib/resume/schema"
 import { DEFAULT_TEMPLATE_ID, getTemplate, RESUME_TEMPLATES } from "@/lib/resume/templates"
@@ -20,19 +20,6 @@ import { getTypstClient } from "../engine/client"
 import { createDraft, listDrafts, type DraftSummary } from "../lib/drafts"
 import { TemplateGrid } from "./DesignPanel"
 
-/** A sensible first guess at the country format from the browser's language. The person can change it. */
-function guessPreset(): PresetId {
-  const lang = typeof navigator !== "undefined" ? navigator.language : "en-US"
-  const region = lang.split("-")[1]?.toUpperCase() ?? ""
-  if (["US", "CA"].includes(region)) return "us"
-  if (["GB", "IE"].includes(region)) return "uk"
-  if (region === "IN") return "in"
-  if (region === "DE" || region === "AT" || region === "CH") return "de"
-  if (["AE", "SA", "QA", "KW", "BH", "OM"].includes(region)) return "gulf"
-  if (["AU", "NZ"].includes(region)) return "au"
-  if (["FR", "ES", "IT", "NL", "BE", "PT", "PL", "SE", "DK", "FI", "NO"].includes(region)) return "eu"
-  return "us"
-}
 
 function timeAgo(ts: number) {
   const m = Math.round((Date.now() - ts) / 60000)

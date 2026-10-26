@@ -128,3 +128,17 @@ export function formatRange(start: string, end: string, current: boolean, style:
   if (a && b) return a === b ? a : `${a} – ${b}`
   return a || b
 }
+
+/** A sensible first guess at the country format from the browser's language. The person can change it. */
+export function guessPreset(): PresetId {
+  const lang = typeof navigator !== "undefined" ? navigator.language : "en-US"
+  const region = lang.split("-")[1]?.toUpperCase() ?? ""
+  if (["US", "CA"].includes(region)) return "us"
+  if (["GB", "IE"].includes(region)) return "uk"
+  if (region === "IN") return "in"
+  if (region === "DE" || region === "AT" || region === "CH") return "de"
+  if (["AE", "SA", "QA", "KW", "BH", "OM"].includes(region)) return "gulf"
+  if (["AU", "NZ"].includes(region)) return "au"
+  if (["FR", "ES", "IT", "NL", "BE", "PT", "PL", "SE", "DK", "FI", "NO"].includes(region)) return "eu"
+  return "us"
+}

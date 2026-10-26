@@ -2,7 +2,7 @@
   "format": "webp",
   "templates": {
     "r001-ledger": {
-      "hash": "530d691c1661c2d8",
+      "hash": "2efc2b02418f86d7",
       "renders": [
         {
           "sample": "meera",
@@ -183,7 +183,7 @@
       ]
     },
     "r002-plain": {
-      "hash": "e92786ea965c14be",
+      "hash": "98204e003167862f",
       "renders": [
         {
           "sample": "arjun",
@@ -320,7 +320,7 @@
       ]
     },
     "r003-column": {
-      "hash": "55b7e5732001e590",
+      "hash": "e5b731112187808b",
       "renders": [
         {
           "sample": "lena",
@@ -501,7 +501,7 @@
       ]
     },
     "r004-scholar": {
-      "hash": "20ae1df5177fa6b8",
+      "hash": "5dccf25f8cca7fdd",
       "renders": [
         {
           "sample": "mei",
@@ -572,7 +572,7 @@
       ]
     },
     "r005-compact": {
-      "hash": "f1d28a928a85470a",
+      "hash": "1c444b5f6ede79e6",
       "renders": [
         {
           "sample": "robert",
@@ -687,7 +687,7 @@
       ]
     },
     "r006-modern": {
-      "hash": "f0590f0d3174af7c",
+      "hash": "dc8ed7a061ad2a5e",
       "renders": [
         {
           "sample": "sofia",
@@ -824,7 +824,7 @@
       ]
     },
     "r007-executive": {
-      "hash": "9ba93484286e4563",
+      "hash": "751b5ca036328346",
       "renders": [
         {
           "sample": "robert",
@@ -939,7 +939,7 @@
       ]
     },
     "r008-fresher": {
-      "hash": "4b6394743d63efe6",
+      "hash": "13b69e85f084841d",
       "renders": [
         {
           "sample": "sneha",
@@ -1010,7 +1010,7 @@
       ]
     },
     "r009-switcher": {
-      "hash": "6b88273ba6dc82ac",
+      "hash": "39299951bf5e82d2",
       "renders": [
         {
           "sample": "maya",
@@ -1081,7 +1081,7 @@
       ]
     },
     "r010-europa": {
-      "hash": "dadcbf7077cbd219",
+      "hash": "ca9e77a6b60ffdab",
       "renders": [
         {
           "sample": "tomas",
@@ -1196,7 +1196,7 @@
       ]
     },
     "r011-gulf": {
-      "hash": "e96f7084cce5460c",
+      "hash": "80f040e076189ff0",
       "renders": [
         {
           "sample": "omar",
@@ -1267,7 +1267,7 @@
       ]
     },
     "r012-specimen": {
-      "hash": "dbf4d075943f9f58",
+      "hash": "6bf018bc9a97d156",
       "renders": [
         {
           "sample": "noor",
@@ -1360,7 +1360,7 @@
       ]
     },
     "r013-margin": {
-      "hash": "1caf10ec1cc30b56",
+      "hash": "51d292ce8cb0027f",
       "renders": [
         {
           "sample": "lukas",
@@ -1431,7 +1431,7 @@
       ]
     },
     "r014-harbor": {
-      "hash": "c47f7620b0bf7199",
+      "hash": "5b301da1dae828aa",
       "renders": [
         {
           "sample": "priya",
@@ -1502,7 +1502,7 @@
       ]
     },
     "r015-bedside": {
-      "hash": "d98f9b61cbf986ef",
+      "hash": "b416bc158dbcd7a3",
       "renders": [
         {
           "sample": "lena",
@@ -1573,7 +1573,7 @@
       ]
     },
     "r016-counter": {
-      "hash": "c6422508f84b1371",
+      "hash": "5d70a44287e87545",
       "renders": [
         {
           "sample": "marcus",
@@ -1644,7 +1644,7 @@
       ]
     },
     "r017-shift": {
-      "hash": "ea0103bffb3bc39b",
+      "hash": "c94fc81904d489f0",
       "renders": [
         {
           "sample": "andre",
@@ -1715,7 +1715,7 @@
       ]
     },
     "r018-brief": {
-      "hash": "3be471b4ae3f8278",
+      "hash": "9f56209724da3a3b",
       "renders": [
         {
           "sample": "aoife",
@@ -1786,7 +1786,7 @@
       ]
     },
     "r019-folio": {
-      "hash": "48edb9f058db2203",
+      "hash": "44d6a98f40a06073",
       "renders": [
         {
           "sample": "ananya",
@@ -1857,7 +1857,7 @@
       ]
     },
     "r020-transit": {
-      "hash": "b9bde6ccbcbf21d4",
+      "hash": "d2b93a6bc5caaee7",
       "renders": [
         {
           "sample": "rahul",
@@ -1928,7 +1928,7 @@
       ]
     },
     "r021-lecture": {
-      "hash": "8d97f317abb912f3",
+      "hash": "211e244f9fae6365",
       "renders": [
         {
           "sample": "emily",
@@ -1999,7 +1999,7 @@
       ]
     },
     "r022-atelier": {
-      "hash": "75db5d96da44d1c2",
+      "hash": "a33b6052d018db03",
       "renders": [
         {
           "sample": "noor",
@@ -2070,7 +2070,7 @@
       ]
     },
     "r023-signal": {
-      "hash": "2701f6cf29570d31",
+      "hash": "a4f9251767779153",
       "renders": [
         {
           "sample": "vikram",
@@ -2141,7 +2141,7 @@
       ]
     },
     "r024-docket": {
-      "hash": "2d5170ff466e8632",
+      "hash": "8884edfb140fffe3",
       "renders": [
         {
           "sample": "olivia",
@@ -2212,7 +2212,7 @@
       ]
     },
     "r025-ward": {
-      "hash": "134cba992de79ae2",
+      "hash": "9b1086a8305d5c51",
       "renders": [
         {
           "sample": "rosa",
@@ -2283,7 +2283,7 @@
       ]
     },
     "r026-site": {
-      "hash": "68031420b2234180",
+      "hash": "30beb68afc682c2a",
       "renders": [
         {
           "sample": "ben",
@@ -2354,7 +2354,7 @@
       ]
     },
     "r027-quarter": {
-      "hash": "a492164f196e8144",
+      "hash": "3743d8c5c78acd08",
       "renders": [
         {
           "sample": "robert",
@@ -2425,7 +2425,7 @@
       ]
     },
     "r028-pitch": {
-      "hash": "a04c352c934c83e1",
+      "hash": "f74a5ac9bf1c1b8d",
       "renders": [
         {
           "sample": "jessica",
@@ -2496,7 +2496,7 @@
       ]
     },
     "r029-campus": {
-      "hash": "3812083955d3d6eb",
+      "hash": "e3bd7153af066337",
       "renders": [
         {
           "sample": "sneha",
@@ -2567,7 +2567,7 @@
       ]
     },
     "r030-clinic": {
-      "hash": "bb1b02b895484dc6",
+      "hash": "563131d0bf53ba95",
       "renders": [
         {
           "sample": "mei",
@@ -2638,7 +2638,7 @@
       ]
     },
     "r031-tally": {
-      "hash": "e039bff29b575c7a",
+      "hash": "206cee80d04dd672",
       "renders": [
         {
           "sample": "meera",
@@ -2709,7 +2709,7 @@
       ]
     },
     "r032-field": {
-      "hash": "4bb471bb842c45b8",
+      "hash": "b0ff82960fd2d913",
       "renders": [
         {
           "sample": "kwame",
@@ -2780,7 +2780,7 @@
       ]
     },
     "r033-atlas": {
-      "hash": "7f73d0ae9d9f57c8",
+      "hash": "54c828e1c56b1103",
       "renders": [
         {
           "sample": "nina",
@@ -2851,7 +2851,7 @@
       ]
     },
     "r034-notebook": {
-      "hash": "f6b2b1db14df9b98",
+      "hash": "cd9c1f9c7460be74",
       "renders": [
         {
           "sample": "grace",
@@ -2922,7 +2922,7 @@
       ]
     },
     "r035-kernel": {
-      "hash": "9849bba0c558a452",
+      "hash": "3f72badfd67b82c5",
       "renders": [
         {
           "sample": "daniel",
@@ -2993,7 +2993,7 @@
       ]
     },
     "r036-cadence": {
-      "hash": "d3378947b74b6fb8",
+      "hash": "71bc914afeaf5fa0",
       "renders": [
         {
           "sample": "hannah",
@@ -3064,7 +3064,7 @@
       ]
     },
     "r037-mercy": {
-      "hash": "c1aa6ed46ba7ff58",
+      "hash": "8673a216cf1e8510",
       "renders": [
         {
           "sample": "rachel",
@@ -3135,7 +3135,7 @@
       ]
     },
     "r038-bench": {
-      "hash": "4121e9621bfb3497",
+      "hash": "76af0bd517a7f4e4",
       "renders": [
         {
           "sample": "mei",
@@ -3206,7 +3206,7 @@
       ]
     },
     "r039-range": {
-      "hash": "8495e4406ab0205c",
+      "hash": "5094f2021080b827",
       "renders": [
         {
           "sample": "sofia",
@@ -3277,7 +3277,7 @@
       ]
     },
     "r040-crew": {
-      "hash": "e03bae4ae3b24aca",
+      "hash": "a94e388f8d96c34a",
       "renders": [
         {
           "sample": "carlos",
@@ -3348,7 +3348,7 @@
       ]
     },
     "r041-civic": {
-      "hash": "6c369d04e3295d8a",
+      "hash": "a52634addfa87eb6",
       "renders": [
         {
           "sample": "david",
@@ -3419,7 +3419,7 @@
       ]
     },
     "r042-thread": {
-      "hash": "3a1c42349e9a110b",
+      "hash": "374a1c1f3c6fa9f4",
       "renders": [
         {
           "sample": "mateo",

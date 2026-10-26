@@ -1,7 +1,8 @@
 /**
  * Blog posts as typed data: no MDX dependency, every post renders to semantic HTML and Article JSON-LD.
- * Inline links use [label](/path). Add a post by appending to GUIDES, or to RESUME_BUILDER_POSTS when it hands off to the builder. Keep claims checkable: no invented statistics.
+ * Inline links use [label](/path). Add a post by appending to GUIDES, to RESUME_BUILDER_POSTS when it hands off to the builder, or to JOB_SEARCH_POSTS for mid-search problems. Keep claims checkable: no invented statistics.
  */
+import { JOB_SEARCH_POSTS } from "./job-search-posts"
 import { RESUME_BUILDER_POSTS } from "./resume-builder-posts"
 
 export type Block =
@@ -25,7 +26,7 @@ export type Post = {
   /** Optional hand-made or AI-generated image in /public. When absent, an on-brand card is generated. */
   hero?: string
   /** Slug of the free tool the post hands off to, or the resume builder. */
-  tool: "ats-checker" | "headline-writer" | "linkedin-about" | "resume-to-website" | "resume-builder"
+  tool: "ats-checker" | "headline-writer" | "linkedin-about" | "resume-to-website" | "resume-summary-generator" | "resume-bullet-point-generator" | "resume-builder"
   toolPitch: string
   body: Block[]
   /** Questions people also search. Rendered under the post and as FAQPage JSON-LD. Answers are plain text. */
@@ -113,8 +114,8 @@ const GUIDES: readonly Post[] = [
     query: "resume bullet points examples",
     category: "Resume",
     published: "2026-10-09",
-    tool: "ats-checker",
-    toolPitch: "The ATS scanner flags weak openers and bullets with no numbers, rewrites the weakest ones and lists the fixes by priority.",
+    tool: "resume-bullet-point-generator",
+    toolPitch: "Paste a weak bullet. You get it back four ways, each starting with a verb and ending with a result.",
     body: [
       { t: "p", text: "A recruiter spends seconds on a first read. Bullets that open with a duty (\"Responsible for...\") describe the job. Bullets that open with a result describe you. The fix is mostly mechanical." },
       { t: "h2", text: "The pattern" },
@@ -137,7 +138,7 @@ const GUIDES: readonly Post[] = [
       { t: "p", text: "Count something: people trained, tickets closed, pages shipped, events run, hours saved. If you really have nothing to count, name the scope: \"for a team of 8\", \"across 3 regions\", \"for the CEO\"." },
       { t: "h2", text: "Vary your verbs" },
       { t: "p", text: "If five bullets start with \"Managed\", pick different words where they fit: led, planned, ran, owned, coordinated. Do not stretch for a fancy verb that means something else." },
-      { t: "tip", text: "Read the bullet aloud and ask \"so what?\" If the answer is not in the sentence, add it." },
+      { t: "tip", text: "Read the bullet aloud and ask \"so what?\" If the answer is not in the sentence, add it. To fix a batch quickly, paste each one into the [bullet point generator](/tools/resume-bullet-point-generator)." },
     ],
   },
   {
@@ -370,8 +371,8 @@ const GUIDES: readonly Post[] = [
     query: "resume summary examples",
     category: "Resume",
     published: "2026-10-13",
-    tool: "ats-checker",
-    toolPitch: "Paste your resume and a job post. The scanner shows whether your summary carries the keywords the job asks for.",
+    tool: "resume-summary-generator",
+    toolPitch: "Answer five short questions and get four summaries for your career stage, free and without sign-up.",
     body: [
       { t: "p", text: "A summary sits at the top of your resume and answers one question: why should this person read on? Two to three lines is enough. Longer and nobody reads it." },
       { t: "h2", text: "The formula" },
@@ -386,7 +387,7 @@ const GUIDES: readonly Post[] = [
       { t: "p", text: "Lead with the skill that transfers. Do not apologise for the old job title." },
       { t: "h2", text: "What to cut" },
       { t: "ul", items: ["\"Hard-working team player\" and similar phrases. Every resume says it.", "First-person sentences. Write \"Built\", not \"I built\".", "Objectives that describe what you want. Say what you offer."] },
-      { t: "tip", text: "Write the summary last. Once your bullets are done, the strongest result in them is usually your proof line." },
+      { t: "tip", text: "Write the summary last. Once your bullets are done, the strongest result in them is usually your proof line. Stuck on wording? The free [resume summary generator](/tools/resume-summary-generator) turns five answers into four drafts." },
       { t: "h2", text: "Check it against the job" },
       { t: "p", text: "Copy two or three phrases from the job post into your summary where they are true. Then run the resume through the [free ATS scanner](/tools/ats-checker). Read [how to pass an ATS resume scan](/blog/how-to-pass-ats-resume-scan) if the report shows parsing problems." },
     ],
@@ -623,7 +624,7 @@ const GUIDES: readonly Post[] = [
   },
 ]
 
-export const POSTS: readonly Post[] = [...GUIDES, ...RESUME_BUILDER_POSTS]
+export const POSTS: readonly Post[] = [...GUIDES, ...RESUME_BUILDER_POSTS, ...JOB_SEARCH_POSTS]
 
 export function getPost(slug: string): Post | undefined {
   return POSTS.find((p) => p.slug === slug)

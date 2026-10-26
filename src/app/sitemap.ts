@@ -20,7 +20,7 @@ function buildEntries(): Entry[] {
     { path: ROUTES.features, priority: 0.8 },
     { path: ROUTES.pricing, priority: 0.8 },
     { path: ROUTES.tools, priority: 0.8 },
-    ...FREE_TOOLS.map((t) => ({ path: `${ROUTES.tools}/${t.slug}`, priority: t.slug === "ats-checker" ? 0.9 : 0.7 })),
+    ...FREE_TOOLS.map((t) => ({ path: `${ROUTES.tools}/${t.slug}`, priority: ["ats-checker", "resume-summary-generator", "resume-bullet-point-generator"].includes(t.slug) ? 0.9 : 0.7 })),
     { path: ROUTES.blog, priority: 0.8 },
     ...POSTS.map((p) => ({ path: `${ROUTES.blog}/${p.slug}`, priority: 0.7, updated: p.updated ?? p.published })),
     { path: ROUTES.looks, priority: 0.7 },

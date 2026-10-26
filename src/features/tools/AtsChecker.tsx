@@ -1,9 +1,11 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Check, X } from "lucide-react"
+import Link from "next/link"
+import { ArrowRight, Check, X } from "lucide-react"
 
 import { runAtsScan, type Severity } from "@/features/tools/atsScan"
+import { BULLET_HANDOFF_KEY } from "@/features/tools/bulletGen"
 import { ToolHandoff } from "@/features/tools/ToolHandoff"
 import { track } from "@/lib/analytics"
 import { cn } from "@/lib/utils"
@@ -147,6 +149,19 @@ export function AtsChecker() {
                       <p className="text-[var(--site-ink-2)]">{b.line}</p>
                       <p className="sp-data mt-2">{b.reason}</p>
                       {b.rewrite ? <p className="mt-2 font-medium">{b.rewrite}</p> : null}
+                      <Link
+                        href="/tools/resume-bullet-point-generator"
+                        className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--site-accent-ink)] underline-offset-4 hover:underline"
+                        onClick={() => {
+                          try {
+                            sessionStorage.setItem(BULLET_HANDOFF_KEY, b.line)
+                          } catch {
+                            /* storage blocked: the generator opens empty */
+                          }
+                        }}
+                      >
+                        Rewrite it in the bullet generator <ArrowRight className="size-3.5" aria-hidden />
+                      </Link>
                     </li>
                   ))}
                 </ul>

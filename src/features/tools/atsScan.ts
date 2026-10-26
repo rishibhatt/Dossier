@@ -89,7 +89,7 @@ const SECTION_NAMES: Record<string, RegExp> = {
 }
 const REQUIRED_SECTIONS = ["Experience", "Education", "Skills"] as const
 
-const ACTION_VERBS = new Set(
+export const ACTION_VERBS = new Set(
   "led built launched cut grew reduced increased designed wrote ran managed created shipped delivered improved closed trained organized organised negotiated automated migrated owned planned taught raised saved won opened started founded redesigned mentored resolved developed implemented analyzed analysed coordinated established executed generated identified optimized optimised produced streamlined supervised achieved architected authored boosted configured conducted directed drove enhanced evaluated expanded forecasted initiated introduced maintained monitored operated partnered presented processed programmed reviewed scaled secured simplified sold spearheaded standardized tested transformed upgraded validated".split(" ")
 )
 
@@ -98,7 +98,7 @@ const E_VERBS = new Set(
 )
 const IRREGULAR: Record<string, string> = { leading: "Led", building: "Built", running: "Ran", writing: "Wrote", driving: "Drove", making: "Made", giving: "Gave", taking: "Took", selling: "Sold", teaching: "Taught", winning: "Won", growing: "Grew", cutting: "Cut", holding: "Held", keeping: "Kept", setting: "Set", putting: "Put", "overseeing": "Oversaw" }
 
-function toPast(gerund: string): string | null {
+export function toPast(gerund: string): string | null {
   const g = gerund.toLowerCase()
   if (IRREGULAR[g]) return IRREGULAR[g]
   if (!g.endsWith("ing") || g.length < 6) return null

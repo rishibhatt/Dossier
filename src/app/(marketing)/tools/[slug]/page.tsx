@@ -8,9 +8,11 @@ import { buildPageMetadata } from "@/config/seo"
 import { siteConfig } from "@/config/site"
 import { AboutBuilder } from "@/features/tools/AboutBuilder"
 import { AtsChecker } from "@/features/tools/AtsChecker"
+import { BulletGenerator } from "@/features/tools/BulletGenerator"
 import { FREE_TOOLS, getFreeTool, type FreeToolSlug } from "@/features/tools/catalog"
 import { HeadlineWriter } from "@/features/tools/HeadlineWriter"
 import { LinkInBio } from "@/features/tools/LinkInBio"
+import { SummaryGenerator } from "@/features/tools/SummaryGenerator"
 import { ROUTES } from "@/lib/constants/routes"
 
 export const dynamicParams = false
@@ -59,6 +61,18 @@ const HOW: Record<FreeToolSlug, string[]> = {
     "Building needs a free account, with no card. Your PDF waits in this browser while you sign up, then the builder opens.",
     "Free includes one published portfolio with a small Dossier badge.",
   ],
+  "resume-summary-generator": [
+    "Each summary follows the order a recruiter reads in: who you are, one result, then the skills the job asks for. The shapes change the order, so you can pick the one that leads with your strongest point.",
+    "The career stage changes the wording. Students lead with what they study and a project, career changers name the field they come from, and senior people lead with scope.",
+    "Type a common job title and the tool offers skills and tools from our keyword lists for that role. Only add the ones you can talk about in an interview.",
+    "The drafts are written in your browser from your own words. Polish with AI sends one draft to a language model for a smoother rewrite. It keeps your facts, and any rewrite with a number you did not type is thrown away.",
+  ],
+  "resume-bullet-point-generator": [
+    "Weak openers such as \"responsible for\", \"helped with\" and \"worked on\" are removed, and a leading -ing verb becomes past tense, so every bullet starts with what you did.",
+    "The same facts are then arranged four ways: action then result, result first (the XYZ formula), a short version under one line, and a version that names the tool first for keyword searches.",
+    "No number? The tool says so. Recruiters skim, and a number is what stops the skim. An honest estimate is fine.",
+    "Everything runs in your browser. Polish with AI is optional, capped per day, and rejects any rewrite that adds a number you did not give it.",
+  ],
 }
 
 function ToolBody({ slug }: { slug: FreeToolSlug }) {
@@ -71,6 +85,10 @@ function ToolBody({ slug }: { slug: FreeToolSlug }) {
       return <AboutBuilder />
     case "link-in-bio":
       return <LinkInBio />
+    case "resume-summary-generator":
+      return <SummaryGenerator />
+    case "resume-bullet-point-generator":
+      return <BulletGenerator />
     case "resume-to-website":
       return (
         <div className="grid gap-10 lg:grid-cols-12">
@@ -100,9 +118,18 @@ export default async function ToolPage({ params }: Props) {
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   }
 
+  const faqLd = tool.faq?.length
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: tool.faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+      }
+    : null
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      {faqLd ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} /> : null}
       <PageHead running={[`Free tools / ${tool.name}`, `No. ${tool.no}`]} title={tool.h1} lead={<p>{tool.intro}</p>} />
       <section aria-label={tool.name} className="site-wrap pb-20">
         <ToolBody slug={tool.slug} />
@@ -123,9 +150,52 @@ export default async function ToolPage({ params }: Props) {
         </div>
       </section>
 
+      {tool.examples?.length ? (
+        <section aria-labelledby="examples-title" className="site-wrap py-16 sm:py-20">
+          <h2 id="examples-title" className="site-h3">
+            Before and after
+          </h2>
+          <ol className="mt-6 grid gap-px border border-[var(--site-rule)] bg-[var(--site-rule)] lg:grid-cols-3">
+            {tool.examples.map((x, k) => (
+              <li key={x.label} className="flex flex-col gap-4 bg-[var(--site-paper)] p-5 sm:p-6">
+                <p className="sp-data">
+                  <span className="sp-no">{String(k + 1).padStart(2, "0")}</span> {x.label}
+                </p>
+                <div>
+                  <p className="sp-data text-[var(--site-ink-3)]">Before</p>
+                  <p className="mt-1 text-[0.9375rem] text-[var(--site-ink-2)] line-through decoration-[var(--site-rule-strong)]">{x.before}</p>
+                </div>
+                <div className="border-t border-[var(--site-rule)] pt-4">
+                  <p className="sp-data text-[var(--site-accent-ink)]">After</p>
+                  <p className="mt-1 font-medium leading-relaxed">{x.after}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
+
+      {tool.faq?.length ? (
+        <section aria-labelledby="faq-title" className="border-t border-[var(--site-rule-strong)] py-16 sm:py-20">
+          <div className="site-wrap grid gap-8 lg:grid-cols-12">
+            <h2 id="faq-title" className="site-h3 lg:col-span-4">
+              Questions
+            </h2>
+            <dl className="grid gap-5 lg:col-span-8">
+              {tool.faq.map((f) => (
+                <div key={f.q} className="border-t border-[var(--site-rule)] pt-5">
+                  <dt className="font-semibold">{f.q}</dt>
+                  <dd className="site-body mt-2 text-[var(--site-ink-2)]">{f.a}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </section>
+      ) : null}
+
       <nav aria-label="Other tools" className="site-wrap py-16">
         <p className="site-h3">More free tools</p>
-        <ul className="mt-6 grid grid-cols-1 gap-px border border-[var(--site-rule)] bg-[var(--site-rule)] sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="mt-6 grid grid-cols-1 gap-px border border-[var(--site-rule)] bg-[var(--site-rule)] sm:grid-cols-2 lg:grid-cols-3">
           {others.map((t) => (
             <li key={t.slug} className="bg-[var(--site-paper)]">
               <Link href={`${ROUTES.tools}/${t.slug}`} className="flex h-full min-h-24 flex-col justify-between gap-2 p-4 hover:bg-[var(--site-sheet)]">

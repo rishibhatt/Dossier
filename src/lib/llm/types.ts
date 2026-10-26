@@ -1,7 +1,7 @@
 import type { z } from "zod"
 
-/** The AI only reads resumes. Design is a deterministic rules engine and never calls a model. */
-export type LLMTask = "resume"
+/** The AI reads resumes and polishes short text on the free tools. Design is a deterministic rules engine and never calls a model. */
+export type LLMTask = "resume" | "polish"
 
 export type LLMProviderId = "groq" | "openrouter"
 
