@@ -65,7 +65,7 @@
     columns: (1fr, auto),
     column-gutter: 1em,
     row-gutter: st.leading * 0.9em,
-    text(weight: title-weight, e.title),
+    text(weight: title-weight, maybe-link(e.link, e.title)),
     align(right, text(fill: date-fill, e.date)),
     ..if e.subtitle != "" or e.meta != "" {
       (

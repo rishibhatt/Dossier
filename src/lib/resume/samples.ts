@@ -52,7 +52,7 @@ const CORE_SAMPLES: SampleResume[] = [
         location: "Pune, India",
         summary:
           "Chartered accountancy inter with seven years in month-end close, GST and audit support for mid-size firms. I close the books faster and catch what does not add up.",
-        links: [{ id: sid("l"), label: "linkedin.com/in/meera-sample", url: "https://linkedin.com/in/meera-sample" }],
+        links: [{ id: sid("l"), label: "LinkedIn", url: "https://linkedin.com/in/meera-sample" }],
       },
       personal: { dateOfBirth: "", nationality: "", visaStatus: "", maritalStatus: "", drivingLicence: "" },
       sections: [
@@ -108,7 +108,7 @@ const CORE_SAMPLES: SampleResume[] = [
         phone: "+91 90000 11111",
         location: "Bengaluru, India",
         summary: "",
-        links: [{ id: sid("l"), label: "github.com/arjun-sample", url: "https://github.com/arjun-sample" }],
+        links: [{ id: sid("l"), label: "GitHub", url: "https://github.com/arjun-sample" }],
       },
       personal: { dateOfBirth: "", nationality: "", visaStatus: "", maritalStatus: "", drivingLicence: "" },
       sections: [
@@ -146,6 +146,7 @@ const CORE_SAMPLES: SampleResume[] = [
               name: "Hostel Mess Tracker",
               role: "Creator",
               link: "https://github.com/arjun-sample/mess",
+              linkLabel: "GitHub",
               start: "2024",
               end: "",
               current: false,
@@ -209,8 +210,8 @@ const CORE_SAMPLES: SampleResume[] = [
           title: "",
           hidden: false,
           items: [
-            { id: sid("c"), title: "Advanced Life Support (ALS)", subtitle: "Resuscitation Council UK", date: "2024-03", link: "", detail: "" },
-            { id: sid("c"), title: "NMC Registration", subtitle: "Nursing and Midwifery Council", date: "2019-09", link: "", detail: "" },
+            { id: sid("c"), title: "Advanced Life Support (ALS)", subtitle: "Resuscitation Council UK", date: "2024-03", link: "", linkLabel: "", detail: "" },
+            { id: sid("c"), title: "NMC Registration", subtitle: "Nursing and Midwifery Council", date: "2019-09", link: "", linkLabel: "", detail: "" },
           ],
         },
         skills([["Clinical", ["Ventilator care", "Arterial lines", "Sepsis bundles", "Medication management"]]]),
@@ -233,7 +234,7 @@ const CORE_SAMPLES: SampleResume[] = [
         phone: "+49 151 00000000",
         location: "Berlin, Germany",
         summary: "Eight years running demand generation for B2B software. I plan campaigns around pipeline, not clicks.",
-        links: [{ id: sid("l"), label: "sofia-sample.de", url: "https://sofia-sample.de" }],
+        links: [{ id: sid("l"), label: "Website", url: "https://sofia-sample.de" }],
       },
       personal: { dateOfBirth: "", nationality: "German", visaStatus: "", maritalStatus: "", drivingLicence: "Class B" },
       sections: [

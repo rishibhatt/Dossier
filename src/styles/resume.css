@@ -592,6 +592,17 @@
     color: var(--site-ink-3);
     line-height: 1;
   }
+  .rz-link-row {
+    display: grid;
+    grid-template-columns: minmax(105px, 1fr) minmax(130px, 1.8fr) 2.75rem;
+    align-items: start;
+    gap: 0.375rem;
+  }
+  @media (max-width: 480px) {
+    .rz-link-row {
+      grid-template-columns: 1fr 1fr 2.75rem;
+    }
+  }
 
   .rz-add {
     display: inline-flex;

@@ -1,3 +1,4 @@
+import { autoLabel } from "./links"
 import { PERSONAL_LABELS, PRESETS, SECTION_LABELS, formatMonth, formatRange } from "./presets"
 import type { Accent, Density, ResumeDesign, ResumeDocument, ResumeSection } from "./schema"
 
@@ -114,16 +115,19 @@ function sectionModel(section: ResumeSection, style: ReturnType<typeof styleOf>)
     case "projects": {
       const entries = section.items
         .filter((i) => clean(i.name))
-        .map((i) => ({
-          id: i.id,
-          title: clean(i.name),
-          subtitle: clean(i.role),
-          meta: safeUrl(i.link) ? linkLabel(safeUrl(i.link)) : "",
-          date: formatRange(i.start, i.end, i.current, ds),
-          link: safeUrl(i.link),
-          bullets: nonEmpty(i.bullets).map((b) => ({ id: b.id, text: clean(b.text) })),
-          detail: "",
-        }))
+        .map((i) => {
+          const url = safeUrl(i.link)
+          return {
+            id: i.id,
+            title: clean(i.name),
+            subtitle: clean(i.role),
+            meta: url ? autoLabel(url, i.linkLabel) : "",
+            date: formatRange(i.start, i.end, i.current, ds),
+            link: url,
+            bullets: nonEmpty(i.bullets).map((b) => ({ id: b.id, text: clean(b.text) })),
+            detail: "",
+          }
+        })
       return entries.length ? { id: section.id, type: section.type, kind: "entries", title, entries } : null
     }
     case "skills": {
@@ -141,16 +145,19 @@ function sectionModel(section: ResumeSection, style: ReturnType<typeof styleOf>)
     default: {
       const entries = section.items
         .filter((i) => clean(i.title))
-        .map((i) => ({
-          id: i.id,
-          title: clean(i.title),
-          subtitle: clean(i.subtitle),
-          meta: safeUrl(i.link) ? linkLabel(safeUrl(i.link)) : "",
-          date: formatMonth(i.date, ds),
-          link: safeUrl(i.link),
-          bullets: [],
-          detail: clean(i.detail),
-        }))
+        .map((i) => {
+          const url = safeUrl(i.link)
+          return {
+            id: i.id,
+            title: clean(i.title),
+            subtitle: clean(i.subtitle),
+            meta: url ? autoLabel(url, i.linkLabel) : "",
+            date: formatMonth(i.date, ds),
+            link: url,
+            bullets: [],
+            detail: clean(i.detail),
+          }
+        })
       return entries.length ? { id: section.id, type: section.type, kind: "entries", title, entries } : null
     }
   }
@@ -170,7 +177,7 @@ export function toRenderModel(doc: ResumeDocument, design: ResumeDesign): Render
   if (clean(b.location)) contact.push({ text: clean(b.location), url: "" })
   for (const l of b.links) {
     const url = safeUrl(l.url)
-    if (url) contact.push({ text: clean(l.label) || linkLabel(url), url })
+    if (url) contact.push({ text: autoLabel(url, l.label), url })
   }
 
   const personal = preset.personal

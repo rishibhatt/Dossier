@@ -1,5 +1,6 @@
 import type { ResumeData } from "@/lib/pdf/extractSections"
 
+import { autoLabel } from "./links"
 import { newId, type ResumeDocument, type ResumeSection } from "./schema"
 
 /**
@@ -94,16 +95,20 @@ export function resumeDataToDocument(r: ResumeData): ResumeDocument {
       type: "projects",
       title: "",
       hidden: false,
-      items: r.projects.slice(0, 20).map((p) => ({
-        id: newId("p"),
-        name: p.name.slice(0, 120),
-        role: "",
-        link: p.link && /^https:\/\//i.test(p.link) ? p.link.slice(0, 300) : "",
-        start: "",
-        end: "",
-        current: false,
-        bullets: bullets([p.description, p.tech.length ? `Built with ${p.tech.join(", ")}.` : ""]).map((b) => ({ ...b, text: b.text.slice(0, 600) })),
-      })),
+      items: r.projects.slice(0, 20).map((p) => {
+        const link = p.link && /^https:\/\//i.test(p.link) ? p.link.slice(0, 300) : ""
+        return {
+          id: newId("p"),
+          name: p.name.slice(0, 120),
+          role: "",
+          link,
+          linkLabel: link ? autoLabel(link).slice(0, 60) : "",
+          start: "",
+          end: "",
+          current: false,
+          bullets: bullets([p.description, p.tech.length ? `Built with ${p.tech.join(", ")}.` : ""]).map((b) => ({ ...b, text: b.text.slice(0, 600) })),
+        }
+      }),
     })
   }
 
@@ -129,6 +134,7 @@ export function resumeDataToDocument(r: ResumeData): ResumeDocument {
         subtitle: c.issuer.slice(0, 200),
         date: parseMonth(c.year),
         link: "",
+        linkLabel: "",
         detail: "",
       })),
     })
@@ -146,6 +152,7 @@ export function resumeDataToDocument(r: ResumeData): ResumeDocument {
         subtitle: "",
         date: "",
         link: "",
+        linkLabel: "",
         detail: "",
       })),
     })
@@ -154,7 +161,10 @@ export function resumeDataToDocument(r: ResumeData): ResumeDocument {
   const links = r.contact.links
     .filter((l) => l.length <= 280 && (/^https:\/\//i.test(l) || /^[\w.-]+\.[a-z]{2,}/i.test(l)))
     .slice(0, 6)
-    .map((url) => ({ id: newId("l"), label: url.replace(/^https:\/\/(www\.)?/i, "").replace(/\/$/, "").slice(0, 40), url: /^https:/i.test(url) ? url : `https://${url}` }))
+    .map((url) => {
+      const cleanUrl = /^https:/i.test(url) ? url : `https://${url}`
+      return { id: newId("l"), label: autoLabel(cleanUrl).slice(0, 40), url: cleanUrl }
+    })
 
   return {
     version: 1,
