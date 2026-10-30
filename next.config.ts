@@ -8,12 +8,12 @@ import type { NextConfig } from "next";
  */
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://www.googletagmanager.com https://www.clarity.ms https://scripts.clarity.ms https://pagead2.googlesyndication.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://www.googletagmanager.com https://www.clarity.ms https://scripts.clarity.ms https://pagead2.googlesyndication.com https://checkout.razorpay.com https://*.posthog.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://*.clarity.ms",
-  "frame-src 'self' https://googleads.g.doubleclick.net",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://*.clarity.ms https://*.posthog.com https://api.razorpay.com https://lumberjack.razorpay.com",
+  "frame-src 'self' https://googleads.g.doubleclick.net https://api.razorpay.com https://checkout.razorpay.com",
   // The resume typesetter runs in a same-origin module worker.
   "worker-src 'self'",
   "object-src 'none'",

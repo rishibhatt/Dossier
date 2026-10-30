@@ -15,7 +15,7 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
   {
     group: "Basics",
     q: "What file can I upload?",
-    a: "A PDF up to 10 MB. Export it from Word, Google Docs or Pages if your resume lives there. Scanned images of a resume do not read well yet.",
+    a: "A PDF up to 4 MB. Export it from Word, Google Docs or Pages if your resume lives there. Scanned images of a resume do not read well yet.",
   },
   {
     group: "Basics",

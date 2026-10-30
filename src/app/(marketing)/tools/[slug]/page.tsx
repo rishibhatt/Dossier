@@ -57,7 +57,7 @@ const HOW: Record<FreeToolSlug, string[]> = {
     "On Dossier, your portfolio site can be that page, with your work one tap further.",
   ],
   "resume-to-website": [
-    "Upload a PDF up to 10 MB. Dossier reads it into sections and suggests a look from your profession.",
+    "Upload a PDF up to 4 MB. Dossier reads it into sections and suggests a look from your profession.",
     "Building needs a free account, with no card. Your PDF waits in this browser while you sign up, then the builder opens.",
     "Free includes one published portfolio with a small Dossier badge.",
   ],

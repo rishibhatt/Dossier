@@ -171,6 +171,10 @@ export function UploadZone({ className, onSelectFile, disabled }: UploadZoneProp
 
         <p className="text-sm text-[var(--site-ink-2)]">PDF only, up to {MAX_MB} MB. Text you can select works best.</p>
       </div>
+      <p className="mt-3 text-center text-sm text-[var(--site-ink-2)]">
+        No resume file? Use your LinkedIn profile: open it on a computer, press <strong className="font-semibold">More</strong>, then{" "}
+        <strong className="font-semibold">Save to PDF</strong>, and drop that file here.
+      </p>
 
       <div ref={errRef}>{problem ? <ProblemNote problem={problem} className="mt-3" /> : null}</div>
     </div>

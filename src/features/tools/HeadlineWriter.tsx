@@ -1,9 +1,10 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo } from "react"
 
 import { CopyText } from "@/features/tools/CopyText"
 import { ToolHandoff } from "@/features/tools/ToolHandoff"
+import { useSaved } from "@/features/tools/useSaved"
 
 const LIMIT = 220
 
@@ -52,7 +53,7 @@ const FIELDS: { key: keyof Input; label: string; placeholder: string; hint?: str
 ]
 
 export function HeadlineWriter() {
-  const [v, setV] = useState<Input>({ role: "", years: "", focus: "", proof: "", audience: "" })
+  const [v, setV] = useSaved<Input>("headline", { role: "", years: "", focus: "", proof: "", audience: "" })
   const lines = useMemo(() => buildHeadlines(v), [v])
 
   return (

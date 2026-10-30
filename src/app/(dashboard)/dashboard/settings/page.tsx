@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 
+import { saveEmailPrefsAction } from "@/app/(dashboard)/dashboard/settings/actions"
 import { UsernameForm } from "@/app/(dashboard)/dashboard/settings/UsernameForm"
 import { buildPageMetadata } from "@/config/seo"
 import { messages } from "@/config/messages"
@@ -20,6 +21,7 @@ const display = { fontFamily: "var(--site-display)" } as const
 export default async function SettingsPage() {
   const ctx = await getDashboardContext()
   const plan = PLAN_CARDS.find((p) => p.id === ctx.plan)!
+  const { data: prefs } = ctx.userId && ctx.supabase ? await ctx.supabase.from("users").select("email_product, email_offers").eq("id", ctx.userId).maybeSingle() : { data: null }
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -40,6 +42,32 @@ export default async function SettingsPage() {
           <div className="mt-6 border-t border-[var(--site-rule)] pt-6">
             <UsernameForm initial={ctx.username} />
           </div>
+        </section>
+
+        <section className="p-5 sm:p-7" aria-labelledby="email-h">
+          <h2 id="email-h" className="text-lg font-bold tracking-[-0.02em]" style={display}>
+            Emails
+          </h2>
+          <p className="mt-2 text-sm text-[var(--site-ink-2)]">Receipts, password and security emails always come. These two are your choice.</p>
+          <form action={saveEmailPrefsAction} className="mt-4 grid gap-3 text-sm">
+            <label className="flex items-start gap-3">
+              <input type="checkbox" name="product" defaultChecked={prefs?.email_product ?? true} className="mt-0.5 size-4 accent-[var(--site-accent)]" />
+              <span>
+                <strong className="font-semibold">Tips and updates about my site</strong>
+                <span className="block text-[var(--site-ink-2)]">Weekly visit counts, help getting started, Pro ending reminders. A few a month at most.</span>
+              </span>
+            </label>
+            <label className="flex items-start gap-3">
+              <input type="checkbox" name="offers" defaultChecked={prefs?.email_offers ?? false} className="mt-0.5 size-4 accent-[var(--site-accent)]" />
+              <span>
+                <strong className="font-semibold">Offers and discounts</strong>
+                <span className="block text-[var(--site-ink-2)]">Festival sales and new features. About four a year.</span>
+              </span>
+            </label>
+            <button type="submit" className="dx-btn dx-btn-outline mt-2 w-full sm:w-auto">
+              Save email choices
+            </button>
+          </form>
         </section>
 
         <section className="p-5 sm:p-7" aria-labelledby="plan-h">

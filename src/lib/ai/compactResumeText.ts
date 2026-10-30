@@ -12,7 +12,7 @@ const BULLET_GLYPHS = /^[\s ]*[•●◦▪▫■□►▶➢➤✓✔★☆◆
 const PAGE_NUMBER = /^-{1,3}\s*\d{1,3}\s*of\s*\d{1,3}\s*-{1,3}$|^(?:page\s*)?\d{1,3}\s*(?:\/|of)\s*\d{1,3}$|^page\s*\d{1,3}$|^-\s*\d{1,3}\s*-$|^\d{1,2}$/i
 const RULE_LINE = /^[\s_=\-~.*#|]{3,}$/
 const CONTROL = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f​-‍﻿]/g
-const HEADING = /^(?:summary|profile|about(?: me)?|objective|experience|work experience|professional experience|employment(?: history)?|education|skills|technical skills|projects|certifications?|awards?|publications?|languages|interests|volunteer(?:ing)?|contact|references?)\s*:?$/i
+const HEADING = /^(?:summary|profile|about(?: me)?|objective|experience|work experience|professional experience|employment(?: history)?|education|skills|top skills|technical skills|honors-awards|projects|certifications?|awards?|publications?|languages|interests|volunteer(?:ing)?|contact|references?)\s*:?$/i
 
 export function cleanResumeLines(raw: string): string[] {
   const seen = new Set<string>()

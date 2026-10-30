@@ -33,7 +33,7 @@ export const messages = {
   },
   dossier: {
     uploadTitle: "Drop your PDF here",
-    uploadSubtitle: "Or choose a file from your device. PDF, up to 10 MB.",
+    uploadSubtitle: "Or choose a file from your device. PDF, up to 4 MB.",
     uploadCta: "Choose a PDF",
     buildStyle: {
       fileLabel: "Your resume",
@@ -155,7 +155,7 @@ export const messages = {
       generic: "Could not complete parsing. Try again.",
       fileRequired: "Please choose a PDF file.",
       invalidFileType: "Only PDF uploads are supported.",
-      fileTooLarge: "File is too large. Max 10 MB.",
+      fileTooLarge: "File is too large. Max 4 MB.",
       pipelineFailed: "We could not read that PDF. If it is a scan, try a version with selectable text.",
       requestFailed: "The upload did not go through. Check your connection and try again.",
       quota_exceeded: "You have used today's free resume reads. Try again tomorrow, or sign in to get more.",
@@ -213,7 +213,7 @@ export const messages = {
   },
   dashboard: {
     nav: {
-      portfolios: "Portfolios",
+      portfolios: "Home",
       billing: "Plan & billing",
       referrals: "Invite",
       settings: "Settings",

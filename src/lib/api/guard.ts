@@ -14,6 +14,7 @@ import {
   type PlanLimits,
   type UsageKind,
 } from "@/lib/billing/plans"
+import { isTestEnv } from "@/config/site"
 import { activeShufflePackBonus } from "@/lib/credits/server"
 import { createAdminSupabaseClient } from "@/lib/supabase/admin"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
@@ -48,13 +49,14 @@ export async function resolveCaller(): Promise<Caller> {
     return { supabase, user: null, plan: "free", limits: IS_DEV_UNLIMITED ? DEV_UNLIMITED_LIMITS : ANONYMOUS_LIMITS }
   }
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("users")
-    .select("plan, plan_expires_at")
+    .select("plan, plan_expires_at, owns_starter")
     .eq("id", user.id)
     .maybeSingle()
 
-  const plan = resolveEffectivePlan(profile?.plan ?? "free", profile?.plan_expires_at ?? null)
+  if (profileError) console.error("[guard] profile read failed, treating as Free:", profileError.message)
+  const plan = resolveEffectivePlan(profile?.plan ?? "free", profile?.plan_expires_at ?? null, profile?.owns_starter)
   return { supabase, user, plan, limits: IS_DEV_UNLIMITED ? DEV_UNLIMITED_LIMITS : PLAN_LIMITS[plan] }
 }
 
@@ -102,7 +104,8 @@ export async function consumeQuota(request: Request, caller: Caller, kind: Usage
     return null
   }
 
-  const subject = subjectFor(request, caller.user)
+  // `test:` keeps local dev traffic out of the admin numbers while quotas still work per caller.
+  const subject = `${isTestEnv ? "test:" : ""}${subjectFor(request, caller.user)}`
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
 
   const { count, error: countError } = await admin

@@ -53,8 +53,8 @@ export async function shouldShowCredit(userId: string | null): Promise<boolean> 
   const admin = createAdminSupabaseClient()
   if (!admin) return true
   try {
-    const { data } = await admin.from("users").select("plan, plan_expires_at").eq("id", userId).maybeSingle()
-    return !data || resolveEffectivePlan(data.plan, data.plan_expires_at) === "free"
+    const { data } = await admin.from("users").select("plan, plan_expires_at, owns_starter").eq("id", userId).maybeSingle()
+    return !data || resolveEffectivePlan(data.plan, data.plan_expires_at, data.owns_starter) === "free"
   } catch {
     return true
   }

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { SiteFooter } from "@/components/marketing/SiteFooter"
 import { SiteHeader } from "@/components/marketing/SiteHeader"
 import { SmoothScroll } from "@/components/marketing/motion/SmoothScroll"
+import { OfferBar } from "@/features/billing/OfferBar"
 import { ROUTES } from "@/lib/constants/routes"
 import { cn } from "@/lib/utils"
 
@@ -25,6 +26,7 @@ export function MarketingLayoutTemplate({ children, className }: MarketingLayout
   return (
     <div className={cn("site flex min-h-dvh flex-col", className)}>
       <SmoothScroll />
+      <OfferBar />
       <SiteHeader />
       <main className="flex-1">{children}</main>
       <SiteFooter />

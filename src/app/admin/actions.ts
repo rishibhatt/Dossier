@@ -6,7 +6,9 @@ import { after } from "next/server"
 import { z } from "zod"
 
 import { requireAdminAction } from "@/lib/admin/auth"
-import { notifyPlanChanged } from "@/lib/email/events"
+import { sendEmail } from "@/lib/email/brevo"
+import { notifyPlanChanged, unsubscribeUrl } from "@/lib/email/events"
+import { lifecycleEmail, purchaseEmail, welcomeEmail } from "@/lib/email/templates"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import type { Json } from "@/types/database"
 
@@ -102,6 +104,37 @@ export async function setMessageStatusAction(formData: FormData): Promise<void> 
   await admin.from("contact_messages").update({ status: status.data }).eq("id", id.data)
   await audit(admin, user.id, "message_status", null, { id: id.data, status: status.data })
   revalidatePath("/admin/messages")
+  revalidatePath("/admin")
+}
+
+/** Sends one copy of every app email to the signed-in admin, so each template can be checked in a real inbox. */
+export async function sendTestEmailsAction(): Promise<void> {
+  const { user, admin } = await requireAdminAction()
+  if (!user.email) return
+  const { data: me } = await admin.from("users").select("email_token").eq("id", user.id).maybeSingle()
+  const unsubscribe = unsubscribeUrl(user.id, me?.email_token ?? "00000000-0000-0000-0000-000000000000")
+  const week = new Date(Date.now() + 4 * 86_400_000).toISOString()
+  const mails = [
+    welcomeEmail("Test"),
+    purchaseEmail({ product: "pro_year", expiresAt: week }),
+    ...["life:activate", "life:resume_to_site", "life:published", "life:invite", "views:test", "life:winback", "renew:test", "expired:test"].map((kind) =>
+      lifecycleEmail({ kind, name: "Test", views: 12, expiresAt: week, unsubscribe })
+    ),
+  ]
+  for (const m of mails) if (m) await sendEmail({ to: user.email, ...m, subject: `[TEST] ${m.subject}`, tags: ["test"], unsubscribe })
+  await audit(admin, user.id, "send_test_emails", null, { count: mails.length })
+}
+
+/** Marks an account as test data (hidden from the console's numbers) or back as real. */
+export async function setTestAction(formData: FormData): Promise<void> {
+  const { user, admin } = await requireAdminAction()
+  const id = uuid.safeParse(formData.get("userId"))
+  if (!id.success) return
+  const isTest = formData.get("isTest") === "1"
+  await admin.from("users").update({ is_test: isTest }).eq("id", id.data)
+  await audit(admin, user.id, "set_test", id.data, { is_test: isTest })
+  revalidatePath(`/admin/users/${id.data}`)
+  revalidatePath("/admin/users")
   revalidatePath("/admin")
 }
 

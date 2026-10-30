@@ -66,7 +66,7 @@ const FAQ = [
   },
   {
     q: "Can I bring in my old resume?",
-    a: "Yes, as a PDF up to 10 MB. It is read on your device and never uploaded. We fill in the form from its text; check it and fix anything we missed. Scanned images have no text to read.",
+    a: "Yes, as a PDF up to 4 MB. It is read on your device and never uploaded. We fill in the form from its text; check it and fix anything we missed. Scanned images have no text to read.",
   },
   {
     q: "Which countries does it handle?",

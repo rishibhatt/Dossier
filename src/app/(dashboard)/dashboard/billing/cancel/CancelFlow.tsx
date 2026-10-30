@@ -263,7 +263,7 @@ export function CancelFlow({ plan, supportEmail }: { plan: PlanId; supportEmail:
       )}
       {isPro ? (
         <p className="mt-4 text-sm text-[var(--site-ink-2)]">
-          Checkout is not live yet, so no one has been charged for Pro and there is no refund to process. The switch happens now.
+          Pro is a one-time pass, so nothing renews and nothing more will be charged. Switching to Free now ends your remaining Pro days early. For a refund, write to us instead.
         </p>
       ) : null}
       {errorNote}
@@ -337,24 +337,8 @@ function offerFor(reason: CancelReason, plan: PlanId, supportEmail: string): Off
       return isPro
         ? {
             title: "Would Starter work instead?",
-            body: "Starter is $9 once and never renews. It keeps no badge, unlimited shuffles and ZIP downloads, for one portfolio. Or pause Pro for 3 months. Checkout is not open yet, so we save your choice and nothing is charged today.",
-            actions: [
-              {
-                kind: "submit",
-                label: "Move me to Starter instead",
-                outcome: "accepted_offer",
-                offer: "switch_starter",
-                doneText: "Your request to move to Starter is saved. Checkout is not open yet, so nothing is charged and your plan stays as it is for now.",
-                primary: true,
-              },
-              {
-                kind: "submit",
-                label: "Pause Pro for 3 months",
-                outcome: "accepted_offer",
-                offer: "pause_3_months",
-                doneText: "Your pause request is saved. Checkout is not open yet, so nothing is charged in the meantime.",
-              },
-            ],
+            body: "Pro never renews: it simply ends on its date. If you only need no badge, unlimited shuffles and ZIP downloads, Starter is $9 (₹399 in India) once and keeps them for good, even after Pro ends.",
+            actions: [{ kind: "link", label: "See Starter", href: ROUTES.billing }],
           }
         : {
             title: plan === "starter" ? "Starter never charges again" : "Free stays free",

@@ -5,7 +5,7 @@ import { listUsers, PAGE_SIZE } from "@/lib/admin/data"
 
 export const dynamic = "force-dynamic"
 
-type Props = { searchParams: Promise<{ q?: string; plan?: string; page?: string }> }
+type Props = { searchParams: Promise<{ q?: string; plan?: string; who?: string; joined?: string; sort?: string; page?: string }> }
 
 const day = (iso: string) => iso.slice(0, 10)
 
@@ -14,10 +14,14 @@ export default async function AdminUsers({ searchParams }: Props) {
   const sp = await searchParams
   const q = (sp.q ?? "").slice(0, 80)
   const plan = sp.plan ?? ""
+  const who = sp.who === "test" || sp.who === "all" ? sp.who : "real"
+  const joined = [7, 30, 90].find((d) => String(d) === sp.joined) ?? 0
+  const sort = sp.sort === "oldest" ? "oldest" : "newest"
   const page = Math.max(1, Number.parseInt(sp.page ?? "1", 10) || 1)
-  const { users, total } = await listUsers(admin, { q, page, plan })
+  const { users, total } = await listUsers(admin, { q, page, plan, who, joined, sort })
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE))
-  const href = (p: number) => `/admin/users?${new URLSearchParams({ ...(q ? { q } : {}), ...(plan ? { plan } : {}), page: String(p) })}`
+  const kept = { ...(q ? { q } : {}), ...(plan ? { plan } : {}), ...(who !== "real" ? { who } : {}), ...(joined ? { joined: String(joined) } : {}), ...(sort !== "newest" ? { sort } : {}) }
+  const href = (p: number) => `/admin/users?${new URLSearchParams({ ...kept, page: String(p) })}`
 
   return (
     <div>
@@ -40,6 +44,36 @@ export default async function AdminUsers({ searchParams }: Props) {
             <option value="free">Free</option>
             <option value="starter">Starter</option>
             <option value="pro">Pro</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="who" className="sp-label">
+            Accounts
+          </label>
+          <select id="who" name="who" defaultValue={who} className="sp-field">
+            <option value="real">Real only</option>
+            <option value="test">Test only</option>
+            <option value="all">Real and test</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="joined" className="sp-label">
+            Joined
+          </label>
+          <select id="joined" name="joined" defaultValue={joined ? String(joined) : ""} className="sp-field">
+            <option value="">Any time</option>
+            <option value="7">Last 7 days</option>
+            <option value="30">Last 30 days</option>
+            <option value="90">Last 90 days</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="sort" className="sp-label">
+            Order
+          </label>
+          <select id="sort" name="sort" defaultValue={sort} className="sp-field">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
           </select>
         </div>
         <button type="submit" className="site-btn site-btn-primary">
@@ -66,6 +100,7 @@ export default async function AdminUsers({ searchParams }: Props) {
                   <Link href={`/admin/users/${u.id}`} className="underline decoration-[var(--site-rule-strong)] underline-offset-4 hover:decoration-[var(--site-ink)]">
                     {u.email ?? u.id}
                   </Link>
+                  {u.is_test ? <span className="sp-data ml-2">test</span> : null}
                 </td>
                 <td className="py-3 pr-4 text-[var(--site-ink-2)]">{u.username ?? "-"}</td>
                 <td className="py-3 pr-4">{u.plan}</td>

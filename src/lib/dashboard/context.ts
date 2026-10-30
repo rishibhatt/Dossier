@@ -15,6 +15,8 @@ export type DashboardContext = {
   email: string | null
   username: string | null
   plan: PlanId
+  /** End of the current Pro pass; null for Free and Starter. */
+  planExpiresAt: string | null
   limits: PlanLimits
   /** Design shuffles used in the last 24 hours. Null when the usage ledger is not configured. */
   shufflesUsed: number | null
@@ -30,6 +32,7 @@ export const getDashboardContext = cache(async (): Promise<DashboardContext> => 
     email: null,
     username: null,
     plan: "free",
+    planExpiresAt: null,
     limits: PLAN_LIMITS.free,
     shufflesUsed: null,
     shuffleBonus: 0,
@@ -47,13 +50,15 @@ export const getDashboardContext = cache(async (): Promise<DashboardContext> => 
   } = await supabase.auth.getUser()
   if (!user) return { ...empty, supabase }
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("users")
-    .select("plan, plan_expires_at, username")
+    .select("plan, plan_expires_at, username, owns_starter")
     .eq("id", user.id)
     .maybeSingle()
+  // A failed read would show a paying user as Free. Say so in the server log instead of hiding it.
+  if (profileError) console.error("[dashboard] profile read failed, showing Free:", profileError.message)
 
-  const plan = resolveEffectivePlan(profile?.plan ?? "free", profile?.plan_expires_at ?? null)
+  const plan = resolveEffectivePlan(profile?.plan ?? "free", profile?.plan_expires_at ?? null, profile?.owns_starter)
 
   let shufflesUsed: number | null = null
   let shuffleBonus = 0
@@ -63,7 +68,7 @@ export const getDashboardContext = cache(async (): Promise<DashboardContext> => 
     const { count } = await admin
       .from("usage_events")
       .select("id", { count: "exact", head: true })
-      .eq("subject", `u:${user.id}`)
+      .in("subject", [`u:${user.id}`, `test:u:${user.id}`])
       .eq("kind", "regenerate")
       .gte("created_at", since)
     shufflesUsed = count ?? 0
@@ -76,6 +81,7 @@ export const getDashboardContext = cache(async (): Promise<DashboardContext> => 
     email: user.email ?? null,
     username: profile?.username ?? null,
     plan,
+    planExpiresAt: plan === "pro" ? (profile?.plan_expires_at ?? null) : null,
     limits: PLAN_LIMITS[plan],
     shufflesUsed,
     shuffleBonus,

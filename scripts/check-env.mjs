@@ -9,7 +9,7 @@ const errors = []
 const warnings = []
 
 // 1. A NEXT_PUBLIC_ name is shipped to every browser. It must never look like a secret.
-const publicAllow = new Set(["NEXT_PUBLIC_SUPABASE_ANON_KEY"])
+const publicAllow = new Set(["NEXT_PUBLIC_SUPABASE_ANON_KEY", "NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN"])
 for (const key of Object.keys(env)) {
   if (key.startsWith("NEXT_PUBLIC_") && !publicAllow.has(key) && /(SECRET|SERVICE_ROLE|PRIVATE|PASSWORD|TOKEN)/i.test(key)) {
     errors.push(`${key} is public (NEXT_PUBLIC_ is sent to the browser) but its name looks secret. Rename it without the prefix.`)
@@ -27,6 +27,8 @@ need("SUPABASE_SERVICE_ROLE_KEY", "Server only. Needed for quotas and publish li
 need("RATE_LIMIT_SALT", "Random 32+ characters")
 if (!env.ADMIN_USER_IDS) warnings.push("ADMIN_USER_IDS is not set, so nobody can open the admin console.")
 if (!env.BREVO_API_KEY || !env.BREVO_SENDER_EMAIL) warnings.push("BREVO_API_KEY or BREVO_SENDER_EMAIL is not set, so no app emails are sent.")
+if (!env.RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET || !env.RAZORPAY_WEBHOOK_SECRET) warnings.push("RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET or RAZORPAY_WEBHOOK_SECRET is not set, so checkout is off.")
+if (!env.CRON_SECRET) warnings.push("CRON_SECRET is not set, so the daily lifecycle emails do not run.")
 if (!env.GROQ_API_KEY && !env.GROQ_API_KEYS && !env.OPENROUTER_API_KEY) {
   ;(enforce ? errors : warnings).push("No LLM key set (GROQ_API_KEY, GROQ_API_KEYS or OPENROUTER_API_KEY). Resume reading falls back to the offline reader.")
 }

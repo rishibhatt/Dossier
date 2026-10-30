@@ -34,9 +34,9 @@ const HEADINGS: Record<SectionKey, string[]> = {
   experience: ["experience", "work experience", "professional experience", "relevant experience", "employment", "employment history", "work history", "career history", "experience history", "internships", "internship"],
   projects: ["projects", "personal projects", "selected projects", "key projects", "academic projects", "side projects", "notable projects", "portfolio", "open source"],
   education: ["education", "academic background", "education & training", "education and training", "academics", "academic qualifications", "qualifications", "education & certifications"],
-  skills: ["skills", "technical skills", "core skills", "key skills", "core competencies", "competencies", "expertise", "areas of expertise", "tools", "technologies", "tech stack", "skills & tools", "skills and tools", "toolbox", "skills & interests", "skills & expertise"],
+  skills: ["skills", "technical skills", "core skills", "key skills", "core competencies", "competencies", "expertise", "areas of expertise", "tools", "technologies", "tech stack", "skills & tools", "skills and tools", "toolbox", "skills & interests", "skills & expertise", "top skills"],
   certifications: ["certifications", "certification", "certificates", "licenses", "licences", "licenses & certifications", "licenses and certifications", "certifications & licenses", "certifications and licenses", "credentials", "training", "courses"],
-  awards: ["awards", "honors", "honours", "awards & honors", "awards and honors", "honors & awards", "achievements", "accomplishments", "key achievements"],
+  awards: ["awards", "honors", "honours", "awards & honors", "awards and honors", "honors & awards", "achievements", "accomplishments", "key achievements", "honors awards"],
   activities: ["volunteer", "volunteering", "volunteer experience", "extracurricular", "extracurricular activities", "activities", "leadership", "community", "leadership & activities"],
   ignore: ["references", "publications", "languages", "interests", "hobbies", "contact", "contact information", "personal details", "personal information"],
 }
@@ -94,7 +94,7 @@ const COMPANY_WORDS =
 const DEGREE_WORDS =
   /\b(b\.?\s?sc|bsc|m\.?\s?sc|msc|b\.?\s?a\.?(?=\s|,|$)|m\.?\s?a\.?(?=\s|,|$)|b\.?\s?s\.?(?=\s|,|$)|m\.?\s?s\.?(?=\s|,|$)|b\.?\s?e\.?(?=\s|,|$)|m\.?\s?e\.?(?=\s|,|$)|b\.?\s?tech|m\.?\s?tech|bba|mba|b\.?\s?com|m\.?\s?com|ph\.?\s?d|doctorate|bachelor\w*|master\w*|associate\w* degree|diploma|certificate|high school|secondary school|a-levels?|hsc|ssc|ged|llb|llm|mbbs|bds|j\.?d\.?(?=\s|,|$)|m\.?d\.?(?=\s|,|$))/i
 const INSTITUTION_WORDS = /\b(university|college|institute|school|academy|polytechnic|iit|nit|iim|conservatory|faculty|universit\w+)\b/i
-const LOCATION_RE = /^(?:remote|hybrid|[A-Z][A-Za-z.'-]+(?: [A-Z][A-Za-z.'-]+){0,2},\s?(?:[A-Z]{2}|[A-Z][A-Za-z.'-]+(?: [A-Z][A-Za-z.'-]+)?)(?:\s\d{4,6})?)(?:\s?\((?:remote|hybrid)\))?$/i
+const LOCATION_RE = /^(?:remote|hybrid|[A-Z][A-Za-z.'-]+(?: [A-Z][A-Za-z.'-]+){0,2}(?:,\s?(?:[A-Z]{2}|[A-Z][A-Za-z.'-]+(?: [A-Z][A-Za-z.'-]+)?)){1,2}(?:\s\d{4,6})?)(?:\s?\((?:remote|hybrid)\))?$/i
 
 const SEP_RE = /\s*(?:\||•|·|◆|♦|▪|\s[–—-]\s)\s*/
 
@@ -215,11 +215,12 @@ function groupEntries(lines: string[]): Draft[] {
       continue
     }
     const hasRange = RANGE_RE.test(line)
-    if (cur && isSentence(line) && !hasRange) {
+    // Once an entry has its dates, a short line ending in a full stop is a description line (LinkedIn has no bullets).
+    if (cur && !hasRange && (isSentence(line) || (cur.hasRange && /[.!]$/.test(line)))) {
       cur.bullets.push(line)
       continue
     }
-    const startNew = !cur || (cur.bullets.length > 0 && (hasRange || looksLikeHead(line))) || (hasRange && cur.hasRange) || cur.head.length >= 3
+    const startNew = !cur || (cur.bullets.length > 0 && (hasRange || looksLikeHead(line))) || (hasRange && cur.hasRange) || (cur.head.length >= 3 && !LOCATION_RE.test(line) && !(hasRange && !cur.hasRange))
     if (startNew) {
       cur = { head: [line], bullets: [], hasRange }
       out.push(cur)
@@ -254,7 +255,8 @@ function parseExperience(lines: string[]): ExperienceEntry[] {
       const after = text.slice(range.index + range[0].length)
       text = text.slice(0, range.index)
       // "Staff Nurse, City Hospital Pune, 2017 - present. ICU care, triage ..." -> the tail is the description
-      const tail = after.replace(/^[\s.,;:|)–—-]+/, "").trim()
+      // LinkedIn adds the length after the dates: "March 2022 - Present (2 years 8 months)".
+      const tail = after.replace(/^\s*\((?:\d+\s*(?:yrs?|years?|mos?|months?)\s*)+\)/i, "").replace(/^[\s.,;:|)–—-]+/, "").trim()
       if (tail.length > 30) bullets.unshift(...splitSentences(tail))
       else if (tail) text = `${text} | ${tail}`
     }
@@ -269,7 +271,9 @@ function parseExperience(lines: string[]): ExperienceEntry[] {
     const { location, rest: kept } = takeLocation(coarse)
     const fine = kept.flatMap((p) => p.split(/,\s*(?=[A-Z])/).map(tidy)).filter(Boolean)
     const { location: loc2, rest } = location ? { location, rest: fine } : takeLocation(fine)
-    const roleIdx = rest.findIndex((p) => ROLE_WORDS.test(p) && !COMPANY_WORDS.test(p))
+    // "Software Engineer Intern" has a company word too; it is still the role when nothing else names one.
+    const strictRole = rest.findIndex((p) => ROLE_WORDS.test(p) && !COMPANY_WORDS.test(p))
+    const roleIdx = strictRole >= 0 ? strictRole : rest.findIndex((p) => ROLE_WORDS.test(p))
     const role = roleIdx >= 0 ? rest[roleIdx]! : (rest[0] ?? "")
     const others = rest.filter((_, i) => i !== (roleIdx >= 0 ? roleIdx : 0))
     const company = others.find((p) => COMPANY_WORDS.test(p)) ?? others[0] ?? ""
@@ -524,7 +528,22 @@ function readHeader(header: string[], emails: string[], phone: string) {
 }
 
 /** Reads the cleaned lines of one resume. Pure and fast (a few ms), no network. */
-export function readResume(lines: string[]): ResumeData {
+/**
+ * LinkedIn's "Save to PDF" export prints its sidebar (Contact, Top Skills, Languages, Certifications,
+ * Honors-Awards) before the name. Move the name, headline and location (the lines just above the first
+ * Summary or Experience heading) to the top so they read as the header, not as the last sidebar section.
+ */
+export function unfoldLinkedIn(lines: string[]): string[] {
+  if (!lines.some((l) => /linkedin\.com\/in\//i.test(l)) || !lines.some((l) => normHeading(l) === "top skills")) return lines
+  const main = lines.findIndex((l) => ["summary", "experience"].includes(normHeading(l)))
+  if (main < 3) return lines
+  let start = main
+  while (start > main - 3 && !matchHeading(lines[start - 1]!)) start--
+  return [...lines.slice(start, main), ...lines.slice(0, start), ...lines.slice(main)]
+}
+
+export function readResume(rawLines: string[]): ResumeData {
+  const lines = unfoldLinkedIn(rawLines)
   const { header, sections } = splitSections(lines)
   const text = lines.join("\n")
   const headerText = header.join("\n")

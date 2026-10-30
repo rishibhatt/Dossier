@@ -7,6 +7,7 @@ import { CopyText } from "@/features/tools/CopyText"
 import { PolishButton } from "@/features/tools/PolishButton"
 import { ResumeHandoff } from "@/features/tools/ResumeHandoff"
 import { ResultsJump } from "@/features/tools/ResultsJump"
+import { useSaved } from "@/features/tools/useSaved"
 
 const FIELDS: { key: Exclude<keyof BulletInput, "action">; label: string; placeholder: string; hint?: string }[] = [
   { key: "tool", label: "Tool or method (optional)", placeholder: "Customer.io", hint: "A keyword the job post asks for, if you used it." },
@@ -16,7 +17,7 @@ const FIELDS: { key: Exclude<keyof BulletInput, "action">; label: string; placeh
 ]
 
 export function BulletGenerator() {
-  const [v, setV] = useState<BulletInput>({ action: "", tool: "", scale: "", result: "", number: "" })
+  const [v, setV] = useSaved<BulletInput>("bullet", { action: "", tool: "", scale: "", result: "", number: "" })
   /** The text before the last verb swap, so a chip tap can be undone. */
   const [beforeSwap, setBeforeSwap] = useState<string | null>(null)
   const { bullets, notes } = useMemo(() => buildBullets(v), [v])
@@ -26,12 +27,11 @@ export function BulletGenerator() {
       const handed = sessionStorage.getItem(BULLET_HANDOFF_KEY)
       if (!handed) return
       sessionStorage.removeItem(BULLET_HANDOFF_KEY)
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of browser storage after hydration
       setV((s) => ({ ...s, action: handed.slice(0, 300) }))
     } catch {
       /* storage blocked: start empty */
     }
-  }, [])
+  }, [setV])
 
   return (
     <div className="grid gap-10 lg:grid-cols-12">

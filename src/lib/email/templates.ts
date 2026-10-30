@@ -131,3 +131,49 @@ export function contactNoticeEmail(m: { name: string; email: string; message: st
     { label: `Reply to ${m.name}`, href: `mailto:${m.email}` }
   )
 }
+
+const RECEIPT: Record<string, string> = { starter: "Starter, owned for good", pro_month: "Pro for 30 days", pro_year: "Pro for 365 days" }
+
+export function purchaseEmail({ product, expiresAt }: { product: string; expiresAt: string | null }): Mail {
+  const until = expiresAt ? ` Pro runs until ${expiresAt.slice(0, 10)}. Nothing renews by itself; we will remind you before it ends.` : ""
+  return build(
+    "Thanks! Your Dossier purchase",
+    `${RECEIPT[product] ?? product} is on.`,
+    "Payment received",
+    [`${RECEIPT[product] ?? product} is now on your account.${until}`, "The badge is off your site and ZIP export is unlocked. Razorpay emails you the payment receipt separately."],
+    { label: "Open my dashboard", href: url("/dashboard") },
+    `Something wrong with the payment? Reply to this email or write to ${esc(siteConfig.supportEmail)}.`
+  )
+}
+
+/** Footer for product emails: why they got it and a one-click way out. */
+const optOut = (unsubscribe: string) => `You get these because you have a Dossier account. <a href="${esc(unsubscribe)}" style="color:${ACCENT};">Stop these emails</a> (account emails like receipts still come).`
+
+export type LifecycleInput = { kind: string; name?: string | null; views?: number | null; expiresAt?: string | null; unsubscribe: string; referralUrl?: string }
+
+/** The email for one lifecycle kind (see lifecycle_candidates in the migration). Null for an unknown kind. */
+export function lifecycleEmail({ kind, name, views, expiresAt, unsubscribe, referralUrl }: LifecycleInput): Mail | null {
+  const hi = name ? `Hi ${esc(name)},` : "Hi,"
+  const day = expiresAt ? expiresAt.slice(0, 10) : ""
+  const k = kind.split(":")[0] === "life" ? kind : kind.split(":")[0]
+  switch (k) {
+    case "life:activate":
+      return build("Your resume is two minutes from a website", "Upload the PDF you already have.", "Your site is two minutes away", [hi, "You made a Dossier account but have not built anything yet. Upload the resume PDF you already have and Dossier lays it out as a website. You can change every line before anyone sees it.", "No resume file? Start one in the free resume builder and turn it into a site later."], { label: "Upload my resume", href: url("/build") }, optOut(unsubscribe))
+    case "life:resume_to_site":
+      return build("Your resume can be a website too", "Same content, one link to share.", "Same resume, now a website", [hi, "You built a resume in Dossier. The same content can be a portfolio site with one link, which is easier to share on LinkedIn, in emails and on job forms than a PDF.", "It is free for one site, and you can unpublish it any time."], { label: "Make my site", href: url("/build") }, optOut(unsubscribe))
+    case "life:published":
+      return build("Your site is live. Here is how to get it seen", "Three places to put your new link.", "Your site is live", [hi, "Your portfolio is online. A link nobody sees does nothing, so put it in these three places today:", "1. <strong>LinkedIn</strong>: Profile, Add section, Featured, Add a link.<br>2. <strong>Your email signature</strong> and job applications (the \"website\" field).<br>3. <strong>Your resume header</strong>, next to your phone number.", "Your dashboard shows how many people open it."], { label: "Open my dashboard", href: url("/dashboard") }, optOut(unsubscribe))
+    case "life:invite":
+      return build("Know someone job hunting?", "You both earn a credit.", "Invite a friend, both of you earn a credit", [hi, "If a friend is job hunting, send them your invite link. When they publish their first site, you each get a credit. Three credits unlock Starter (no badge, ZIP download).", referralUrl ? `Your link: <a href="${esc(referralUrl)}" style="color:${ACCENT};">${esc(referralUrl)}</a>` : "Your invite link is on the referrals page."], { label: "Get my invite link", href: url("/dashboard/referrals") }, optOut(unsubscribe))
+    case "views":
+      return build(`Your site was opened ${views} times this week`, "See which days people looked.", `${views} visits this week`, [hi, `Your Dossier site was opened <strong>${views} times</strong> in the last 7 days. Sharing the link again in a post or an application usually brings a new spike.`], { label: "See my visits", href: url("/dashboard") }, optOut(unsubscribe))
+    case "life:winback":
+      return build("Your Dossier site is still here", "Update it in a minute when you need it.", "Still here when you need it", [hi, "It has been a while. Your account and anything you published are still here.", "When the next application comes, update a line or shuffle to a fresh look in a minute. The free ATS scanner also checks your resume against a job post."], { label: "Open Dossier", href: url("/dashboard") }, optOut(unsubscribe))
+    case "renew":
+      return build(`Your Dossier Pro ends on ${day}`, "Add more time if you still need it.", "Pro ends soon", [hi, `Your Pro pass ends on <strong>${day}</strong>. Nothing renews by itself, so nothing will be charged.`, "If you still need Pro, add a month or a year and it stacks on the days you have left. If not, do nothing: your site stays online on Free (or Starter, if you own it)."], { label: "Add more time", href: url("/dashboard/billing") })
+    case "expired":
+      return build("Your Dossier Pro has ended", "Your site is still online.", "Pro has ended", [hi, `Your Pro pass ended on ${day}. Your site is still online on your other plan, and nothing was charged.`, "Want Pro back? It takes a minute."], { label: "Get Pro again", href: url("/dashboard/billing") })
+    default:
+      return null
+  }
+}

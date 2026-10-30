@@ -168,6 +168,13 @@
   .dx-btn-ghost { background: transparent; color: var(--site-ink-2); }
   .dx-btn-ghost:hover:not(:disabled):not([aria-disabled="true"]) { background: rgba(16, 17, 20, 0.06); color: var(--site-ink); }
 
+  /* Dashboard shell: printed controls (DESIGN.md: 4px corners, 44px targets, press inverts to ink). */
+  .dash .dx-btn { border-radius: 4px; }
+  .dash .dx-btn-sm { min-height: 2.75rem; padding: 0 1rem; border-radius: 4px; }
+  .dash .dx-btn-outline { background: var(--site-sheet); }
+  .dash .dx-btn-outline:active:not(:disabled):not([aria-disabled="true"]) { background: var(--site-ink); color: var(--site-paper); border-color: var(--site-ink); }
+  .dash .dx-btn-primary:active:not(:disabled):not([aria-disabled="true"]) { background: var(--site-paper); color: var(--site-ink); border-color: var(--site-ink); }
+
   .dx-field {
     height: 3rem;
     width: 100%;

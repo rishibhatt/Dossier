@@ -1,8 +1,10 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Check, Clock } from "lucide-react"
+import { Check } from "lucide-react"
 
 import { buildPageMetadata } from "@/config/seo"
+import { PlanBuy } from "@/features/billing/BuyButton"
+import { OfferBar } from "@/features/billing/OfferBar"
 import { messages } from "@/config/messages"
 import { PLAN_CARDS } from "@/lib/billing/pricing"
 import type { PlanId } from "@/lib/billing/plans"
@@ -25,23 +27,17 @@ export default async function BillingPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
+      <div className="mb-6">
+        <OfferBar cta={false} />
+      </div>
       <h1 className="text-[clamp(1.75rem,4vw,2.5rem)] font-bold leading-[1.05] tracking-[-0.04em]" style={display}>
         {messages.dashboard.nav.billing}
       </h1>
       <p className="mt-2 max-w-xl text-[var(--site-ink-2)]">
-        You are on the {PLAN_CARDS.find((p) => p.id === ctx.plan)!.name} plan. Compare what each plan includes below.
+        You are on the {PLAN_CARDS.find((p) => p.id === ctx.plan)!.name} plan
+        {ctx.plan === "pro" && ctx.planExpiresAt ? `, paid until ${ctx.planExpiresAt.slice(0, 10)}` : ""}. Payments are one time: nothing renews or charges you again by itself.
       </p>
 
-      <p
-        role="note"
-        className="mt-6 flex items-start gap-2.5 rounded-xl border border-[var(--site-rule-strong)] bg-[var(--site-accent-wash)] px-4 py-3 text-sm text-[var(--site-ink)]"
-      >
-        <Clock className="mt-0.5 size-4 shrink-0 text-[var(--site-accent-ink)]" aria-hidden />
-        <span>
-          <strong className="font-semibold">Paid plans are not on sale yet.</strong> Checkout is still being built, so nothing here
-          charges you. Your free portfolio keeps working in the meantime.
-        </span>
-      </p>
 
       <ul className="mt-8 grid gap-4 md:grid-cols-3">
         {PLAN_CARDS.map((p) => {
@@ -72,6 +68,7 @@ export default async function BillingPage() {
                 </span>
                 <span className="text-sm text-[var(--site-ink-2)]">{p.cadence}</span>
               </p>
+              <p className="mt-1 text-xs text-[var(--site-ink-2)]">{p.inr}</p>
               <p className="mt-2 text-sm text-[var(--site-ink-2)]">{p.summary}</p>
               <ul className="mt-5 flex-1 space-y-2.5 border-t border-[var(--site-rule)] pt-5 text-sm">
                 {p.features.map((f) => (
@@ -85,19 +82,14 @@ export default async function BillingPage() {
                 ))}
               </ul>
               <div className="mt-6">
-                {current ? (
+                {current && p.id === "pro" ? (
+                  <PlanBuy plan="pro" />
+                ) : current ? (
                   <p className="text-center text-sm font-medium text-[var(--site-ink-2)]">You are on this plan</p>
-                ) : included ? (
+                ) : included || p.id === "free" ? (
                   <p className="text-center text-sm font-medium text-[var(--site-ink-2)]">Included in your plan</p>
                 ) : (
-                  <>
-                    <button type="button" aria-disabled="true" aria-describedby={`${p.id}-soon`} className="dx-btn dx-btn-outline w-full">
-                      {p.cta}: coming soon
-                    </button>
-                    <p id={`${p.id}-soon`} className="mt-2 text-center text-xs text-[var(--site-ink-2)]">
-                      Not available to buy yet.
-                    </p>
-                  </>
+                  <PlanBuy plan={p.id} />
                 )}
               </div>
             </li>
@@ -108,7 +100,7 @@ export default async function BillingPage() {
       <div className="mt-8 flex flex-col gap-3 border-t border-[var(--site-rule)] pt-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-[var(--site-ink-2)]">
           {ctx.plan === "pro"
-            ? "Want a different plan, or to stop paying? You can switch to Free and keep your link."
+            ? "Pro is a pass, so nothing renews. When it ends you keep your link on Free (or Starter, if you bought it). Leaving early? Tell us why."
             : ctx.plan === "starter"
               ? "Starter is a one-time purchase, so nothing renews. Leaving? Tell us why."
               : "Free never charges you. Done with Dossier? Tell us why before you go."}

@@ -7,6 +7,8 @@ import { requireAdmin } from "@/lib/admin/auth"
 import { getUserDetail } from "@/lib/admin/data"
 import { resolveEffectivePlan } from "@/lib/billing/plans"
 
+import { setTestAction } from "../../../actions"
+
 import { CreditsForm, PlanForm } from "./UserForms"
 
 export const dynamic = "force-dynamic"
@@ -21,7 +23,7 @@ export default async function AdminUser({ params }: { params: Promise<{ id: stri
   if (!d) notFound()
   const { user } = d
   const expires = user.plan_expires_at ? user.plan_expires_at.slice(0, 10) : ""
-  const expired = user.plan !== "free" && resolveEffectivePlan(user.plan, user.plan_expires_at) === "free"
+  const expired = user.plan !== "free" && resolveEffectivePlan(user.plan, user.plan_expires_at, user.owns_starter) !== user.plan
 
   return (
     <div className="grid gap-12">
@@ -37,6 +39,14 @@ export default async function AdminUser({ params }: { params: Promise<{ id: stri
           {user.id} · joined {when(user.created_at)}
           {user.username ? ` · /u/${user.username}` : ""}
         </p>
+        <form action={setTestAction} className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+          <input type="hidden" name="userId" value={user.id} />
+          <input type="hidden" name="isTest" value={user.is_test ? "0" : "1"} />
+          <span>{user.is_test ? "Test account, hidden from the numbers." : "Real account, counted in the numbers."}</span>
+          <button type="submit" className="underline underline-offset-4">
+            {user.is_test ? "Mark as real" : "Mark as test"}
+          </button>
+        </form>
       </div>
 
       <section className="grid gap-px border border-[var(--site-rule-strong)] bg-[var(--site-rule)] sm:grid-cols-2 lg:grid-cols-4" aria-label="Summary">

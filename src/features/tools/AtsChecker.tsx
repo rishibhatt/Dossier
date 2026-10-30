@@ -9,13 +9,14 @@ import { BULLET_HANDOFF_KEY } from "@/features/tools/bulletGen"
 import { ToolHandoff } from "@/features/tools/ToolHandoff"
 import { track } from "@/lib/analytics"
 import { cn } from "@/lib/utils"
+import { useSaved } from "@/features/tools/useSaved"
 
 const MIN_WORDS = 60
 const SEV_LABEL: Record<Severity, string> = { high: "Fix first", medium: "Fix next", low: "Polish" }
 
 export function AtsChecker() {
   const [resume, setResume] = useState("")
-  const [jd, setJd] = useState("")
+  const [jd, setJd] = useSaved("ats_jd", "")
   const [ran, setRan] = useState<{ resume: string; jd: string } | null>(null)
   const words = resume.split(/\s+/).filter(Boolean).length
   const report = useMemo(() => (ran ? runAtsScan(ran.resume, ran.jd) : null), [ran])

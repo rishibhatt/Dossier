@@ -26,7 +26,7 @@ function contextNote(plan: string | undefined, invited: boolean, next: string | 
   }
   if (plan === "starter" || plan === "pro") {
     const name = plan === "starter" ? "Starter" : "Pro"
-    return `Checkout for ${name} is not open yet. You start on Free, keep everything you make, and can upgrade from your dashboard when it opens.`
+    return `Create a free account first. Then you can buy ${name} on the next page with UPI or a card.`
   }
   if (invited) return "You were invited by a friend. Publish your first portfolio and you both get a credit."
   return undefined
@@ -37,11 +37,13 @@ export default async function SignupPage({ searchParams }: PageProps) {
   const safeNext = next ? safeNextPath(next) : undefined
   const invited = Boolean((await cookies()).get("dx_ref")?.value)
   const note = contextNote(plan, invited, safeNext)
+  // Buying a plan: after signup, land on billing instead of the dashboard.
+  const target = safeNext ?? (plan === "starter" || plan === "pro" ? ROUTES.billing : undefined)
 
   return (
     <AuthShell title={messages.auth.signupTitle} subtitle={messages.auth.signupSubtitle} info={note}>
       <OAuthSection />
-      <SignupForm next={safeNext} />
+      <SignupForm next={target} />
     </AuthShell>
   )
 }

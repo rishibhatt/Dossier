@@ -24,12 +24,12 @@ function getPdfWorkerFileUrl(): string {
   const cwd = process.cwd()
 
   const legacyRoots = [
-    path.join(cwd, "node_modules", "pdfjs-dist", "legacy", "build"),
-    path.join(cwd, "node_modules", "pdf-parse", "node_modules", "pdfjs-dist", "legacy", "build"),
+    path.join(/*turbopackIgnore: true*/ cwd, "node_modules", "pdfjs-dist", "legacy", "build"),
+    path.join(/*turbopackIgnore: true*/ cwd, "node_modules", "pdf-parse", "node_modules", "pdfjs-dist", "legacy", "build"),
   ]
   for (const legacyBuild of legacyRoots) {
     for (const name of WORKER_NAMES) {
-      const full = path.join(legacyBuild, name)
+      const full = path.join(/*turbopackIgnore: true*/ legacyBuild, name)
       if (existsSync(full)) {
         cachedWorkerSrc = pathToFileURL(full).href
         return cachedWorkerSrc
@@ -37,15 +37,15 @@ function getPdfWorkerFileUrl(): string {
     }
   }
 
-  const anchors = [path.join(cwd, "package.json"), path.join(cwd, "node_modules", "pdf-parse", "package.json")]
+  const anchors = [path.join(/*turbopackIgnore: true*/ cwd, "package.json"), path.join(/*turbopackIgnore: true*/ cwd, "node_modules", "pdf-parse", "package.json")]
   for (const anchor of anchors) {
     if (!existsSync(anchor)) continue
     try {
       const require = createRequire(anchor)
       const pkgJsonPath = require.resolve("pdfjs-dist/package.json")
-      const legacyBuild = path.join(path.dirname(pkgJsonPath), "legacy", "build")
+      const legacyBuild = path.join(/*turbopackIgnore: true*/ path.dirname(pkgJsonPath), "legacy", "build")
       for (const name of WORKER_NAMES) {
-        const full = path.join(legacyBuild, name)
+        const full = path.join(/*turbopackIgnore: true*/ legacyBuild, name)
         if (existsSync(full)) {
           cachedWorkerSrc = pathToFileURL(full).href
           return cachedWorkerSrc

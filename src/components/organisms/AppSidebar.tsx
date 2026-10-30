@@ -31,7 +31,7 @@ export function AppSidebar({ footer }: AppSidebarProps) {
 
   return (
     <>
-      <aside className="sticky top-16 hidden h-[calc(100dvh-4rem)] w-64 shrink-0 flex-col border-r border-[var(--site-rule)] bg-[var(--site-paper-deep)]/60 md:flex">
+      <aside className="sticky top-16 hidden h-[calc(100dvh-4rem)] w-64 shrink-0 flex-col border-r border-[var(--site-rule-strong)] bg-[var(--site-paper-deep)] md:flex">
         <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Dashboard">
           <ul className="flex flex-col gap-1">
             {NAV.map(({ id, href, label, Icon }) => {
@@ -42,13 +42,11 @@ export function AppSidebar({ footer }: AppSidebarProps) {
                     href={href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors",
-                      active
-                        ? "bg-white text-[var(--site-ink)] shadow-[inset_0_0_0_1px_var(--site-rule-strong)]"
-                        : "text-[var(--site-ink-2)] hover:bg-black/[0.05] hover:text-[var(--site-ink)]"
+                      "flex min-h-11 items-center gap-3 rounded-[4px] px-3 text-sm font-medium transition-colors",
+                      active ? "bg-[var(--site-ink)] text-[var(--site-paper)]" : "text-[var(--site-ink-2)] hover:bg-black/[0.06] hover:text-[var(--site-ink)]"
                     )}
                   >
-                    <Icon className={cn("size-[1.125rem] shrink-0", active && "text-[var(--site-accent-ink)]")} aria-hidden />
+                    <Icon className="size-[1.125rem] shrink-0" aria-hidden />
                     {label}
                   </Link>
                 </li>
@@ -61,7 +59,7 @@ export function AppSidebar({ footer }: AppSidebarProps) {
 
       <nav
         aria-label="Dashboard"
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--site-rule-strong)] bg-white pb-[env(safe-area-inset-bottom)] md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--site-ink)] bg-[var(--site-paper)] pb-[env(safe-area-inset-bottom)] md:hidden"
       >
         <ul className="grid grid-cols-4">
           {NAV.map(({ id, href, label, Icon }) => {
@@ -72,8 +70,11 @@ export function AppSidebar({ footer }: AppSidebarProps) {
                   href={href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex min-h-14 flex-col items-center justify-center gap-1 text-[0.6875rem] font-semibold transition-colors",
-                    active ? "text-[var(--site-accent-ink)]" : "text-[var(--site-ink-2)] hover:text-[var(--site-ink)]"
+                    "relative flex min-h-14 flex-col items-center justify-center gap-1 text-xs font-semibold transition-colors",
+                    // The current tab carries the 2px violet mark, like the masthead's current link.
+                    active
+                      ? "text-[var(--site-ink)] before:absolute before:inset-x-4 before:top-0 before:h-0.5 before:bg-[var(--site-accent)]"
+                      : "text-[var(--site-ink-2)] hover:text-[var(--site-ink)]"
                   )}
                 >
                   <Icon className="size-5" aria-hidden />

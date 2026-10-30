@@ -22,6 +22,7 @@ import {
 import { SAMPLE_RESUMES } from "@/lib/resume/samples"
 
 import { useResumeEditor } from "../lib/store"
+import { guessLinkLabel } from "@/lib/resume/links"
 import { AreaField, BulletsField, CheckField, MonthField, TextField } from "./fields"
 
 type AnyItem = ResumeSection["items"][number]
@@ -48,13 +49,13 @@ function newItem(type: SectionType): AnyItem {
     case "education":
       return { id, school: "", degree: "", location: "", start: "", end: "", current: false, bullets: [] } satisfies EducationItem
     case "projects":
-      return { id, name: "", role: "", link: "", start: "", end: "", current: false, bullets: [] } satisfies ProjectItem
+      return { id, name: "", role: "", link: "", linkLabel: "", start: "", end: "", current: false, bullets: [] } satisfies ProjectItem
     case "skills":
       return { id, group: "", items: [] } satisfies SkillGroup
     case "languages":
       return { id, language: "", level: "" } satisfies LanguageItem
     default:
-      return { id, title: "", subtitle: "", date: "", link: "", detail: "" } satisfies EntryItem
+      return { id, title: "", subtitle: "", date: "", link: "", linkLabel: "", detail: "" } satisfies EntryItem
   }
 }
 
@@ -231,7 +232,25 @@ function ItemEditor({ type, item, onChange }: { type: SectionType; item: AnyItem
         <div className="rz-grid">
           <TextField label="Project name" value={i.name} onChange={set("name")} maxLength={120} />
           <TextField label="Your role" value={i.role} onChange={set("role")} placeholder="Creator, Lead, Contributor" maxLength={120} />
-          <TextField label="Link" value={i.link} onChange={set("link")} placeholder="https://" type="url" inputMode="url" wide maxLength={300} />
+          <TextField
+            label="Link"
+            value={i.link}
+            onChange={(url) => {
+              const guessed = !i.linkLabel?.trim() ? guessLinkLabel(url) : i.linkLabel
+              onChange({ link: url, linkLabel: guessed } as Partial<AnyItem>)
+            }}
+            placeholder="https://"
+            type="url"
+            inputMode="url"
+            maxLength={300}
+          />
+          <TextField
+            label="Link text (optional)"
+            value={i.linkLabel ?? ""}
+            onChange={set("linkLabel")}
+            placeholder="e.g. GitHub, Live Demo"
+            maxLength={60}
+          />
           <MonthField label="Start" value={i.start} onChange={set("start")} />
           <MonthField label="End" value={i.end} onChange={set("end")} />
           <BulletsField bullets={i.bullets} onChange={set("bullets")} placeholder="What it does and who uses it" max={12} />
@@ -265,7 +284,25 @@ function ItemEditor({ type, item, onChange }: { type: SectionType; item: AnyItem
           <TextField label={titleLabel} value={i.title} onChange={set("title")} wide maxLength={200} />
           <TextField label={subLabel} value={i.subtitle} onChange={set("subtitle")} maxLength={200} />
           <MonthField label="Date" value={i.date} onChange={set("date")} />
-          <TextField label="Link (optional)" value={i.link} onChange={set("link")} placeholder="https://" type="url" inputMode="url" wide maxLength={300} />
+          <TextField
+            label="Link (optional)"
+            value={i.link}
+            onChange={(url) => {
+              const guessed = !i.linkLabel?.trim() ? guessLinkLabel(url) : i.linkLabel
+              onChange({ link: url, linkLabel: guessed } as Partial<AnyItem>)
+            }}
+            placeholder="https://"
+            type="url"
+            inputMode="url"
+            maxLength={300}
+          />
+          <TextField
+            label="Link text (optional)"
+            value={i.linkLabel ?? ""}
+            onChange={set("linkLabel")}
+            placeholder="e.g. Credential, Publication"
+            maxLength={60}
+          />
           <AreaField label="Note (optional)" value={i.detail} onChange={set("detail")} maxLength={400} rows={2} />
         </div>
       )
@@ -627,32 +664,52 @@ function LinksEditor() {
     <div className="rz-field rz-wide">
       <span className="rz-label">
         <span>Links</span>
-        <span className="rz-mono">LinkedIn, portfolio, GitHub</span>
+        <span className="rz-mono">Text &amp; URL (e.g. GitHub, LinkedIn)</span>
       </span>
       <div className="rz-bullets">
         {links.map((l, i) => {
           const bad = l.url !== "" && !/^(https:\/\/|mailto:|tel:)/i.test(l.url) && !/^[\w.-]+\.[a-z]{2,}(\/\S*)?$/i.test(l.url)
           return (
-            <div key={l.id} style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) auto", gap: "0.25rem" }}>
-              <div>
+            <div key={l.id} className="rz-link-row">
+              <input
+                className="rz-input"
+                aria-label={`Link ${i + 1} text`}
+                placeholder="Text (e.g. GitHub)"
+                value={l.label}
+                maxLength={40}
+                onChange={(e) =>
+                  set(
+                    (ls) => ls.map((x) => (x.id === l.id ? { ...x, label: e.target.value } : x)),
+                    `link-label:${l.id}`,
+                  )
+                }
+              />
+              <div style={{ minWidth: 0 }}>
                 <input
                   className="rz-input"
-                  aria-label={`Link ${i + 1}`}
+                  aria-label={`Link ${i + 1} URL`}
                   inputMode="url"
-                  placeholder="linkedin.com/in/your-name"
+                  placeholder="https://..."
                   value={l.url}
                   maxLength={300}
                   aria-invalid={bad || undefined}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const nextUrl = e.target.value
+                    const guessed = !l.label.trim() ? guessLinkLabel(nextUrl) : l.label
                     set(
-                      (ls) => ls.map((x) => (x.id === l.id ? { ...x, url: e.target.value.trim(), label: "" } : x)),
+                      (ls) => ls.map((x) => (x.id === l.id ? { ...x, url: nextUrl.trim(), label: guessed } : x)),
                       `link:${l.id}`,
                     )
-                  }
+                  }}
                 />
                 {bad ? <span className="rz-field-error">Use a web address, like linkedin.com/in/your-name.</span> : null}
               </div>
-              <button type="button" className="rz-icon-btn" aria-label={`Remove link ${i + 1}`} onClick={() => set((ls) => ls.filter((x) => x.id !== l.id))}>
+              <button
+                type="button"
+                className="rz-icon-btn"
+                aria-label={`Remove link ${i + 1}`}
+                onClick={() => set((ls) => ls.filter((x) => x.id !== l.id))}
+              >
                 <X />
               </button>
             </div>
@@ -660,7 +717,11 @@ function LinksEditor() {
         })}
         {links.length < 6 ? (
           <div>
-            <button type="button" className="rz-add" onClick={() => set((ls) => [...ls, { id: newId("l"), label: "", url: "" }])}>
+            <button
+              type="button"
+              className="rz-add"
+              onClick={() => set((ls) => [...ls, { id: newId("l"), label: "", url: "" }])}
+            >
               <Plus aria-hidden /> Add a link
             </button>
           </div>

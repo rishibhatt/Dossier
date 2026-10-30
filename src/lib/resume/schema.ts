@@ -55,6 +55,7 @@ export const projectItemSchema = z.object({
   name: text(120),
   role: text(120).default(""),
   link: urlSchema.default(""),
+  linkLabel: text(60).default(""),
   ...dated,
   bullets: z.array(bulletSchema).max(12).default([]),
 })
@@ -71,6 +72,7 @@ export const entryItemSchema = z.object({
   subtitle: text(200).default(""),
   date: monthSchema.default(""),
   link: urlSchema.default(""),
+  linkLabel: text(60).default(""),
   detail: text(400).default(""),
 })
 

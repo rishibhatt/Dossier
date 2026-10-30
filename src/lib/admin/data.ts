@@ -1,7 +1,10 @@
 import "server-only"
 
-import type { SupabaseClient } from "@supabase/supabase-js"
+import type { SupabaseClient, User } from "@supabase/supabase-js"
 
+import { adminIds } from "@/lib/admin/auth"
+import { isTestEnv } from "@/config/site"
+import { createAdminSupabaseClient } from "@/lib/supabase/admin"
 import type { CreditReason, Database, Json, PlanId } from "@/types/database"
 
 type Admin = SupabaseClient<Database>
@@ -11,36 +14,62 @@ export type Overview = {
     users: number
     users_7d: number
     users_30d: number
+    users_range: number
     paid: number
     starter: number
     pro: number
     portfolios: number
     publishers: number
+    resumes: number
+    resume_makers: number
+    test_users: number
     credits_outstanding: number
     messages_new: number
     active_subscriptions: number
   }
+  /** People who signed up inside the range, and how many of them reached each step. */
+  cohort: { signed_up: number; made_resume: number; published: number; paid: number }
   referrals: Record<string, number>
   usage_by_kind: Record<string, number>
-  daily: { day: string; signups: number; publishes: number; builds: number }[]
+  daily: { day: string; signups: number; publishes: number; resumes: number; builds: number }[]
 }
 
 const EMPTY: Overview = {
-  totals: { users: 0, users_7d: 0, users_30d: 0, paid: 0, starter: 0, pro: 0, portfolios: 0, publishers: 0, credits_outstanding: 0, messages_new: 0, active_subscriptions: 0 },
+  totals: { users: 0, users_7d: 0, users_30d: 0, users_range: 0, paid: 0, starter: 0, pro: 0, portfolios: 0, publishers: 0, resumes: 0, resume_makers: 0, test_users: 0, credits_outstanding: 0, messages_new: 0, active_subscriptions: 0 },
+  cohort: { signed_up: 0, made_resume: 0, published: 0, paid: 0 },
   referrals: {},
   usage_by_kind: {},
   daily: [],
 }
 
-export async function getOverview(admin: Admin, days = 30): Promise<Overview> {
-  const { data, error } = await admin.rpc("admin_overview", { p_days: days })
+export const RANGES = [7, 30, 90, 180, 365] as const
+
+export async function getOverview(admin: Admin, days = 30, includeTest = false): Promise<Overview> {
+  let { data, error } = await admin.rpc("admin_overview", { p_days: days, p_include_test: includeTest })
+  // shortcut: before migration 20261030120000 runs, only the one-argument function exists. Drop once applied.
+  if (error) ({ data, error } = await admin.rpc("admin_overview", { p_days: days }))
   if (error || !data) return EMPTY
   const o = data as unknown as Partial<Overview>
-  return { ...EMPTY, ...o, totals: { ...EMPTY.totals, ...(o.totals ?? {}) } }
+  return { ...EMPTY, ...o, totals: { ...EMPTY.totals, ...(o.totals ?? {}) }, cohort: { ...EMPTY.cohort, ...(o.cohort ?? {}) } }
 }
 
-export async function getRecentSignups(admin: Admin, limit = 8) {
-  const { data } = await admin.from("users").select("id, email, plan, created_at").order("created_at", { ascending: false }).limit(limit)
+/**
+ * Flags an account as test data: made on a local dev server, or an admin's own account. Runs after every
+ * sign in, so it also catches accounts that existed before the flag did. Never throws.
+ */
+export async function markTestAccount(user: Pick<User, "id">): Promise<void> {
+  if (!isTestEnv && !adminIds().has(user.id.toLowerCase())) return
+  try {
+    await createAdminSupabaseClient()?.from("users").update({ is_test: true }).eq("id", user.id)
+  } catch {
+    /* A missing flag only means a test row shows up in the console. */
+  }
+}
+
+export async function getRecentSignups(admin: Admin, limit = 8, includeTest = false) {
+  let query = admin.from("users").select("id, email, plan, created_at").order("created_at", { ascending: false }).limit(limit)
+  if (!includeTest) query = query.eq("is_test", false)
+  const { data } = await query
   return data ?? []
 }
 
@@ -69,8 +98,20 @@ export type UserRow = {
   plan: PlanId
   plan_expires_at: string | null
   created_at: string
+  is_test: boolean
   balance: number
   portfolios: number
+}
+
+export type UserFilters = {
+  q: string
+  page: number
+  plan: string
+  /** "real" (default) hides test accounts, "test" shows only them, "all" shows both. */
+  who: string
+  /** Joined in the last N days; 0 = any time. */
+  joined: number
+  sort: string
 }
 
 /** Search text is cut down to characters that cannot change the meaning of the filter string. */
@@ -78,11 +119,17 @@ function cleanQuery(q: string): string {
   return q.toLowerCase().replace(/[^a-z0-9@._+-]/g, "").slice(0, 80)
 }
 
-export async function listUsers(admin: Admin, { q, page, plan }: { q: string; page: number; plan: string }) {
-  let query = admin.from("users").select("id, email, username, plan, plan_expires_at, created_at", { count: "exact" }).order("created_at", { ascending: false })
+export async function listUsers(admin: Admin, { q, page, plan, who, joined, sort }: UserFilters) {
+  // "estimated" counts are exact up to the API row cap (1k) and a planner estimate past that, so paging stays fast as the table grows.
+  let query = admin
+    .from("users")
+    .select("id, email, username, plan, plan_expires_at, created_at, is_test", { count: "estimated" })
+    .order("created_at", { ascending: sort === "oldest" })
   const s = cleanQuery(q)
   if (s) query = query.or(`email.ilike.%${s}%,username.ilike.%${s}%`)
   if (plan === "free" || plan === "starter" || plan === "pro") query = query.eq("plan", plan)
+  if (who !== "all") query = query.eq("is_test", who === "test")
+  if (joined > 0) query = query.gte("created_at", new Date(Date.now() - joined * 24 * 60 * 60 * 1000).toISOString())
   const from = Math.max(0, page - 1) * PAGE_SIZE
   const { data, count } = await query.range(from, from + PAGE_SIZE - 1)
   const rows = data ?? []

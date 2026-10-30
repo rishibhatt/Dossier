@@ -115,19 +115,19 @@
   let entry(e) = {
     if o.entry == "one-line" {
       grid(columns: (1fr, auto), column-gutter: 1em,
-        [#text(weight: 700, maybe-link(e.link, e.title))#if e.subtitle != "" [, #e.subtitle]#if e.meta != "" [#text(fill: ink2)[, #e.meta]]],
+        [#text(weight: 700, maybe-link(e.link, e.title))#if e.subtitle != "" [, #e.subtitle]#if e.meta != "" [#text(fill: ink2)[, #maybe-link(e.link, e.meta)]]],
         align(right, text(fill: ink2, e.date)))
     } else if o.entry == "org-first" {
       let lead = if e.subtitle != "" { e.subtitle } else { e.title }
       let second = if e.subtitle != "" { e.title } else { "" }
       grid(columns: (1fr, auto), column-gutter: 1em, row-gutter: st.leading * 0.9em,
-        text(weight: 700, maybe-link(e.link, lead)), align(right, if second != "" { e.meta } else { e.date }),
+        text(weight: 700, maybe-link(e.link, lead)), align(right, if second != "" { maybe-link(e.link, e.meta) } else { e.date }),
         ..if second != "" { (emph(second), align(right, emph(e.date))) } else { () })
     } else if o.entry == "date-gutter" {
       // moderncv-style date column on the left. Typst writes text in on-page order, so the date is drawn into
       // the gutter with place() after the role: the text reads role, organisation, then dates.
       block(width: 100%, inset: (left: o.date-col))[
-        #text(weight: 700, maybe-link(e.link, e.title))#if e.subtitle != "" or e.meta != "" { linebreak(); text(fill: ink2)[#e.subtitle#if e.meta != "" [, #e.meta]] }
+        #text(weight: 700, maybe-link(e.link, e.title))#if e.subtitle != "" or e.meta != "" { linebreak(); text(fill: ink2)[#e.subtitle#if e.meta != "" [, #maybe-link(e.link, e.meta)]] }
         #place(top + left, dx: -o.date-col, block(width: o.date-col - 3mm, text(fill: ink2, size: st.size * 0.9pt, e.date)))
       ]
     } else {

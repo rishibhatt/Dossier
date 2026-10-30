@@ -161,9 +161,9 @@ export function DashboardNudges({ latest }: { latest: Latest }) {
   return (
     <aside
       aria-label="Suggestion"
-      className="mt-6 flex items-start gap-3 rounded-2xl border border-[var(--site-rule-strong)] bg-white p-4 sm:items-center sm:p-5"
+      className="mt-6 flex items-start gap-3 border border-[var(--site-rule-strong)] bg-[var(--site-accent-wash)] p-4 sm:items-center sm:p-5"
     >
-      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[var(--site-accent-wash)] text-[var(--site-accent-ink)]">
+      <span className="grid size-10 shrink-0 place-items-center text-[var(--site-accent-ink)]">
         <Icon className="size-5" aria-hidden />
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

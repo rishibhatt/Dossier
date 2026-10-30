@@ -2,6 +2,7 @@ import { Check, Minus } from "lucide-react"
 
 import { RunningHead } from "@/components/marketing/PageHead"
 import { SiteButton } from "@/components/marketing/primitives"
+import { PlanPrice } from "@/features/billing/PlanPrice"
 import { PLAN_CARDS } from "@/lib/billing/pricing"
 import { ROUTES } from "@/lib/constants/routes"
 import { cn } from "@/lib/utils"
@@ -14,7 +15,7 @@ const COMPARE: { row: string; free: string | boolean; starter: string | boolean;
   { row: "\"Made with Dossier\" badge", free: "Shown", starter: "Removed", pro: "Removed" },
   { row: "Download the site as a ZIP", free: false, starter: true, pro: true },
   { row: "Your own domain", free: false, starter: false, pro: true, soon: true },
-  { row: "Visit counts", free: false, starter: false, pro: true, soon: true },
+  { row: "Visit counts", free: "Weekly total", starter: "Weekly total", pro: "Day by day" },
   { row: "Resume PDF download", free: true, starter: true, pro: true },
   { row: "Saved resumes", free: "2", starter: "200", pro: "200" },
 ]
@@ -59,9 +60,7 @@ export function Pricing({ as: Heading = "h2", full = false }: { as?: "h1" | "h2"
                   </h3>
                   <span className={cn("sp-data", marked && "!text-white/70")}>{plan.cadence}</span>
                 </div>
-                <p className="mt-6 text-[3.5rem] font-bold leading-none tracking-[-0.04em]" style={{ fontFamily: "var(--site-display)" }}>
-                  {plan.price}
-                </p>
+                <PlanPrice plan={plan.id} onInk={marked} />
                 <p className={cn("mt-3 text-[0.9375rem]", marked ? "text-white/80" : "text-[var(--site-ink-2)]")}>{plan.summary}</p>
 
                 <ul className={cn("mt-6 flex-1 border-t pt-4 text-[0.9375rem]", marked ? "border-white/20" : "border-[var(--site-rule)]")}>
@@ -90,8 +89,8 @@ export function Pricing({ as: Heading = "h2", full = false }: { as?: "h1" | "h2"
         </div>
 
         <p className="mt-6 max-w-2xl text-sm text-[var(--site-ink-2)]">
-          Checkout is not open yet. For now the paid buttons create a free account, and you can upgrade from your dashboard once payments open. Prices are in US
-          dollars. Starter is one payment for one portfolio. Pro renews yearly and you can cancel any time.
+          Pay with UPI, a card or net banking through Razorpay. Prices are in US dollars, or rupees in India. Every payment is one time: Starter is
+          yours for good, and Pro runs for the month or year you paid for. Nothing renews by itself.
         </p>
 
         {full ? (

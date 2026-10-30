@@ -3,8 +3,9 @@ import { after } from "next/server"
 import { z } from "zod"
 
 import { apiError, consumeQuota, resolveCaller } from "@/lib/api/guard"
-import { notifyCreditsEarned } from "@/lib/email/events"
+import { notifyCreditsEarned, notifyPublished } from "@/lib/email/events"
 import { qualifyReferralAfterFirstPublish } from "@/lib/referrals/server"
+import { createAdminSupabaseClient } from "@/lib/supabase/admin"
 import { designConfigSchema } from "@/lib/validations/designConfig"
 import { portfolioDocumentSchema, portfolioViewSchema } from "@/lib/validations/portfolioDocument"
 import type { Json } from "@/types/database"
@@ -63,6 +64,9 @@ export async function POST(request: Request) {
   if (blocked) return blocked
 
   const { supabase, user, limits } = caller
+  // Writes go through the service role: users cannot write this table directly (see migration 20261101120000).
+  const admin = createAdminSupabaseClient()
+  if (!admin) return apiError("publish_unavailable", 503, { message: "Publishing is not set up on this server yet." })
 
   // A person with a username gets a readable link (/u/name). Otherwise the random /p/ link is used.
   const { data: profile } = await supabase.from("users").select("username").eq("id", user.id).maybeSingle()
@@ -79,7 +83,7 @@ export async function POST(request: Request) {
   if (owned.length >= limits.portfolios) {
     // Plans with a single portfolio republish over it, so edits go live without a new link.
     if (limits.portfolios === 1 && owned[0]) {
-      const { data, error } = await supabase
+      const { data, error } = await admin
         .from("published_portfolios")
         .update({ payload })
         .eq("id", owned[0].id)
@@ -98,7 +102,7 @@ export async function POST(request: Request) {
     })
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await admin
     .from("published_portfolios")
     .insert({ slug: nanoid(10), payload, user_id: user.id })
     .select("slug")
@@ -111,6 +115,7 @@ export async function POST(request: Request) {
   if (firstPublish) {
     await qualifyReferralAfterFirstPublish(user.id)
     after(() => notifyCreditsEarned(user.id))
+    after(() => notifyPublished(user.id))
   }
 
   return Response.json({ slug: data.slug, url: linkFor(data.slug), updated: false, firstPublish })

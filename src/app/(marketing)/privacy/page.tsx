@@ -12,7 +12,7 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/privacy",
 })
 
-const UPDATED = "9 October 2026"
+const UPDATED = "31 October 2026"
 
 const BODY: Block[] = [
   { t: "p", text: `This page explains what Dossier collects and why. Last updated ${UPDATED}. Questions: ${siteConfig.supportEmail}.` },
@@ -22,7 +22,9 @@ const BODY: Block[] = [
     "Your resume and portfolio: the PDF you upload is read to build your site. The text and the site you create are stored so you can edit and publish them.",
     "Usage: which actions you run (for example a resume read or a publish) and a salted, one-way hash of your IP address. We use these for daily limits and to stop abuse. We do not store your raw IP address.",
     "Messages you send us through the contact form.",
-    "Analytics: page views and clicks through Google Analytics and Microsoft Clarity, to learn which pages help.",
+    "Analytics: page views and clicks through Google Analytics, Microsoft Clarity and PostHog, to learn which pages help. Nothing loads until you interact with the page.",
+    "Visits to published sites: a count per site per day, shown to the site owner. We do not record who visited.",
+    "Payments: Razorpay handles card and UPI details. We only store what you bought, the amount and Razorpay's payment id.",
   ] },
   { t: "h2", text: "The free tools" },
   { t: "p", text: "The ATS scanner and the other free tools run in your browser. The text you paste is not sent to our servers." },
@@ -33,13 +35,14 @@ const BODY: Block[] = [
     "Supabase: stores accounts and data.",
     "Netlify: hosts the site.",
     "Groq and OpenRouter: language models that read the text of your resume to structure it. They receive the resume text, not your account details.",
-    "Brevo: sends our emails (welcome, sign-in notices, credits, replies to your messages).",
-    "Google and Microsoft: analytics.",
+    "Brevo: sends our emails (welcome, sign-in notices, credits, receipts, tips about your site, replies to your messages).",
+    "Razorpay: takes payments.",
+    "Google, Microsoft and PostHog: analytics.",
   ] },
   { t: "h2", text: "Cookies" },
   { t: "p", text: "We use a cookie to keep you signed in and a short-lived cookie to remember an invite link. Analytics tools set their own cookies." },
   { t: "h2", text: "Your choices" },
-  { t: "p", text: `You can ask us to export or delete your account and data at any time by writing to ${siteConfig.supportEmail}. We act within 30 days. You can also stop emails by deleting your account.` },
+  { t: "p", text: `You can ask us to export or delete your account and data at any time by writing to ${siteConfig.supportEmail}. We act within 30 days. Tips and offer emails can be turned off in Settings or with the link at the bottom of each one; offers are off until you turn them on. Receipts and security emails come while you have an account.` },
   { t: "h2", text: "Changes" },
   { t: "p", text: "If we change this policy in a way that matters, we will update the date above and tell account holders by email." },
 ]

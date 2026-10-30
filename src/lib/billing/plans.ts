@@ -48,9 +48,9 @@ export const DEV_UNLIMITED_LIMITS: PlanLimits = {
 // Plan limits and credits are enforced everywhere by default, including `next dev`. Set DEV_UNLIMITED=1 in .env.local to lift them while testing.
 export const IS_DEV_UNLIMITED = process.env.NODE_ENV !== "production" && process.env.DEV_UNLIMITED === "1"
 
-/** A plan with an expiry date (Pro, yearly) falls back to free once it passes. */
-export function resolveEffectivePlan(plan: PlanId, planExpiresAt: string | null): PlanId {
-  if (plan === "free") return "free"
-  if (planExpiresAt && new Date(planExpiresAt).getTime() < Date.now()) return "free"
+/** A plan with an expiry date (a Pro pass) falls back once it passes: to Starter if they own it, else Free. */
+export function resolveEffectivePlan(plan: PlanId, planExpiresAt: string | null, ownsStarter = false): PlanId {
+  if (plan === "free") return ownsStarter ? "starter" : "free"
+  if (planExpiresAt && new Date(planExpiresAt).getTime() < Date.now()) return ownsStarter ? "starter" : "free"
   return plan
 }

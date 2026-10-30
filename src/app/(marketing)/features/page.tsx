@@ -20,7 +20,7 @@ const GROUPS: { title: string; summary: string; rows: Row[] }[] = [
     title: "Reading your resume",
     summary: "The part that saves you an evening of copying and pasting.",
     rows: [
-      { name: "PDF upload", detail: "Any text-based PDF up to 10 MB, from a laptop or a phone.", plan: "Free" },
+      { name: "PDF upload", detail: "Any text-based PDF up to 4 MB, from a laptop or a phone.", plan: "Free" },
       { name: "Section sorting", detail: "Name, headline, jobs, projects, skills, education and contact are found and filled in.", plan: "Free" },
       { name: "Check every field", detail: "See what was read before anything is laid out, and correct it.", plan: "Free" },
       { name: "Wording polish", detail: "Ask the AI panel for a tighter version of your wording, then edit it as you like.", plan: "Free" },

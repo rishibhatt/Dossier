@@ -19,7 +19,7 @@ const MAX_PER_DAY = 10
 
 /**
  * Stores the exit survey answer. The only plan change it can make is Pro -> Free, and only when the
- * person confirmed it. Checkout is not live, so there is no subscription to cancel at a provider yet.
+ * person confirmed it. Payments are one-time Razorpay passes, so there is nothing to cancel at the provider.
  */
 export async function POST(request: Request) {
   const caller = await resolveCaller()

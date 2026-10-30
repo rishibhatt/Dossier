@@ -246,7 +246,7 @@ function UpgradeBody({
               {summary.signedIn ? `See ${card.name}` : "Create a free account to see plans"}
             </Link>
             <p className="text-center text-xs text-[var(--site-ink-2)]">
-              Checkout is not open yet, so nothing is charged today. The plans page shows what each one includes.
+              Pay once with UPI or a card. Nothing renews by itself.
             </p>
           </>
         ) : (

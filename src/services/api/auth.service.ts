@@ -1,5 +1,7 @@
 import type { AuthError } from "@supabase/supabase-js"
 
+import { siteConfig } from "@/config/site"
+import { ROUTES } from "@/lib/constants/routes"
 import type { PublicSupabaseClient } from "@/services/repositories/user.repository"
 
 export type AuthResult<T> = { data: T | null; error: AuthError | Error | null }
@@ -27,7 +29,8 @@ export async function signUpWithPassword(
   const { data, error } = await client.auth.signUp({
     email: params.email,
     password: params.password,
-    options: { data: { full_name: params.fullName ?? null } },
+    // The confirm link returns to this deployment (localhost in dev), not the Supabase Site URL.
+    options: { data: { full_name: params.fullName ?? null }, emailRedirectTo: `${siteConfig.url}${ROUTES.authCallback}` },
   })
 
   if (error) {

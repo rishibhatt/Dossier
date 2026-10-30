@@ -35,6 +35,7 @@ function buildEntries(): Entry[] {
     { path: "/contact", priority: 0.5 },
     { path: "/privacy", priority: 0.3 },
     { path: "/terms", priority: 0.3 },
+    { path: "/refund-policy", priority: 0.3 },
     { path: ROUTES.signup, priority: 0.5 },
 
   ]

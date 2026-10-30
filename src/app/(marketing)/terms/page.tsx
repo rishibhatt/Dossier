@@ -30,7 +30,7 @@ const BODY: Block[] = [
   { t: "h2", text: "Plans and payments" },
   { t: "p", text: "Free, Starter and Pro are described on the pricing page. Limits apply to each plan. Prices may change for new purchases, and we will not charge you a new price without telling you first." },
   { t: "h2", text: "Refunds" },
-  { t: "p", text: "If a paid plan does not work for you, write to us within 7 days of paying and we will refund you." },
+  { t: "p", text: "If a paid plan does not work for you, write to us within 7 days of paying and we will refund you. The full refund and cancellation policy is at dossier-cv.com/refund-policy." },
   { t: "h2", text: "The service" },
   { t: "p", text: "We work to keep Dossier available, but we do not promise it will never be interrupted. Generated text and designs can contain mistakes, so check your site before you publish it. Dossier is provided as is, and to the extent the law allows we are not liable for indirect losses." },
   { t: "h2", text: "Ending your account" },

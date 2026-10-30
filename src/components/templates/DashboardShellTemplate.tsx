@@ -24,7 +24,7 @@ function PlanChip({ plan, used, limit }: { plan: PlanId; used: number | null; li
   const unlimited = limit >= 100
 
   return (
-    <div className="rounded-xl border border-[var(--site-rule-strong)] bg-white p-3.5">
+    <div className="border border-[var(--site-rule-strong)] bg-[var(--site-sheet)] p-3.5">
       <div className="flex items-center justify-between gap-2">
         <p className="text-sm font-semibold">{PLAN_NAME[plan]} plan</p>
         {plan !== "pro" ? (
@@ -42,14 +42,14 @@ function PlanChip({ plan, used, limit }: { plan: PlanId; used: number | null; li
             Regenerations used today: <span className="font-semibold tabular-nums text-[var(--site-ink)]">{used}</span> of {limit}
           </p>
           <div
-            className="mt-2 h-1.5 overflow-hidden rounded-full bg-black/10"
+            className="mt-2 h-1 overflow-hidden bg-black/10"
             role="progressbar"
             aria-label="Regenerations used today"
             aria-valuemin={0}
             aria-valuemax={limit}
             aria-valuenow={Math.min(used, limit)}
           >
-            <div className="h-full rounded-full bg-[var(--site-accent-ink)]" style={{ width: `${pct}%` }} />
+            <div className="h-full bg-[var(--site-ink)]" style={{ width: `${pct}%` }} />
           </div>
         </>
       ) : (
@@ -63,8 +63,8 @@ function PlanChip({ plan, used, limit }: { plan: PlanId; used: number | null; li
 
 export function DashboardShellTemplate({ userEmail, plan, shufflesUsed, shuffleLimit, children, className }: DashboardShellTemplateProps) {
   return (
-    <div className={cn("site flex min-h-dvh w-full flex-col", className)}>
-      <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-[var(--site-rule)] bg-[var(--site-paper)]/95 px-4 backdrop-blur sm:px-6">
+    <div className={cn("site dash flex min-h-dvh w-full flex-col", className)}>
+      <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-[var(--site-rule-strong)] bg-[var(--site-paper)] px-4 sm:px-6">
         <Link href={ROUTES.home} aria-label="Dossier home" className="rounded-lg">
           <Logo />
         </Link>

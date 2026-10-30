@@ -13,6 +13,8 @@ export type SendInput = {
   replyTo?: { email: string; name?: string }
   /** Shows up in Brevo's logs so you can filter by kind. */
   tags?: string[]
+  /** One-click unsubscribe URL (sets List-Unsubscribe, which Gmail and Yahoo require for bulk mail). */
+  unsubscribe?: string
 }
 
 export type SendResult = { ok: true } | { ok: false; error: string }
@@ -54,6 +56,7 @@ export async function sendEmail(input: SendInput): Promise<SendResult> {
     textContent: input.text,
     ...(input.replyTo ? { replyTo: input.replyTo } : {}),
     ...(input.tags?.length ? { tags: input.tags } : {}),
+    ...(input.unsubscribe ? { headers: { "List-Unsubscribe": `<${input.unsubscribe}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } } : {}),
   })
 
   let out = await attempt(body, apiKey)

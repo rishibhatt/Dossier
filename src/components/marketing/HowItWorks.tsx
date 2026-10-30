@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils"
 export const HOW_STEPS = [
   {
     title: "Upload the resume you already have",
-    body: "A PDF up to 10 MB, from your laptop or straight from your phone's files. Dossier starts from your career history, not from a blank template.",
+    body: "A PDF up to 4 MB, from your laptop or straight from your phone's files. Dossier starts from your career history, not from a blank template.",
   },
   {
     title: "Dossier reads it into sections",

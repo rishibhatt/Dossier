@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo } from "react"
 import { Plus } from "lucide-react"
 
 import { ROLES } from "@/content/roles"
@@ -9,6 +9,7 @@ import { PolishButton } from "@/features/tools/PolishButton"
 import { ResumeHandoff } from "@/features/tools/ResumeHandoff"
 import { ResultsJump } from "@/features/tools/ResultsJump"
 import { buildSummaries, STAGES, SUMMARY_LIMIT, type Stage, type SummaryInput } from "@/features/tools/summaryGen"
+import { useSaved } from "@/features/tools/useSaved"
 
 type TextKey = Exclude<keyof SummaryInput, "stage">
 
@@ -28,7 +29,7 @@ function suggestionsFor(role: string, skills: string): string[] {
 }
 
 export function SummaryGenerator() {
-  const [v, setV] = useState<SummaryInput>({ role: "", stage: "mid", years: "", focus: "", skills: "", proof: "", background: "" })
+  const [v, setV] = useSaved<SummaryInput>("summary", { role: "", stage: "mid", years: "", focus: "", skills: "", proof: "", background: "" })
   const out = useMemo(() => buildSummaries(v), [v])
   const ideas = useMemo(() => suggestionsFor(v.role, v.skills), [v.role, v.skills])
   const set = (k: TextKey, max: number) => (e: React.ChangeEvent<HTMLInputElement>) =>

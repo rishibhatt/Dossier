@@ -96,7 +96,7 @@ export function StartScreen() {
       return
     }
     if (file.size > PDF_UPLOAD_MAX_BYTES) {
-      setImportError("That PDF is over 10 MB. Resumes are usually under 1 MB; try exporting it again without images.")
+      setImportError("That PDF is over 4 MB. Resumes are usually under 1 MB; try exporting it again without images.")
       return
     }
     setImporting(true)
@@ -176,7 +176,7 @@ export function StartScreen() {
                 <span>or drop it here</span>
               </span>
             </button>
-            <span className="rz-fine rz-mono">PDF · up to 10 MB · read on this device, never uploaded</span>
+            <span className="rz-fine rz-mono">PDF · up to 4 MB · read on this device, never uploaded</span>
             <input
               ref={fileInput}
               type="file"

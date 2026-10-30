@@ -6,7 +6,6 @@ import { toast } from "sonner"
 
 import { siteBtnClass } from "@/components/marketing/primitives"
 import { messages } from "@/config/messages"
-import { siteConfig } from "@/config/site"
 import { safeNextPath } from "@/lib/auth/safeNext"
 import { ROUTES } from "@/lib/constants/routes"
 import { createBrowserSupabaseClient } from "@/lib/supabase/client"
@@ -45,7 +44,8 @@ export function OAuthSection() {
     try {
       const requested = new URLSearchParams(window.location.search).get("next")
       const next = encodeURIComponent(safeNextPath(requested))
-      const redirectTo = `${siteConfig.url}${ROUTES.authCallback}?next=${next}`
+      // This tab's own origin, so localhost logins come back to localhost (Supabase still checks its allow-list).
+      const redirectTo = `${window.location.origin}${ROUTES.authCallback}?next=${next}`
       const supabase = createBrowserSupabaseClient()
       const { error } = await supabase.auth.signInWithOAuth({ provider, options: { redirectTo } })
       if (error) {

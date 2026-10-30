@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createSupabaseMiddlewareClient } from "@/lib/supabase/middleware"
 
 const PROTECTED_PREFIXES = ["/dashboard", "/build"]
-const PUBLIC_PREFIXES = ["/blog", "/resume-keywords", "/tools", "/og", "/p", "/u", "/faq", "/features", "/how-it-works", "/pricing", "/contact", "/privacy", "/terms"]
+const PUBLIC_PREFIXES = ["/blog", "/resume-keywords", "/tools", "/og", "/p", "/u", "/faq", "/features", "/how-it-works", "/pricing", "/contact", "/privacy", "/terms", "/refund-policy"]
 
 const startsWithPath = (pathname: string, p: string) => pathname === p || pathname.startsWith(`${p}/`)
 const isProtected = (pathname: string) => PROTECTED_PREFIXES.some((p) => startsWithPath(pathname, p))

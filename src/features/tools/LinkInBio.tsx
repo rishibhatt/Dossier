@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
 import { ArrowUpRight, Plus, X } from "lucide-react"
 
 import { CopyText } from "@/features/tools/CopyText"
 import { ToolHandoff } from "@/features/tools/ToolHandoff"
+import { useSaved } from "@/features/tools/useSaved"
 
 type LinkRow = { label: string; url: string }
 const MAX = 5
@@ -14,9 +14,9 @@ function tidyUrl(u: string) {
 }
 
 export function LinkInBio() {
-  const [name, setName] = useState("")
-  const [role, setRole] = useState("")
-  const [links, setLinks] = useState<LinkRow[]>([
+  const [name, setName] = useSaved("bio_name", "")
+  const [role, setRole] = useSaved("bio_role", "")
+  const [links, setLinks] = useSaved<LinkRow[]>("bio_links", [
     { label: "Portfolio", url: "" },
     { label: "LinkedIn", url: "" },
   ])

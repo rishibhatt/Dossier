@@ -18,6 +18,12 @@ export type CancelOutcome = "kept_plan" | "accepted_offer" | "downgraded" | "fee
 export type Database = {
   public: {
     Tables: {
+      portfolio_views: {
+        Row: { slug: string; day: string; views: number }
+        Insert: { slug: string; day?: string; views?: number }
+        Update: { slug?: string; day?: string; views?: number }
+        Relationships: []
+      }
       users: {
         Row: {
           id: string
@@ -29,6 +35,11 @@ export type Database = {
           plan_expires_at: string | null
           starter_unlocked_via_credits: boolean
           signup_ip_hash: string | null
+          is_test: boolean
+          owns_starter: boolean
+          email_product: boolean
+          email_offers: boolean
+          email_token: string
           created_at: string
           updated_at: string
         }
@@ -42,6 +53,11 @@ export type Database = {
           plan_expires_at?: string | null
           starter_unlocked_via_credits?: boolean
           signup_ip_hash?: string | null
+          is_test?: boolean
+          owns_starter?: boolean
+          email_product?: boolean
+          email_offers?: boolean
+          email_token?: string
           created_at?: string
           updated_at?: string
         }
@@ -55,6 +71,11 @@ export type Database = {
           plan_expires_at?: string | null
           starter_unlocked_via_credits?: boolean
           signup_ip_hash?: string | null
+          is_test?: boolean
+          owns_starter?: boolean
+          email_product?: boolean
+          email_offers?: boolean
+          email_token?: string
           created_at?: string
           updated_at?: string
         }
@@ -93,6 +114,11 @@ export type Database = {
           plan: "starter" | "pro"
           status: string
           current_period_end: string | null
+          product: string | null
+          order_id: string | null
+          amount: number | null
+          currency: string | null
+          days: number | null
           created_at: string
           updated_at: string
         }
@@ -453,8 +479,24 @@ export type Database = {
         Args: { p_user: string; p_item: string }
         Returns: Json
       }
+      lifecycle_candidates: {
+        Args: { p_limit?: number }
+        Returns: { user_id: string; email: string; name: string | null; kind: string; views: number | null; plan_expires_at: string | null }[]
+      }
+      grant_purchase: {
+        Args: { p_user: string; p_payment_id: string; p_order_id: string; p_product: string; p_amount: number; p_currency: string }
+        Returns: boolean
+      }
+      revoke_purchase: {
+        Args: { p_payment_id: string; p_status: string }
+        Returns: string | null
+      }
+      bump_portfolio_view: {
+        Args: { p_slug: string }
+        Returns: undefined
+      }
       admin_overview: {
-        Args: { p_days?: number }
+        Args: { p_days?: number; p_include_test?: boolean }
         Returns: Json
       }
       prune_usage_events: {

@@ -1,7 +1,7 @@
 {
   "template": "r001-ledger",
   "sample": "Meera Iyer (sample)",
-  "testedAt": "2026-10-26",
+  "testedAt": "2026-10-30",
   "extractor": "pdf.js",
   "pdfTitle": "Meera Iyer – Senior Accountant",
   "fields": [
@@ -32,7 +32,7 @@
     },
     {
       "field": "Link",
-      "value": "linkedin.com/in/meera-sample",
+      "value": "LinkedIn",
       "found": true
     },
     {

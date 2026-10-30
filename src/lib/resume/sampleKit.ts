@@ -1,3 +1,4 @@
+import { autoLabel } from "./links"
 import type { ResumeDocument, ResumeSection } from "./schema"
 
 /**
@@ -11,8 +12,8 @@ export const b = (...lines: string[]) => lines.map((text) => ({ id: sid("b"), te
 
 export type Job = { role: string; org: string; location?: string; start: string; end?: string; current?: boolean; bullets: string[] }
 export type School = { school: string; degree: string; location?: string; start: string; end: string; bullets?: string[] }
-export type Project = { name: string; role?: string; link?: string; start: string; end?: string; bullets: string[] }
-export type Entry = { title: string; subtitle?: string; date?: string; link?: string; detail?: string }
+export type Project = { name: string; role?: string; link?: string; linkLabel?: string; start: string; end?: string; bullets: string[] }
+export type Entry = { title: string; subtitle?: string; date?: string; link?: string; linkLabel?: string; detail?: string }
 
 export function experience(jobs: Job[], type: "experience" | "volunteering" = "experience"): ResumeSection {
   return {
@@ -73,6 +74,7 @@ export function projects(items: Project[]): ResumeSection {
       name: p.name,
       role: p.role ?? "",
       link: p.link ?? "",
+      linkLabel: p.linkLabel ?? (p.link ? autoLabel(p.link) : ""),
       start: p.start,
       end: p.end ?? "",
       current: false,
@@ -93,6 +95,7 @@ export function entries(type: "certifications" | "awards" | "publications" | "cu
       subtitle: e.subtitle ?? "",
       date: e.date ?? "",
       link: e.link ?? "",
+      linkLabel: e.linkLabel ?? (e.link ? autoLabel(e.link) : ""),
       detail: e.detail ?? "",
     })),
   }
@@ -118,7 +121,7 @@ export function resume(
   const { links = [], ...rest } = basics
   return {
     version: 1,
-    basics: { ...rest, links: links.map(([label, url]) => ({ id: sid("l"), label, url })) },
+    basics: { ...rest, links: links.map(([label, url]) => ({ id: sid("l"), label: autoLabel(url, label), url })) },
     personal: { ...NO_PERSONAL, ...personal },
     sections,
   }

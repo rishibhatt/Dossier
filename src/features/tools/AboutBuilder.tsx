@@ -5,6 +5,7 @@ import { useMemo, useState } from "react"
 import { CopyText } from "@/features/tools/CopyText"
 import { ToolHandoff } from "@/features/tools/ToolHandoff"
 import { cn } from "@/lib/utils"
+import { useSaved } from "@/features/tools/useSaved"
 
 const LIMIT = 2600
 
@@ -47,7 +48,7 @@ export function buildAbouts(v: Input): { name: string; text: string }[] {
 }
 
 export function AboutBuilder() {
-  const [v, setV] = useState<Input>({ now: "", work: "", proof: "", next: "", contact: "" })
+  const [v, setV] = useSaved<Input>("about", { now: "", work: "", proof: "", next: "", contact: "" })
   const versions = useMemo(() => buildAbouts(v), [v])
   const [tab, setTab] = useState(1)
   const current = versions[Math.min(tab, versions.length - 1)]
