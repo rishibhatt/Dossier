@@ -1,10 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { isAuthRetryableFetchError } from "@supabase/supabase-js"
 
 import { createBrowserSupabaseClient } from "@/lib/supabase/client"
 
-import { clearResumeDrafts } from "./drafts"
+import { clearAccountDrafts, clearResumeDrafts } from "./drafts"
 
 export type SessionUser = { id: string; email: string | null }
 
@@ -18,7 +19,9 @@ export function useSessionUser() {
     if (!configured) return
     const client = createBrowserSupabaseClient()
     let active = true
-    client.auth.getUser().then(({ data }) => {
+    client.auth.getUser().then(({ data, error }) => {
+      // A network failure is not a sign-out: keep the account's resumes until the server says nobody is signed in.
+      if (!data.user && !isAuthRetryableFetchError(error)) clearAccountDrafts()
       if (active) setUser(data.user ? { id: data.user.id, email: data.user.email ?? null } : null)
     })
     const { data: sub } = client.auth.onAuthStateChange((event, session) => {

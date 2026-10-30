@@ -69,28 +69,30 @@ function viewWindow() {
 export default async function DashboardHomePage() {
   const ctx = await getDashboardContext()
 
-  const { data: portfolios } =
+  // Sites and resumes load together. Sites read only the parts of the payload this page shows, not the whole site.
+  const [{ data: portfolios }, { data: resumeRows }] =
     ctx.supabase && ctx.userId
-      ? await ctx.supabase
-          .from("published_portfolios")
-          .select("slug, payload, updated_at, indexable")
-          .eq("user_id", ctx.userId)
-          .order("updated_at", { ascending: false })
-      : { data: [] }
-
-  const { data: resumeRows } =
-    ctx.supabase && ctx.userId
-      ? await ctx.supabase
-          .from("resumes")
-          .select("id, title, template_id, updated_at")
-          .eq("user_id", ctx.userId)
-          .order("updated_at", { ascending: false })
-          .limit(50)
-      : { data: [] }
+      ? await Promise.all([
+          ctx.supabase
+            .from("published_portfolios")
+            .select("slug, updated_at, indexable, title:payload->document->meta->title, sections:payload->document->sections, tokens:payload->designConfig->tokens")
+            .eq("user_id", ctx.userId)
+            .order("updated_at", { ascending: false }),
+          ctx.supabase
+            .from("resumes")
+            .select("id, title, template_id, updated_at")
+            .eq("user_id", ctx.userId)
+            .order("updated_at", { ascending: false })
+            .limit(50),
+        ])
+      : [{ data: [] }, { data: [] }]
   const resumes = resumeRows ?? []
   const resumeLimit = ctx.plan === "free" ? 2 : null
 
-  const rows = portfolios ?? []
+  const rows = (portfolios ?? []).map(({ title, sections, tokens, ...r }) => ({
+    ...r,
+    payload: { document: { meta: { title }, sections }, designConfig: { tokens } },
+  }))
   // Visits per site per day for the last 30 days (row level security returns only this owner's sites).
   const { since, weekAgo, days14 } = viewWindow()
   const { data: viewRows } =

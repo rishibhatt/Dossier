@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 
@@ -52,14 +54,16 @@ const COLUMNS = [
     links: [
       { label: "Upload my resume", href: ROUTES.build },
       { label: "Build my resume", href: ROUTES.resumeNew },
-      { label: "Create account", href: ROUTES.signup },
-      { label: "Log in", href: ROUTES.login },
+      { label: "Create account", href: ROUTES.signup, signedOut: true },
+      { label: "Log in", href: ROUTES.login, signedOut: true },
+      { label: "Dashboard", href: ROUTES.dashboard, signedIn: true },
       { label: "Invite a friend", href: ROUTES.invite },
     ],
   },
 ] as const
 
-export function SiteFooter() {
+/** Account links follow the session: signed-in visitors get Dashboard instead of Create account and Log in. */
+export function SiteFooter({ signedIn = false }: { signedIn?: boolean }) {
   return (
     <footer className="border-t border-[var(--site-ink)] bg-[var(--site-paper)] pt-14 sm:pt-20">
       <div className="site-wrap grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
@@ -91,7 +95,7 @@ export function SiteFooter() {
           <nav key={col.title} aria-label={col.title}>
             <h2 className="text-sm font-semibold text-[var(--site-ink)]">{col.title}</h2>
             <ul className="mt-4 space-y-0.5">
-              {col.links.map((link) => (
+              {col.links.filter((link) => ("signedIn" in link ? signedIn : "signedOut" in link ? !signedIn : true)).map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href}

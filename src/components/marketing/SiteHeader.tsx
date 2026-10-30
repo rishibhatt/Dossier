@@ -8,6 +8,7 @@ import { ArrowUpRight, Menu, X } from "lucide-react"
 import { gsap, MOTION_OK, ScrollTrigger, useGSAP } from "@/components/marketing/motion/gsap"
 import { Logo, SiteButton, siteBtnClass } from "@/components/marketing/primitives"
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import type { SessionUser } from "@/features/resume/lib/useSessionUser"
 import { ROUTES } from "@/lib/constants/routes"
 import { cn } from "@/lib/utils"
 
@@ -25,7 +26,7 @@ const NAV = [
  * Full-screen menu body. It only mounts while the sheet is open, so the entrance runs on every open:
  * the big links rise out of masks one after another, the rules draw in, the bottom bar slides up.
  */
-function MobileMenu() {
+function MobileMenu({ account }: { account: { href: string; label: string } }) {
   const root = useRef<HTMLDivElement>(null)
 
   useGSAP(
@@ -82,8 +83,8 @@ function MobileMenu() {
         style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}
       >
         <div className="grid grid-cols-[auto_1fr] gap-3">
-          <SheetClose nativeButton={false} render={<Link href={ROUTES.login} className={siteBtnClass({ variant: "secondary", size: "lg" })} />}>
-            <span className="site-btn-label">Log in</span>
+          <SheetClose nativeButton={false} render={<Link href={account.href} className={siteBtnClass({ variant: "secondary", size: "lg" })} />}>
+            <span className="site-btn-label">{account.label}</span>
           </SheetClose>
           <SheetClose nativeButton={false} render={<Link href={ROUTES.build} className={siteBtnClass({ variant: "primary", size: "lg", arrow: true })} />}>
             <span className="site-btn-label">Build my portfolio</span>
@@ -130,7 +131,8 @@ function FloatingCta({ hidden, href = ROUTES.build, label = "Upload my resume" }
   )
 }
 
-export function SiteHeader() {
+/** `user`: undefined while the session check runs, null when signed out. */
+export function SiteHeader({ user }: { user: SessionUser | null | undefined }) {
   const root = useRef<HTMLElement>(null)
   const progress = useRef<HTMLSpanElement>(null)
   const navRef = useRef<HTMLElement>(null)
@@ -213,6 +215,7 @@ export function SiteHeader() {
   const onResumePages = pathname === ROUTES.resume || pathname === ROUTES.resumeTemplates || pathname === ROUTES.resumeExamples
   const onResumeSide = pathname === ROUTES.resume || pathname?.startsWith(ROUTES.resumeTemplates) || pathname?.startsWith(ROUTES.resumeExamples)
   const hideFloating = pathname === ROUTES.login || pathname === ROUTES.signup || onDetailWithBar
+  const account = user ? { href: ROUTES.dashboard, label: "Dashboard" } : { href: ROUTES.login, label: "Log in" }
 
   return (
     <>
@@ -241,8 +244,9 @@ export function SiteHeader() {
             </nav>
 
             <div className="flex items-center gap-1.5">
-              <SiteButton href={ROUTES.login} variant="quiet" size="sm" className="hidden sm:inline-flex">
-                Log in
+              {/* Hidden until the session check answers, so a signed-in visitor never sees "Log in" flash. */}
+              <SiteButton href={account.href} variant="quiet" size="sm" className={cn("hidden sm:inline-flex", user === undefined && "invisible")}>
+                {account.label}
               </SiteButton>
               {/* On resume pages the main action is the resume; everywhere else it is the website. */}
               {onResumeSide ? (
@@ -263,7 +267,7 @@ export function SiteHeader() {
                 </SheetTrigger>
                 <SheetContent side="top" showCloseButton={false} className={cn("site h-dvh w-full gap-0 border-0 bg-[var(--site-paper)] p-0")}>
                   <SheetTitle className="sr-only">Menu</SheetTitle>
-                  <MobileMenu />
+                  <MobileMenu account={account} />
                 </SheetContent>
               </Sheet>
             </div>
@@ -274,7 +278,11 @@ export function SiteHeader() {
       </header>
       <FloatingCta
         hidden={hideFloating}
-        {...(onResumePages ? { href: pathname === ROUTES.resume ? ROUTES.resumeTemplates : ROUTES.resumeNew, label: pathname === ROUTES.resume ? "Pick a template" : "Start my resume" } : {})}
+        {...(onResumePages
+          ? { href: pathname === ROUTES.resume ? ROUTES.resumeTemplates : ROUTES.resumeNew, label: pathname === ROUTES.resume ? "Pick a template" : "Start my resume" }
+          : user
+            ? { href: ROUTES.dashboard, label: "Open my dashboard" }
+            : {})}
       />
     </>
   )

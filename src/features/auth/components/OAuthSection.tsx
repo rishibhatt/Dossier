@@ -36,13 +36,14 @@ const PROVIDERS: { id: OAuthProvider; label: string; Mark: () => React.JSX.Eleme
   { id: "github", label: messages.auth.oauthGithub, Mark: GithubMark },
 ]
 
-export function OAuthSection() {
+/** `next`: where to land after sign-in. The page passes it when it knows more than the URL (a plan bought from pricing). */
+export function OAuthSection({ next: target }: { next?: string } = {}) {
   const [pending, setPending] = useState<OAuthProvider | null>(null)
 
   async function signIn(provider: OAuthProvider) {
     setPending(provider)
     try {
-      const requested = new URLSearchParams(window.location.search).get("next")
+      const requested = target ?? new URLSearchParams(window.location.search).get("next")
       const next = encodeURIComponent(safeNextPath(requested))
       // This tab's own origin, so localhost logins come back to localhost (Supabase still checks its allow-list).
       const redirectTo = `${window.location.origin}${ROUTES.authCallback}?next=${next}`

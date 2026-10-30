@@ -3,6 +3,12 @@
  * break production. It stops the build for a production deploy (Netlify CONTEXT=production, or ENFORCE_ENV=1)
  * and only warns everywhere else, so a local build without keys still works.
  */
+import nextEnv from "@next/env"
+
+// Read .env files the way `next build` does (.env.local included), so a local build sees the same keys.
+// Variables already set (Netlify's) win over the files.
+nextEnv.loadEnvConfig(process.cwd())
+
 const env = process.env
 const enforce = env.ENFORCE_ENV === "1" || (env.NETLIFY === "true" && env.CONTEXT === "production")
 const errors = []

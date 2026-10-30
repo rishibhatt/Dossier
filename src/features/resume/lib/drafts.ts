@@ -98,6 +98,14 @@ export function clearResumeDrafts() {
   }
 }
 
+/**
+ * Removes only the resumes that belong to an account. Runs whenever the page finds nobody signed in, which also
+ * covers a session that expired or was ended in another tab. Resumes made while signed out stay.
+ */
+export function clearAccountDrafts() {
+  for (const d of listDrafts()) if (read<Draft>(`${PREFIX}d:${d.id}`)?.ownerId) deleteDraft(d.id)
+}
+
 export function newDraftId() {
   const rand =
     typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID().replace(/-/g, "").slice(0, 12) : Math.random().toString(36).slice(2, 14)

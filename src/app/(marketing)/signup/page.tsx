@@ -42,7 +42,7 @@ export default async function SignupPage({ searchParams }: PageProps) {
 
   return (
     <AuthShell title={messages.auth.signupTitle} subtitle={messages.auth.signupSubtitle} info={note}>
-      <OAuthSection />
+      <OAuthSection next={target} />
       <SignupForm next={target} />
     </AuthShell>
   )

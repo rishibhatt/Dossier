@@ -28,7 +28,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
 
   return (
     <AuthShell title={messages.auth.loginTitle} subtitle={messages.auth.loginSubtitle} notice={error ? NOTICES[error] : undefined}>
-      <OAuthSection />
+      <OAuthSection next={safeNext} />
       <LoginForm next={safeNext} />
     </AuthShell>
   )

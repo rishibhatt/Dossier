@@ -1,13 +1,20 @@
 import { type NextRequest, NextResponse } from "next/server"
 
+import { safeNextPath } from "@/lib/auth/safeNext"
+import { ROUTES } from "@/lib/constants/routes"
 import { createSupabaseMiddlewareClient } from "@/lib/supabase/middleware"
 
 const PROTECTED_PREFIXES = ["/dashboard", "/build"]
 const PUBLIC_PREFIXES = ["/blog", "/resume-keywords", "/tools", "/og", "/p", "/u", "/faq", "/features", "/how-it-works", "/pricing", "/contact", "/privacy", "/terms", "/refund-policy"]
 
+// Generated icons, manifest and social images: no extension in the URL, so the matcher below lets them in.
+const PUBLIC_FILES = new Set(["/icon", "/apple-icon", "/manifest.webmanifest", "/opengraph-image", "/twitter-image", "/robots.txt", "/sitemap.xml"])
+
 const startsWithPath = (pathname: string, p: string) => pathname === p || pathname.startsWith(`${p}/`)
 const isProtected = (pathname: string) => PROTECTED_PREFIXES.some((p) => startsWithPath(pathname, p))
-const isPublic = (pathname: string) => PUBLIC_PREFIXES.some((p) => startsWithPath(pathname, p))
+// The home page reads the session in the browser (the header), so it skips the server check too.
+const isPublic = (pathname: string) =>
+  pathname === "/" || PUBLIC_FILES.has(pathname) || PUBLIC_PREFIXES.some((p) => startsWithPath(pathname, p))
 
 function hostOf(request: NextRequest) {
   return (request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "").toLowerCase().split(":")[0]
@@ -64,6 +71,16 @@ export async function proxy(request: NextRequest) {
     const entry = new URL(startsWithPath(pathname, "/build") ? "/signup" : "/login", request.url)
     entry.searchParams.set("next", pathname)
     return NextResponse.redirect(entry)
+  }
+
+  // Signed in already: the login and signup forms have nothing to do. Go where the visitor was headed, to
+  // billing if they came from a paid plan button, else the dashboard. Refreshed session cookies go along.
+  if (user && (pathname === ROUTES.login || pathname === ROUTES.signup)) {
+    const plan = request.nextUrl.searchParams.get("plan")
+    const fallback = plan === "starter" || plan === "pro" ? ROUTES.billing : ROUTES.dashboard
+    const redirect = NextResponse.redirect(new URL(safeNextPath(request.nextUrl.searchParams.get("next"), fallback), request.url))
+    for (const c of client.getResponse().cookies.getAll()) redirect.cookies.set(c)
+    return redirect
   }
 
   const res = client.getResponse()

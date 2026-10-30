@@ -73,10 +73,6 @@ export function safeUrl(raw: string) {
   return ""
 }
 
-function linkLabel(url: string) {
-  return url.replace(/^mailto:/i, "").replace(/^tel:/i, "").replace(/^https:\/\/(www\.)?/i, "").replace(/\/$/, "")
-}
-
 function sectionModel(section: ResumeSection, style: ReturnType<typeof styleOf>): RenderSection | null {
   const title = clean(section.title) || SECTION_LABELS[section.type]
   const ds = style.dateStyle

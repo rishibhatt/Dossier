@@ -50,30 +50,27 @@ export const getDashboardContext = cache(async (): Promise<DashboardContext> => 
   } = await supabase.auth.getUser()
   if (!user) return { ...empty, supabase }
 
-  const { data: profile, error: profileError } = await supabase
-    .from("users")
-    .select("plan, plan_expires_at, username, owns_starter")
-    .eq("id", user.id)
-    .maybeSingle()
+  // Profile and shuffle usage are independent reads: run them together.
+  const admin = createAdminSupabaseClient()
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  const [{ data: profile, error: profileError }, usage, shuffleBonus] = await Promise.all([
+    supabase.from("users").select("plan, plan_expires_at, username, owns_starter").eq("id", user.id).maybeSingle(),
+    admin
+      ? admin
+          .from("usage_events")
+          .select("id", { count: "exact", head: true })
+          .in("subject", [`u:${user.id}`, `test:u:${user.id}`])
+          .eq("kind", "regenerate")
+          .gte("created_at", since)
+      : null,
+    admin ? activeShufflePackBonus(admin, user.id) : 0,
+  ])
   // A failed read would show a paying user as Free. Say so in the server log instead of hiding it.
   if (profileError) console.error("[dashboard] profile read failed, showing Free:", profileError.message)
 
   const plan = resolveEffectivePlan(profile?.plan ?? "free", profile?.plan_expires_at ?? null, profile?.owns_starter)
 
-  let shufflesUsed: number | null = null
-  let shuffleBonus = 0
-  const admin = createAdminSupabaseClient()
-  if (admin) {
-    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-    const { count } = await admin
-      .from("usage_events")
-      .select("id", { count: "exact", head: true })
-      .in("subject", [`u:${user.id}`, `test:u:${user.id}`])
-      .eq("kind", "regenerate")
-      .gte("created_at", since)
-    shufflesUsed = count ?? 0
-    shuffleBonus = await activeShufflePackBonus(admin, user.id)
-  }
+  const shufflesUsed = usage ? (usage.count ?? 0) : null
 
   return {
     supabase,
