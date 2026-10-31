@@ -20,7 +20,7 @@ export const PRODUCTS: Record<ProductId, { name: string; plan: Exclude<PlanId, "
  */
 export type Offer = { id: string; name: string; percent: number; starts: string; ends: string; currency?: Currency }
 export const OFFERS: readonly Offer[] = [
-  { id: "diwali-2026", name: "Diwali offer", percent: 30, starts: "2026-1-01T00:00:00Z", ends: "2026-11-11T18:29:59Z", currency: "INR" },
+  { id: "diwali-2026", name: "Diwali offer", percent: 30, starts: "2026-11-01T00:00:00Z", ends: "2026-11-11T18:29:59Z", currency: "INR" },
   { id: "bf-2026", name: "Black Friday", percent: 30, starts: "2026-11-24T00:00:00Z", ends: "2026-12-01T23:59:59Z" },
   { id: "newyear-2027", name: "New year, new job", percent: 25, starts: "2026-12-26T00:00:00Z", ends: "2027-01-05T23:59:59Z" },
   { id: "grad-2027", name: "Graduation season", percent: 25, starts: "2027-05-15T00:00:00Z", ends: "2027-06-15T23:59:59Z" },
