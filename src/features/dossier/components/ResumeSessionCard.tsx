@@ -3,9 +3,8 @@
 import { useMemo, useState, useSyncExternalStore } from "react"
 import { History } from "lucide-react"
 
+import { restoreSession } from "@/features/studio/siteSession"
 import { clearLastSession, parseLastSession, readLastSessionRaw } from "@/lib/portfolio/lastSession"
-import { useDossierStore } from "@/store/useDossierStore"
-import { usePortfolioStore } from "@/store/usePortfolioStore"
 
 const noop = () => () => {}
 
@@ -28,11 +27,8 @@ export function ResumeSessionCard() {
 
   if (!last || dismissed) return null
 
-  const reopen = () => {
-    usePortfolioStore.getState().hydratePortfolio(last.document, last.designConfig, undefined, last.parsedResume)
-    usePortfolioStore.setState({ hiddenSectionIds: last.hiddenSectionIds ?? {} })
-    useDossierStore.getState().updatePortfolio(last.document)
-  }
+  const reopen = () => restoreSession(last)
+  const state = last.site ? (last.unpublished ? "Live, with changes not published yet" : "Live") : "Not published yet"
 
   return (
     <div className="ws-card flex flex-col gap-3 !p-3 sm:flex-row sm:items-center sm:!p-3.5">
@@ -43,7 +39,7 @@ export function ResumeSessionCard() {
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold tracking-[-0.01em] sm:text-base">Continue your last portfolio</p>
           <p className="truncate text-sm text-[var(--site-ink-2)]">
-            {last.document.meta.title || "Untitled portfolio"}, edited {ago(last.savedAt)}
+            {last.document.meta.title || "Untitled portfolio"}, edited {ago(last.savedAt)} · {state}
           </p>
         </div>
       </div>
@@ -59,7 +55,8 @@ export function ResumeSessionCard() {
           }}
           className="site-btn site-btn-ghost site-btn-sm flex-1 sm:flex-none"
         >
-          <span className="site-btn-label">Discard</span>
+          {/* Clears this device's copy only. A live site stays online; the dashboard reopens it. */}
+          <span className="site-btn-label">{last.site ? "Start a new one" : "Discard"}</span>
         </button>
       </div>
     </div>

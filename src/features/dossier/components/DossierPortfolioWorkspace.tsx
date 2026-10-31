@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { startTransition, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { AlertCircle, Lock } from "lucide-react"
 
@@ -14,12 +14,13 @@ import { PortfolioStudioView } from "@/features/dossier/components/PortfolioStud
 import { PortfolioStyleConfigureCard } from "@/features/dossier/components/PortfolioStyleConfigureCard"
 import { useStudioStatus } from "@/features/studio/studioStatus"
 import { ResumeSessionCard } from "@/features/dossier/components/ResumeSessionCard"
+import { openSite, restoreSession } from "@/features/studio/siteSession"
 import { UploadZone } from "@/features/dossier/components/UploadZone"
 import { usePortfolioParse } from "@/features/dossier/hooks/usePortfolioParse"
 import { clearPendingUpload, peekPendingUpload, restorePendingUpload } from "@/features/dossier/lib/pendingUpload"
 import { messages } from "@/config/messages"
 import { ROUTES } from "@/lib/constants/routes"
-import { clearLastSession } from "@/lib/portfolio/lastSession"
+import { clearLastSession, parseLastSession, peekAfterAuthIntent, readLastSessionRaw, takeAfterAuthIntent } from "@/lib/portfolio/lastSession"
 import { cn } from "@/lib/utils"
 import { useDossierStore } from "@/store/useDossierStore"
 import { buildProgress, useParseProgressStore } from "@/store/useParseProgressStore"
@@ -178,6 +179,34 @@ export function DossierPortfolioWorkspace() {
     }
   }, [])
 
+  // `/build?site=<slug>` (dashboard "Edit site") opens that live site. Edits made on this device and not yet
+  // published win over the server copy, so nothing is lost. After a sign-up round trip the work reopens by itself.
+  const [opening, setOpening] = useState(false)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const slug = params.get("site")
+    const last = parseLastSession(readLastSessionRaw())
+    if (!slug) {
+      if (peekAfterAuthIntent()) {
+        if (last) restoreSession(last)
+        else takeAfterAuthIntent()
+      }
+      return
+    }
+    params.delete("site")
+    window.history.replaceState(null, "", `${window.location.pathname}${params.size ? `?${params}` : ""}`)
+    if (last?.site?.slug === slug && last.unpublished) {
+      restoreSession(last)
+      toast.info("Opened your unpublished edits", { description: "They are from this device. Publish to put them live." })
+      return
+    }
+    startTransition(() => setOpening(true))
+    void openSite(slug).then((r) => {
+      setOpening(false)
+      if (!r.ok) toast.error(r.message)
+    })
+  }, [])
+
   const visualStep: BuildVisualStep = loading ? 2 : draftFile ? 1 : 0
   const progress = loading ? buildProgress(stageIndex) : undefined
 
@@ -219,6 +248,16 @@ export function DossierPortfolioWorkspace() {
   }
 
   const stepKey = loading ? "parse" : draftFile ? "look" : "upload"
+
+  if (opening) {
+    return (
+      <div className="bf-root">
+        <div className="grid min-h-dvh w-full place-items-center" role="status">
+          <p className="sp-data">Opening your site</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="bf-root" data-fit={loading}>

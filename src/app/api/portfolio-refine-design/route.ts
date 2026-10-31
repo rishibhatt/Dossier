@@ -57,8 +57,9 @@ export async function POST(request: Request) {
     return Response.json({ designConfig: next })
   } catch (err) {
     const msg = err instanceof Error ? err.message : "unknown_error"
+    console.error("[refine-design]", msg.slice(0, 300))
     const code =
       msg.includes("GROQ_API_KEY") || msg.includes("not configured") ? "groqMissing" : "refineFailed"
-    return Response.json({ error: code, message: msg }, { status: 500 })
+    return Response.json({ error: code, message: "That change did not apply. Try other words." }, { status: 500 })
   }
 }

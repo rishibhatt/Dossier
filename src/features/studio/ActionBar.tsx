@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { Globe, Layers, Loader2, Palette, Plus } from "lucide-react"
 
 import { publish } from "@/features/studio/studioActions"
+import { useStudioStatus } from "@/features/studio/studioStatus"
 import { useStudioUiStore, type StudioPanelId } from "@/store/useStudioUiStore"
 
 const TOOLS: { id: StudioPanelId; label: string; Icon: typeof Layers }[] = [
@@ -24,6 +25,7 @@ export function ActionBar() {
   const setSnap = useStudioUiStore((s) => s.setSnap)
   const publishing = useStudioUiStore((s) => s.busy.publish)
   const published = useStudioUiStore((s) => s.publishedPath)
+  const waiting = useStudioStatus((s) => s.unpublished)
   const open = snap !== "closed"
 
   return (
@@ -45,6 +47,7 @@ export function ActionBar() {
       <button type="button" className="ws-actionbar-ink" disabled={publishing} onClick={() => void publish(router)}>
         {publishing ? <Loader2 className="size-[1.125rem] animate-spin motion-reduce:animate-none" aria-hidden /> : <Globe className="size-[1.125rem]" aria-hidden />}
         <span>{published ? "Update" : "Publish"}</span>
+        {published && waiting ? <span className="ws-pending-dot" aria-label="Changes not live yet" /> : null}
       </button>
     </nav>
   )

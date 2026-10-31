@@ -4,6 +4,7 @@ import { z } from "zod"
 
 import { apiError, consumeQuota, resolveCaller } from "@/lib/api/guard"
 import { notifyCreditsEarned, notifyPublished } from "@/lib/email/events"
+import { SLUG_PATTERN } from "@/lib/portfolio/published"
 import { qualifyReferralAfterFirstPublish } from "@/lib/referrals/server"
 import { createAdminSupabaseClient } from "@/lib/supabase/admin"
 import { designConfigSchema } from "@/lib/validations/designConfig"
@@ -23,7 +24,14 @@ const bodySchema = z.object({
   /** Optional owner view settings; invalid values are dropped, not fatal. */
   hiddenSectionIds: z.unknown().optional(),
   sectionSurfaceOverrides: z.unknown().optional(),
+  /** The site this editor was opened from or last published to. Its link stays the same when it is updated. */
+  slug: z.string().regex(SLUG_PATTERN).optional(),
 })
+
+const failed = (e: { message: string }) => {
+  console.error("[publish] failed:", e.message)
+  return apiError("publish_failed", 503, { message: "Publishing did not work. Your work is still saved on this device. Try again." })
+}
 
 export async function POST(request: Request) {
   const caller = await resolveCaller()
@@ -68,32 +76,32 @@ export async function POST(request: Request) {
   const admin = createAdminSupabaseClient()
   if (!admin) return apiError("publish_unavailable", 503, { message: "Publishing is not set up on this server yet." })
 
-  // A person with a username gets a readable link (/u/name). Otherwise the random /p/ link is used.
   const { data: profile } = await supabase.from("users").select("username").eq("id", user.id).maybeSingle()
-  const linkFor = (slug: string) => (profile?.username ? `/u/${profile.username}` : `/p/${slug}`)
 
   const { data: owned, error: ownedError } = await supabase
     .from("published_portfolios")
-    .select("id, slug")
+    .select("id, slug, indexable")
     .eq("user_id", user.id)
     .order("updated_at", { ascending: false })
 
-  if (ownedError) return apiError("publish_failed", 503, { message: ownedError.message })
+  if (ownedError) return failed(ownedError)
+
+  // /u/<name> shows the newest site, so it is a stable link only for someone with one site. With several, each
+  // keeps its own /p/ link.
+  const linkFor = (slug: string) => (profile?.username && owned.length <= 1 ? `/u/${profile.username}` : `/p/${slug}`)
+  const update = async (target: { id: string }) => {
+    const { data, error } = await admin.from("published_portfolios").update({ payload }).eq("id", target.id).eq("user_id", user.id).select("slug, indexable").single()
+    if (error) return failed(error)
+    return Response.json({ slug: data.slug, url: linkFor(data.slug), updated: true, indexable: data.indexable })
+  }
+
+  // Editing a site that is already live: update that one, so its link and visit count stay. Any plan.
+  const target = parsed.data.slug ? owned.find((r) => r.slug === parsed.data.slug) : undefined
+  if (target) return update(target)
 
   if (owned.length >= limits.portfolios) {
-    // Plans with a single portfolio republish over it, so edits go live without a new link.
-    if (limits.portfolios === 1 && owned[0]) {
-      const { data, error } = await admin
-        .from("published_portfolios")
-        .update({ payload })
-        .eq("id", owned[0].id)
-        .eq("user_id", user.id)
-        .select("slug")
-        .single()
-
-      if (error) return apiError("publish_failed", 503, { message: error.message })
-      return Response.json({ slug: data.slug, url: linkFor(data.slug), updated: true })
-    }
+    // Plans with a single site republish over it, so edits go live without a new link.
+    if (limits.portfolios === 1 && owned[0]) return update(owned[0])
 
     return apiError("portfolio_limit", 403, {
       message: "Portfolio limit reached for your plan.",
@@ -105,10 +113,10 @@ export async function POST(request: Request) {
   const { data, error } = await admin
     .from("published_portfolios")
     .insert({ slug: nanoid(10), payload, user_id: user.id })
-    .select("slug")
+    .select("slug, indexable")
     .single()
 
-  if (error) return apiError("publish_failed", 503, { message: error.message })
+  if (error) return failed(error)
 
   // First portfolio ever for this account: an invite that brought them here now counts. Idempotent.
   const firstPublish = owned.length === 0
@@ -118,5 +126,5 @@ export async function POST(request: Request) {
     after(() => notifyPublished(user.id))
   }
 
-  return Response.json({ slug: data.slug, url: linkFor(data.slug), updated: false, firstPublish })
+  return Response.json({ slug: data.slug, url: linkFor(data.slug), updated: false, firstPublish, indexable: data.indexable })
 }

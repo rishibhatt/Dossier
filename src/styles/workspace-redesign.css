@@ -334,7 +334,24 @@
     color: var(--site-paper);
   }
 
+  /* Published site with edits that are not live yet: a small accent dot on the Update button. */
+  .ws-pending-dot {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--site-accent);
+    box-shadow: 0 0 0 2px currentColor;
+  }
+
+  .ws-actionbar-ink > .ws-pending-dot {
+    position: absolute;
+    top: 0.45rem;
+    right: calc(50% - 1rem);
+  }
+
   .ws-actionbar > .ws-actionbar-ink {
+    position: relative;
     border-right: 0;
     background: var(--site-ink);
     color: var(--site-paper);

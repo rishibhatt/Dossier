@@ -41,14 +41,14 @@ function SaveState() {
   const pendingSave = useStudioStatus((s) => s.pendingSave)
   const unpublished = useStudioStatus((s) => s.unpublished)
   let Icon = Check
-  let text = savedAt ? "Saved on this device" : "No changes yet"
+  let text = savedAt ? "Saved on this device, not published" : "Not published yet"
   if (pendingSave) {
     Icon = Loader2
     text = "Saving"
   } else if (published && unpublished) {
     Icon = CircleDot
-    text = "Not published yet"
-  } else if (published) text = "Published"
+    text = "Changes not live yet"
+  } else if (published) text = "Live, up to date"
   return (
     <p className="sp-data hidden items-center gap-1.5 whitespace-nowrap xl:flex" role="status">
       <Icon className={cn("size-3.5", pendingSave && "animate-spin motion-reduce:animate-none")} aria-hidden />
@@ -65,6 +65,7 @@ export function StudioTopBar() {
   const publishing = useStudioUiStore((s) => s.busy.publish)
   const designBusy = useStudioUiStore((s) => s.busy.design)
   const published = useStudioUiStore((s) => s.publishedPath)
+  const waiting = useStudioStatus((s) => s.unpublished)
   const openTool = useStudioUiStore((s) => s.openTool)
   const canUndo = useStudioStatus((s) => s.history.length > 0)
   const canRedo = useStudioStatus((s) => s.future.length > 0)
@@ -111,6 +112,7 @@ export function StudioTopBar() {
           <button type="button" disabled={publishing} onClick={() => void publish(router)} className="site-btn site-btn-primary site-btn-sm ml-2">
             {publishing ? <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden /> : null}
             <span className="site-btn-label">{published ? "Update" : "Publish"}</span>
+            {published && waiting ? <span className="ws-pending-dot" aria-label="Changes not live yet" /> : null}
           </button>
         ) : null}
       </div>

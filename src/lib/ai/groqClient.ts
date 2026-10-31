@@ -1,3 +1,5 @@
+import "server-only"
+
 import Groq from "groq-sdk"
 
 const MODEL = "llama-3.3-70b-versatile" as const

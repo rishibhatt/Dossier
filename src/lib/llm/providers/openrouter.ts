@@ -1,3 +1,5 @@
+import "server-only"
+
 import { LLMHttpError, toLLMError } from "@/lib/llm/errors"
 import type { ProviderCall, ProviderResult } from "@/lib/llm/types"
 

@@ -9,7 +9,8 @@ import type { PlanId } from "@/lib/billing/plans"
 import { ROUTES } from "@/lib/constants/routes"
 import { saveEditorDraft } from "@/lib/portfolio/editorPersistence"
 import { ensurePortfolioMeta } from "@/lib/portfolio/ensurePortfolioMeta"
-import { saveLastSession } from "@/lib/portfolio/lastSession"
+import { currentSession } from "@/features/studio/siteSession"
+import { saveLastSession, setAfterAuthIntent, type AfterAuthIntent } from "@/lib/portfolio/lastSession"
 import { openPortfolioPreviewInNewTab } from "@/lib/portfolio/openPortfolioPreview"
 import { selectPublishView, usePortfolioStore } from "@/store/usePortfolioStore"
 import { useStudioUiStore } from "@/store/useStudioUiStore"
@@ -22,6 +23,8 @@ type ApiBody = {
   error?: string
   message?: string
   url?: string
+  slug?: string
+  indexable?: boolean
   updated?: boolean
   designConfig?: DesignConfig
   portfolioData?: PortfolioDocument
@@ -52,18 +55,21 @@ function pagePayload() {
 
 /** Writes the current work to this device. Called before anything that leaves the page, such as sign in. */
 export function persistNow(): boolean {
-  const { document, designConfig, hiddenSectionIds, sectionSurfaceOverrides, parsedResume } = usePortfolioStore.getState()
-  if (!document || !designConfig) return false
+  const session = currentSession()
+  if (!session) return false
+  const { document, designConfig, hiddenSectionIds, sectionSurfaceOverrides = {} } = session
   saveEditorDraft({ document, designConfig, hiddenSectionIds, sectionSurfaceOverrides, savedAt: new Date().toISOString() })
-  saveLastSession({ document, designConfig, parsedResume, hiddenSectionIds })
+  saveLastSession(session)
   return true
 }
 
-function signInAction(nav: Nav) {
+/** Sign up, then come straight back to this work; with `publish`, it goes live as soon as they are back. */
+function signInAction(nav: Nav, intent: AfterAuthIntent = "continue") {
   return {
     label: "Sign up free",
     onClick: () => {
       persistNow()
+      setAfterAuthIntent(intent)
       nav.push(`${ROUTES.signup}?next=${encodeURIComponent(ROUTES.build)}`)
     },
   }
@@ -117,27 +123,63 @@ export async function publish(nav: Nav) {
   if (!payload || ui.busy.publish) return
   ui.setBusy("publish", true)
   try {
-    const { res, body } = await postJson("/api/publish-portfolio", payload)
+    // The site this editor is linked to: updating it keeps its link and visit count.
+    const slug = ui.publishedSlug ?? undefined
+    const { res, body } = await postJson("/api/publish-portfolio", { ...payload, slug })
     if (res.status === 401) {
-      toast.error("Sign in to publish", { description: "Your work is saved on this device.", action: signInAction(nav) })
+      toast.error("Sign up to publish", { description: "It takes a minute and your work comes with you. It goes live as soon as you are back.", action: signInAction(nav, "publish") })
       return
     }
     if (body?.error === "portfolio_limit") {
       openUpgrade("portfolio_limit", { plan: planFrom(body), beforeLeave: persistNow })
       return
     }
-    if (!res.ok || !body?.url) {
+    if (!res.ok || !body?.url || !body.slug) {
       toast.error(describeApiError(res.status, body, "Publishing did not work. Try again."))
       return
     }
-    ui.setPublishedPath(body.url)
+    const url = body.url
+    ui.setPublished({ path: url, slug: body.slug, indexable: body.indexable })
     useStudioStatus.getState().markPublished()
+    persistNow()
+    if (slug && body.updated) {
+      // An update to a site the person already shared: a short note, not the first-publish dialog.
+      toast.success("Your changes are live", { description: "Same link as before.", action: { label: "Open", onClick: () => window.open(url, "_blank", "noopener") } })
+      return
+    }
     // The dialog is the confirmation; no toast on top of it.
     useStudioStatus.getState().setPublishDialogOpen(true)
   } catch {
     toast.error("Could not reach Dossier", OFFLINE)
   } finally {
     useStudioUiStore.getState().setBusy("publish", false)
+  }
+}
+
+/** Lets search engines list the live site, or asks them not to. */
+export async function setSearchVisibility(indexable: boolean): Promise<boolean> {
+  const ui = useStudioUiStore.getState()
+  if (!ui.publishedSlug) return false
+  try {
+    const res = await fetch(`/api/portfolios/${encodeURIComponent(ui.publishedSlug)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ indexable }),
+    })
+    const body = (await res.json().catch(() => null)) as ApiBody | null
+    if (!res.ok) {
+      toast.error(describeApiError(res.status, body, "That did not save. Try again."))
+      return false
+    }
+    useStudioUiStore.getState().setPublishedIndexable(indexable)
+    persistNow()
+    toast.success(indexable ? "Search engines may list your page" : "Search engines are asked to skip your page", {
+      description: indexable ? "Google usually picks it up within a few days to a few weeks." : undefined,
+    })
+    return true
+  } catch {
+    toast.error("Could not reach Dossier", OFFLINE)
+    return false
   }
 }
 

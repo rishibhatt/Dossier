@@ -10,6 +10,9 @@ export const metadata: Metadata = buildPageMetadata({
   title: messages.seo.buildTitle,
   description: messages.seo.buildDescription,
   path: ROUTES.build,
+  // Behind sign-in: a visitor from search would land on the signup wall. Not disallowed in robots.txt, so
+  // crawlers can still see this and drop the URL Google indexed earlier.
+  indexable: false,
 })
 
 export default function BuildPortfolioPage() {

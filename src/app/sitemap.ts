@@ -7,6 +7,10 @@ import { TEMPLATE_PAGES, TEMPLATES_UPDATED } from "@/content/resume/templates"
 import { ROLES } from "@/content/roles"
 import { FREE_TOOLS } from "@/features/tools/catalog"
 import { ROUTES } from "@/lib/constants/routes"
+import { createAdminSupabaseClient } from "@/lib/supabase/admin"
+
+/** Rebuilt hourly, so a portfolio switched to "Show in Google" is listed without a deploy. */
+export const revalidate = 3600
 
 /** Bump when the static pages change in a way worth recrawling. Real dates beat a fresh timestamp on every build. */
 const SITE_UPDATED = "2026-10-20"
@@ -41,11 +45,37 @@ function buildEntries(): Entry[] {
   ]
 }
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  return buildEntries().map((e) => ({
+/** Portfolios whose owners chose "Show in Google", at their canonical address (see canonicalPathFor). */
+async function portfolioEntries(): Promise<MetadataRoute.Sitemap> {
+  const admin = createAdminSupabaseClient()
+  if (!admin) return []
+  try {
+    const { data: listed } = await admin.from("published_portfolios").select("slug, user_id, updated_at").eq("indexable", true).limit(5000)
+    const owners = [...new Set((listed ?? []).map((r) => r.user_id).filter((id): id is string => Boolean(id)))]
+    if (!owners.length) return []
+    const [{ data: users }, { data: all }] = await Promise.all([
+      admin.from("users").select("id, username").in("id", owners),
+      admin.from("published_portfolios").select("user_id").in("user_id", owners),
+    ])
+    const sites = new Map<string, number>()
+    for (const r of all ?? []) if (r.user_id) sites.set(r.user_id, (sites.get(r.user_id) ?? 0) + 1)
+    const names = new Map((users ?? []).map((u) => [u.id, u.username]))
+    return (listed ?? []).map((r) => {
+      const name = r.user_id ? names.get(r.user_id) : null
+      const path = name && sites.get(r.user_id!) === 1 ? `/u/${name}` : `/p/${r.slug}`
+      return { url: `${siteConfig.url}${path}`, lastModified: new Date(r.updated_at), changeFrequency: "monthly" as const, priority: 0.4 }
+    })
+  } catch {
+    return []
+  }
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const pages = buildEntries().map((e) => ({
     url: `${siteConfig.url}${e.path === "/" ? "" : e.path}`,
     lastModified: new Date(`${e.updated ?? SITE_UPDATED}T00:00:00Z`),
     changeFrequency: "monthly" as const,
     priority: e.priority,
   }))
+  return [...pages, ...(await portfolioEntries())]
 }

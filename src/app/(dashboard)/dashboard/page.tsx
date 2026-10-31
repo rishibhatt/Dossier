@@ -5,6 +5,7 @@ import { ArrowUpRight, FilePlus2, Pencil } from "lucide-react"
 import { CopyLinkButton } from "@/app/(dashboard)/dashboard/CopyLinkButton"
 import { DashboardNudges } from "@/app/(dashboard)/dashboard/DashboardNudges"
 import { NewPortfolioButton } from "@/app/(dashboard)/dashboard/NewPortfolioButton"
+import { SiteSettings } from "@/app/(dashboard)/dashboard/SiteSettings"
 import { buildPageMetadata } from "@/config/seo"
 import { siteConfig } from "@/config/site"
 import { messages } from "@/config/messages"
@@ -166,7 +167,8 @@ export default async function DashboardHomePage() {
         ) : (
           <ul className="grid gap-6">
             {rows.map((row) => {
-              const path = `/p/${row.slug}`
+              // Same rule as publishing: /u/<name> only when it is the person's one site.
+              const path = ctx.username && rows.length === 1 ? `/u/${ctx.username}` : `/p/${row.slug}`
               const url = `${siteConfig.url}${path}`
               const look = lookOf(row.payload)
               const title = portfolioTitle(row.payload)
@@ -222,7 +224,7 @@ export default async function DashboardHomePage() {
                       <div className="bg-white p-4">
                         <dt className="sp-data">Updated</dt>
                         <dd className="mt-1 text-sm font-semibold">{dateFormat.format(new Date(row.updated_at))}</dd>
-                        <dd className="text-xs text-[var(--site-ink-2)]">{row.indexable ? "Shown in Google" : "Hidden from Google"}</dd>
+                        <dd className="text-xs text-[var(--site-ink-2)]">{row.indexable ? "Listed in Google" : "Link only"}</dd>
                       </div>
                       <div className="col-span-2 bg-white p-4">
                         {isPro ? (
@@ -251,7 +253,7 @@ export default async function DashboardHomePage() {
                       </div>
                     </dl>
                     <div className="grid grid-cols-2 gap-2 border-t border-[var(--site-rule)] p-4 sm:flex sm:flex-wrap">
-                      <Link href={ROUTES.build} className="dx-btn dx-btn-primary dx-btn-sm col-span-2 sm:col-span-1">
+                      <Link href={`${ROUTES.build}?site=${encodeURIComponent(row.slug)}`} className="dx-btn dx-btn-primary dx-btn-sm col-span-2 sm:col-span-1">
                         <Pencil className="size-4" aria-hidden />
                         Edit site
                       </Link>
@@ -273,6 +275,7 @@ export default async function DashboardHomePage() {
                         WhatsApp
                       </a>
                     </div>
+                    <SiteSettings slug={row.slug} indexable={Boolean(row.indexable)} />
                   </div>
                 </li>
               )

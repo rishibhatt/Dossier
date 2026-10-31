@@ -106,6 +106,22 @@ export async function consumeQuota(request: Request, caller: Caller, kind: Usage
 
   // `test:` keeps local dev traffic out of the admin numbers while quotas still work per caller.
   const subject = `${isTestEnv ? "test:" : ""}${subjectFor(request, caller.user)}`
+
+  // One locked step in Postgres (consume_quota), so a burst of parallel requests cannot all read a count of 0.
+  const consume = (cap: number) => admin.rpc("consume_quota", { p_subject: subject, p_user: caller.user?.id ?? null, p_kind: kind, p_limit: cap })
+  let bonus = 0
+  let { data: used, error: rpcError } = await consume(limit)
+  if (!rpcError && used === -1 && kind === "regenerate" && caller.user) {
+    // Shuffle packs bought with credits raise the regenerate cap. Only looked up once the base cap is hit.
+    bonus = await activeShufflePackBonus(admin, caller.user.id)
+    if (bonus > 0) ({ data: used, error: rpcError } = await consume(limit + bonus))
+  }
+  if (!rpcError) {
+    return used === -1 ? apiError("quota_exceeded", 429, { kind, limit: limit + bonus, plan: caller.plan }) : null
+  }
+  // PGRST202: the function is not in the database yet (migration 20261102120000 not applied). Fall back to count, then insert.
+  if (rpcError.code !== "PGRST202") return apiError("quota_unavailable", 503)
+  console.error("[guard] consume_quota missing, apply migration 20261102120000. Using the unlocked fallback.")
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
 
   const { count, error: countError } = await admin
@@ -117,13 +133,9 @@ export async function consumeQuota(request: Request, caller: Caller, kind: Usage
 
   if (countError) return apiError("quota_unavailable", 503)
 
-  const used = count ?? 0
-  if (used >= limit) {
-    // Shuffle packs bought with credits raise the regenerate cap. Only looked up once the base cap is hit.
-    const bonus = kind === "regenerate" && caller.user ? await activeShufflePackBonus(admin, caller.user.id) : 0
-    if (used >= limit + bonus) {
-      return apiError("quota_exceeded", 429, { kind, limit: limit + bonus, plan: caller.plan })
-    }
+  if ((count ?? 0) >= limit) {
+    bonus = kind === "regenerate" && caller.user ? await activeShufflePackBonus(admin, caller.user.id) : 0
+    if ((count ?? 0) >= limit + bonus) return apiError("quota_exceeded", 429, { kind, limit: limit + bonus, plan: caller.plan })
   }
 
   const { error: insertError } = await admin
@@ -132,4 +144,21 @@ export async function consumeQuota(request: Request, caller: Caller, kind: Usage
 
   if (insertError) return apiError("quota_unavailable", 503)
   return null
+}
+
+/**
+ * Abuse throttle, separate from plan quotas (sign-in attempts, view pings). Records one hit and returns false once
+ * `subject` has made `limit` hits of `kind` within `window` (a Postgres interval such as "15 minutes").
+ * Fails open: a missing service key or table must not lock everyone out of signing in.
+ */
+export async function allowRate(subject: string, kind: string, limit: number, window: string): Promise<boolean> {
+  if (IS_DEV_UNLIMITED) return true
+  const admin = createAdminSupabaseClient()
+  if (!admin) return true
+  const { data, error } = await admin.rpc("hit_rate_limit", { p_subject: subject, p_kind: kind, p_limit: limit, p_window: window })
+  if (error) {
+    if (error.code !== "PGRST202") console.error("[guard] rate limit check failed:", error.message)
+    return true
+  }
+  return data !== false
 }

@@ -146,6 +146,12 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_events: {
+        Row: { id: number; subject: string; kind: string; created_at: string }
+        Insert: { id?: number; subject: string; kind: string; created_at?: string }
+        Update: { id?: number; subject?: string; kind?: string; created_at?: string }
+        Relationships: []
+      }
       payment_events: {
         Row: {
           id: string
@@ -502,6 +508,14 @@ export type Database = {
       prune_usage_events: {
         Args: { older_than?: string }
         Returns: undefined
+      }
+      consume_quota: {
+        Args: { p_subject: string; p_user: string | null; p_kind: string; p_limit: number; p_window?: string }
+        Returns: number
+      }
+      hit_rate_limit: {
+        Args: { p_subject: string; p_kind: string; p_limit: number; p_window: string }
+        Returns: boolean
       }
     }
     Enums: Record<string, never>

@@ -1,7 +1,7 @@
 import { messages } from "@/config/messages"
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "http://localhost:3000"
+// Netlify sets URL on every build, so a deploy preview without NEXT_PUBLIC_SITE_URL still gets real absolute links.
+const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? process.env.URL)?.replace(/\/$/, "") ?? "http://localhost:3000"
 
 /** A local dev server (or a build pointed at localhost). Data it makes is flagged so the admin console can hide it. */
 export const isTestEnv = process.env.NODE_ENV !== "production" || /localhost|127\.0\.0\.1/.test(siteUrl)

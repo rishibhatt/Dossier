@@ -8,7 +8,7 @@ import { after } from "next/server"
 
 import { messages } from "@/config/messages"
 import { siteConfig } from "@/config/site"
-import { clientIpFromHeaders } from "@/lib/api/guard"
+import { allowRate, clientIpFromHeaders, hashIp } from "@/lib/api/guard"
 import { safeNextPath } from "@/lib/auth/safeNext"
 import { notifyAfterAuth, notifyPasswordChanged } from "@/lib/email/events"
 import { captureReferralAfterAuth } from "@/lib/referrals/server"
@@ -66,6 +66,19 @@ async function captureReferral(user: User) {
   }
 }
 
+/**
+ * These actions call Supabase from our server, so Supabase's own per-IP limits see one Netlify address for everyone.
+ * This counts per visitor IP and per email before Supabase is asked at all.
+ */
+async function overLimit(kind: "signin" | "signup" | "reset", email: string): Promise<boolean> {
+  const ip = hashIp(clientIpFromHeaders(await headers()))
+  const limits = { signin: [20, 10], signup: [5, 5], reset: [5, 3] } as const
+  const [perIp, perEmail] = limits[kind]
+  const span = kind === "signin" ? "15 minutes" : "1 hour"
+  if (!(await allowRate(`ip:${ip}`, kind, perIp, span))) return true
+  return !(await allowRate(`email:${hashIp(email.toLowerCase())}`, kind, perEmail, span))
+}
+
 async function getClientOrNull() {
   try {
     return await createServerSupabaseClient()
@@ -84,6 +97,7 @@ export async function signInWithCredentialsAction(
   const parsed = loginSchema.safeParse({ email, password: formData.get("password") })
   if (!parsed.success) return invalid(parsed.error.flatten().fieldErrors, email)
 
+  if (await overLimit("signin", parsed.data.email)) return { error: e.tooManyAttempts, email, nonce: Date.now() }
   const supabase = await getClientOrNull()
   if (!supabase) return { error: e.notConfigured, email, nonce: Date.now() }
 
@@ -122,6 +136,7 @@ export async function signUpWithCredentialsAction(
   })
   if (!parsed.success) return invalid(parsed.error.flatten().fieldErrors, email)
 
+  if (await overLimit("signup", parsed.data.email)) return { error: e.tooManyAttempts, email, nonce: Date.now() }
   const supabase = await getClientOrNull()
   if (!supabase) return { error: e.notConfigured, email, nonce: Date.now() }
 
@@ -156,6 +171,7 @@ export async function requestPasswordResetAction(
     return { error: e.invalidEmail, fieldErrors: { email: e.invalidEmail }, email, nonce: Date.now() }
   }
 
+  if (await overLimit("reset", parsed.data)) return { error: e.tooManyAttempts, email, nonce: Date.now() }
   const supabase = await getClientOrNull()
   if (!supabase) return { error: e.notConfigured, email, nonce: Date.now() }
 

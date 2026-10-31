@@ -56,7 +56,7 @@ export async function POST(request: Request) {
   const inbox = process.env.CONTACT_INBOX || siteConfig.supportEmail
   after(async () => {
     await sendEmail({ to: inbox, ...contactNoticeEmail({ name, email, message, userId: caller.user?.id }), replyTo: { email, name }, tags: ["contact"] })
-    await sendEmail({ to: email, toName: name, ...contactAckEmail(name), tags: ["contact-ack"] })
+    await sendEmail({ to: email, ...contactAckEmail(), tags: ["contact-ack"] })
   })
 
   return Response.json({ ok: true })

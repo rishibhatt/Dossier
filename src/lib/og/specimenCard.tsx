@@ -75,7 +75,7 @@ export async function specimenCard({ title, running, no, footnote }: { title: st
         >
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 22, color: MUTED, paddingBottom: 14, borderBottom: `2px solid ${INK}` }}>
             <span>{running}</span>
-            <span>No. {no}</span>
+            {no ? <span>No. {no}</span> : null}
           </div>
           <div style={{ display: "flex", flex: 1, alignItems: "center" }}>
             <div style={{ fontSize: title.length > 40 ? 76 : 92, fontWeight: 700, letterSpacing: -3.5, lineHeight: 0.98, maxWidth: 1000 }}>{title}</div>

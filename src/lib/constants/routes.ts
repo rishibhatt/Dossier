@@ -10,7 +10,6 @@ export const ROUTES = {
   resumeExamples: "/resume-examples",
   resumeNew: "/resume/new",
   resumeEdit: "/resume/edit",
-  livePreview: "/live-preview",
   authCallback: "/auth/callback",
   login: "/login",
   signup: "/signup",

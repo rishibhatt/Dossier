@@ -7,7 +7,7 @@ import { Copy, Download, ExternalLink, Globe, Link2, Loader2, Lock, Save, Trash2
 import { useAccountSummary } from "@/features/billing/useAccountSummary"
 import { openUpgrade } from "@/features/billing/useUpgrade"
 import { PanelFrame, PanelGroup } from "@/features/studio/panels/PanelFrame"
-import { copyText, exportZip, openPreview, persistNow, publish, saveDraft } from "@/features/studio/studioActions"
+import { copyText, exportZip, openPreview, persistNow, publish, saveDraft, setSearchVisibility } from "@/features/studio/studioActions"
 import { useStudioStatus } from "@/features/studio/studioStatus"
 import { useStudioUiStore } from "@/store/useStudioUiStore"
 
@@ -38,6 +38,8 @@ function StartOver({ onStartOver }: { onStartOver: () => void }) {
 export function SharePanel({ onStartOver }: { onStartOver: () => void }) {
   const router = useRouter()
   const publishedPath = useStudioUiStore((s) => s.publishedPath)
+  const indexable = useStudioUiStore((s) => s.publishedIndexable)
+  const [savingSearch, setSavingSearch] = useState(false)
   const busy = useStudioUiStore((s) => s.busy)
   const unpublished = useStudioStatus((s) => s.unpublished)
   const { status, summary } = useAccountSummary()
@@ -69,7 +71,27 @@ export function SharePanel({ onStartOver }: { onStartOver: () => void }) {
           {busy.publish ? <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden /> : <Globe className="size-4" aria-hidden />}
           <span className="site-btn-label">{publishedPath ? "Publish changes" : "Publish"}</span>
         </button>
-        <p className="sp-data mt-2">Search engines are asked to skip the page.</p>
+        {full ? (
+          <label className="mt-3 flex cursor-pointer items-start gap-2.5 text-sm">
+            <input
+              type="checkbox"
+              className="mt-0.5 size-4 accent-[var(--site-ink)]"
+              checked={indexable}
+              disabled={savingSearch}
+              onChange={async (e) => {
+                setSavingSearch(true)
+                await setSearchVisibility(e.target.checked)
+                setSavingSearch(false)
+              }}
+            />
+            <span>
+              <span className="font-semibold">Show in Google search</span>
+              <span className="block text-[var(--site-ink-2)]">Off: only people with the link find it. On: recruiters can find it by your name.</span>
+            </span>
+          </label>
+        ) : (
+          <p className="sp-data mt-2">New pages are hidden from search engines. You can change that after publishing.</p>
+        )}
       </PanelGroup>
 
       <PanelGroup title="Download" aside={loading ? <span className="sp-data">Checking plan</span> : free ? <span className="sp-data">Starter and Pro</span> : null}>

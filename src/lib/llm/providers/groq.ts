@@ -1,3 +1,5 @@
+import "server-only"
+
 import Groq from "groq-sdk"
 
 import { LLMHttpError, toLLMError } from "@/lib/llm/errors"

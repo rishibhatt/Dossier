@@ -5,11 +5,18 @@ import type { PortfolioDocument } from "@/types/dossier"
 export const LAST_SESSION_KEY = "dossier:last:v1"
 const KEY = LAST_SESSION_KEY
 
+/** The live site this work was published to (or opened from), so the editor updates it instead of making a new one. */
+export type SessionSite = { slug: string; path: string; indexable?: boolean }
+
 export type LastSession = {
   document: PortfolioDocument
   designConfig: DesignConfig
   parsedResume: ParsedResume | null
   hiddenSectionIds: Record<string, boolean>
+  sectionSurfaceOverrides?: Record<string, { bg?: string }>
+  site?: SessionSite | null
+  /** Edited since the last publish. Only meaningful with `site`. */
+  unpublished?: boolean
   savedAt: string
 }
 
@@ -51,5 +58,38 @@ export function clearLastSession(): void {
     window.localStorage.removeItem(KEY)
   } catch {
     /* ignore */
+  }
+}
+
+const INTENT_KEY = "dossier:after-auth"
+
+/** What to do when the person comes back from signing up or in: reopen the work, and publish it if that was the ask. */
+export type AfterAuthIntent = "publish" | "continue"
+
+export function setAfterAuthIntent(intent: AfterAuthIntent): void {
+  try {
+    window.sessionStorage.setItem(INTENT_KEY, intent)
+  } catch {
+    /* blocked storage: the person can press Continue and Publish themselves */
+  }
+}
+
+/** Reads and clears the intent, so it runs once. */
+export function takeAfterAuthIntent(): AfterAuthIntent | null {
+  try {
+    const v = window.sessionStorage.getItem(INTENT_KEY)
+    window.sessionStorage.removeItem(INTENT_KEY)
+    return v === "publish" || v === "continue" ? v : null
+  } catch {
+    return null
+  }
+}
+
+export function peekAfterAuthIntent(): AfterAuthIntent | null {
+  try {
+    const v = window.sessionStorage.getItem(INTENT_KEY)
+    return v === "publish" || v === "continue" ? v : null
+  } catch {
+    return null
   }
 }

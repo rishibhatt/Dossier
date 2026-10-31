@@ -5,7 +5,7 @@ import { ROUTES } from "@/lib/constants/routes"
 import { createSupabaseMiddlewareClient } from "@/lib/supabase/middleware"
 
 const PROTECTED_PREFIXES = ["/dashboard", "/build"]
-const PUBLIC_PREFIXES = ["/blog", "/resume-keywords", "/tools", "/og", "/p", "/u", "/faq", "/features", "/how-it-works", "/pricing", "/contact", "/privacy", "/terms", "/refund-policy"]
+const PUBLIC_PREFIXES = ["/api/csp-report", "/blog", "/resume-keywords", "/tools", "/og", "/p", "/u", "/faq", "/features", "/how-it-works", "/pricing", "/contact", "/privacy", "/terms", "/refund-policy"]
 
 // Generated icons, manifest and social images: no extension in the URL, so the matcher below lets them in.
 const PUBLIC_FILES = new Set(["/icon", "/apple-icon", "/manifest.webmanifest", "/opengraph-image", "/twitter-image", "/robots.txt", "/sitemap.xml"])
@@ -16,8 +16,9 @@ const isProtected = (pathname: string) => PROTECTED_PREFIXES.some((p) => startsW
 const isPublic = (pathname: string) =>
   pathname === "/" || PUBLIC_FILES.has(pathname) || PUBLIC_PREFIXES.some((p) => startsWithPath(pathname, p))
 
+/** The host the request URL was built from. Not `x-forwarded-host`: a client can send that header itself. */
 function hostOf(request: NextRequest) {
-  return (request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "").toLowerCase().split(":")[0]
+  return request.nextUrl.hostname.toLowerCase()
 }
 
 /**

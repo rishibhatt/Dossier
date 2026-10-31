@@ -110,12 +110,13 @@ export function planEmail({ plan, expiresAt }: { plan: keyof typeof PLAN_NAME; e
   return build(`Your Dossier plan: ${name}`, body, `You are on ${name}`, [body], { label: "Open my dashboard", href: url("/dashboard") })
 }
 
-export function contactAckEmail(name: string): Mail {
+/** Carries nothing the sender typed: the form can be pointed at any address, so this must not be usable for spam. */
+export function contactAckEmail(): Mail {
   return build(
     "We got your message",
     "A person will reply, usually within two working days.",
     "We got your message",
-    [`Hi ${esc(name)},`, "Thanks for writing. A person reads every message and will reply, usually within two working days.", "You can reply to this email if you want to add something."],
+    ["Hi,", "Thanks for writing. A person reads every message and will reply, usually within two working days.", "You can reply to this email if you want to add something."],
     undefined,
     "You are getting this because this address was entered on our contact form."
   )

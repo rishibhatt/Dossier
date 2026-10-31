@@ -1,3 +1,5 @@
+import "server-only"
+
 import type { LLMProviderId, LLMTask, Mode, ModelRef } from "@/lib/llm/types"
 
 /**

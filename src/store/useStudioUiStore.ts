@@ -20,8 +20,12 @@ type StudioUiState = {
   editorId: string | null
   /** Template being applied, so only that card shows a spinner. */
   pendingTemplateId: string | null
-  /** Path of the last published page, such as `/p/abc123`. */
+  /** Path of the live page this editor updates, such as `/p/abc123`. */
   publishedPath: string | null
+  /** Slug of that live site. Publishing sends it, so the same site (and link) is updated, not a new one made. */
+  publishedSlug: string | null
+  /** Whether that site asked search engines to list it. */
+  publishedIndexable: boolean
   /** When the draft was last written to this device (ms). */
   savedAt: number | null
   busy: Busy
@@ -38,7 +42,8 @@ type StudioUiState = {
   editSection: (id: string, snap?: SheetSnap) => void
   setEditorId: (id: string | null) => void
   setPendingTemplate: (id: string | null) => void
-  setPublishedPath: (path: string | null) => void
+  setPublished: (site: { path: string; slug: string; indexable?: boolean } | null) => void
+  setPublishedIndexable: (indexable: boolean) => void
   markSaved: () => void
   setBusy: (key: keyof Busy, value: boolean) => void
   reset: () => void
@@ -53,6 +58,8 @@ const initial = {
   editorId: null as string | null,
   pendingTemplateId: null as string | null,
   publishedPath: null as string | null,
+  publishedSlug: null as string | null,
+  publishedIndexable: false,
   savedAt: null as number | null,
   busy: { publish: false, export: false, design: false, ai: false },
 }
@@ -75,7 +82,9 @@ export const useStudioUiStore = create<StudioUiState>((set) => ({
     set((s) => ({ selectedId: id, editorId: id, panel: "content", panelOpen: true, snap: snap ?? (s.snap === "full" ? "full" : "half") })),
   setEditorId: (editorId) => set({ editorId }),
   setPendingTemplate: (pendingTemplateId) => set({ pendingTemplateId }),
-  setPublishedPath: (publishedPath) => set({ publishedPath }),
+  setPublished: (site) =>
+    set({ publishedPath: site?.path ?? null, publishedSlug: site?.slug ?? null, publishedIndexable: Boolean(site?.indexable) }),
+  setPublishedIndexable: (publishedIndexable) => set({ publishedIndexable }),
   markSaved: () => set({ savedAt: Date.now() }),
   setBusy: (key, value) => set((s) => ({ busy: { ...s.busy, [key]: value } })),
   reset: () => set(initial),
