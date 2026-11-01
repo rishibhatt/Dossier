@@ -44,3 +44,6 @@ next-env.d.ts
 # generated resume engine assets
 /public/typst/
 /.resume-verify/
+
+# Local analytics exports (never commit)
+/analytics/

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 
-import { HUMAN_EVENTS, isTestVisit, looksAutomated } from "@/lib/analytics"
+import { HUMAN_EVENTS, isTestVisit, looksAutomated, setNoTrack } from "@/lib/analytics"
 
 /**
  * Loads Google Analytics 4, Microsoft Clarity and PostHog.
@@ -84,6 +84,29 @@ export function Analytics() {
     // Mounted once in the root layout and never unmounted, so the listeners need no cleanup (and a cleanup
     // would drop them in Strict Mode's second effect run, which the flag above skips).
     for (const e of HUMAN_EVENTS) window.addEventListener(e, load, { once: true, passive: true })
+  }, [])
+
+  return null
+}
+
+/**
+ * Mounted in the admin area. Only the owner goes there, so the browser is opted out for good (like
+ * `?notrack=1`) and any tool already running stops, which covers arriving here by client-side navigation.
+ * Landing on /admin directly needs no stop: this effect runs before the root `Analytics` effect, which then
+ * sees the opt-out and loads nothing.
+ */
+export function AnalyticsOptOut() {
+  useEffect(() => {
+    setNoTrack()
+    const w = window as unknown as Record<string, unknown>
+    const ga = safe(GA_ID)
+    if (ga) w[`ga-disable-${ga}`] = true
+    try {
+      window.posthog?.opt_out_capturing?.()
+      window.clarity?.("stop")
+    } catch {
+      // Analytics must never break the page.
+    }
   }, [])
 
   return null

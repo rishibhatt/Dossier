@@ -4,7 +4,7 @@ declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void
     clarity?: (...args: unknown[]) => void
-    posthog?: { capture: (event: string, props?: Props) => void }
+    posthog?: { capture: (event: string, props?: Props) => void; opt_out_capturing?: () => void }
   }
 }
 
@@ -31,6 +31,15 @@ export function looksAutomated(): boolean {
 }
 const TEST_HOST = /^(localhost|127\.|0\.0\.0\.0|\[::1\]|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)|\.local$|\.localhost$|^deploy-preview-|--/
 const OPT_OUT_KEY = "dossier_notrack"
+
+/** Same as visiting with `?notrack=1`: this browser stays out of every analytics tool from now on. */
+export function setNoTrack() {
+  try {
+    localStorage.setItem(OPT_OUT_KEY, "1")
+  } catch {
+    // Storage blocked: the caller still stops the tools for this page.
+  }
+}
 
 /** True when this visit must not reach any analytics tool. */
 export function isTestVisit(): boolean {

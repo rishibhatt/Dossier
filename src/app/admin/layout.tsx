@@ -1,10 +1,17 @@
 import type { Metadata } from "next"
 
+import { AnalyticsOptOut } from "@/components/analytics/Analytics"
+
 export const metadata: Metadata = {
   title: "Admin | Dossier",
   robots: { index: false, follow: false, nocache: true },
 }
 
 export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
-  return <div className="site">{children}</div>
+  return (
+    <div className="site">
+      <AnalyticsOptOut />
+      {children}
+    </div>
+  )
 }
