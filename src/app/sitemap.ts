@@ -28,6 +28,7 @@ function buildEntries(): Entry[] {
     { path: ROUTES.blog, priority: 0.8 },
     ...POSTS.map((p) => ({ path: `${ROUTES.blog}/${p.slug}`, priority: 0.7, updated: p.updated ?? p.published })),
     { path: ROUTES.looks, priority: 0.7 },
+    { path: ROUTES.portfolioExamples, priority: 0.7 },
     { path: ROUTES.resume, priority: 0.9, updated: TEMPLATES_UPDATED },
     { path: ROUTES.resumeTemplates, priority: 0.8, updated: TEMPLATES_UPDATED },
     ...TEMPLATE_PAGES.map((t) => ({ path: `${ROUTES.resumeTemplates}/${t.slug}`, priority: 0.7, updated: TEMPLATES_UPDATED })),

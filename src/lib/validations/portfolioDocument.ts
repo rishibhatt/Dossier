@@ -30,7 +30,7 @@ const sectionSchema = z.discriminatedUnion("type", [
   s("skills", { items: z.array(str) }),
   s("experience", { items: z.array(experienceEntrySchema) }),
   s("projects", { items: z.array(projectEntrySchema) }),
-  s("contact", { email: str, phone: str, links: z.array(str), headline: str.optional(), location: str.optional() }),
+  s("contact", { email: str, phone: str, links: z.array(str), headline: str.optional(), location: str.optional(), showSocialInHero: z.boolean().optional() }),
   s("education", { items: z.array(z.object({ institution: str, degree: str, period: str, details: str })) }),
   s("highlights", { items: z.array(z.object({ value: str, label: str })).max(12) }),
   s("certifications", { items: z.array(z.object({ name: str, issuer: str, year: str })) }),

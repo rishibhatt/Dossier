@@ -5,13 +5,16 @@ import { ArrowUpRight, FilePlus2, Pencil } from "lucide-react"
 import { CopyLinkButton } from "@/app/(dashboard)/dashboard/CopyLinkButton"
 import { DashboardNudges } from "@/app/(dashboard)/dashboard/DashboardNudges"
 import { NewPortfolioButton } from "@/app/(dashboard)/dashboard/NewPortfolioButton"
+import { ShareSiteCard } from "@/app/(dashboard)/dashboard/ShareSiteCard"
 import { SiteSettings } from "@/app/(dashboard)/dashboard/SiteSettings"
 import { buildPageMetadata } from "@/config/seo"
 import { siteConfig } from "@/config/site"
 import { messages } from "@/config/messages"
+import { shareFacts } from "@/features/studio/share/postDraft"
 import { PLAN_CARDS } from "@/lib/billing/pricing"
 import { ROUTES } from "@/lib/constants/routes"
 import { getDashboardContext } from "@/lib/dashboard/context"
+import type { PortfolioDocument } from "@/types/dossier"
 
 export const metadata: Metadata = buildPageMetadata({
   title: messages.seo.dashboardTitle,
@@ -282,6 +285,14 @@ export default async function DashboardHomePage() {
             })}
           </ul>
         )}
+        {rows[0] ? (
+          <ShareSiteCard
+            origin={siteConfig.url}
+            path={ctx.username && rows.length === 1 ? `/u/${ctx.username}` : `/p/${rows[0].slug}`}
+            slug={rows[0].slug}
+            facts={shareFacts(rows[0].payload.document as unknown as PortfolioDocument)}
+          />
+        ) : null}
         {atLimit && rows.length > 0 && !isPro ? (
           <p className="mt-3 text-sm text-[var(--site-ink-2)]">
             Your plan includes {limit} {limit === 1 ? "site" : "sites"}.{limit === 1 ? " Publishing again updates it, and the link stays the same." : ""}{" "}

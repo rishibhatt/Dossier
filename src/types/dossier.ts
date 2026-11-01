@@ -94,6 +94,9 @@ export type PortfolioContactSection = {
     links: string[]
     headline?: string
     location?: string
+    /** Icon row of web links under the hero name. Missing (older documents) means on; false hides it. */
+    /** Hero icon row. Missing = off (sites made before the row existed); new Contact sections set it to true. */
+    showSocialInHero?: boolean
   }
 }
 

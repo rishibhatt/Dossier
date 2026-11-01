@@ -29,7 +29,7 @@ export function createEmptySection(type: PortfolioSectionType): PortfolioSection
         data: { items: [{ name: "Project name", description: "What it is, your part in it and the result.", tech: [] }] },
       }
     case "contact":
-      return { id: id("contact"), type, data: { email: "", phone: "", links: [], headline: "Get in touch" } }
+      return { id: id("contact"), type, data: { email: "", phone: "", links: [], headline: "Get in touch", showSocialInHero: true } }
     case "education":
       return {
         id: id("education"),

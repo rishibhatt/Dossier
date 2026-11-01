@@ -8,6 +8,7 @@ const ERRORS: Record<string, string> = {
   invalid_username: "Use 3 to 30 characters: lowercase letters, numbers and hyphens. Start with a letter or number.",
   username_reserved: "That name is reserved. Try another.",
   username_taken: "Someone already has that username. Try another.",
+  username_held: "Someone used that name until recently. It stays with them for 90 days so their old links keep working. Try another.",
   unauthorized: "Sign in again to change your username.",
 }
 
@@ -70,7 +71,9 @@ export function UsernameForm({ initial }: { initial: string | null }) {
         </button>
       </div>
       <p id="username-help" className="text-sm text-[var(--site-ink-2)]">
-        Used for the personal links coming to Pro. 3 to 30 characters: letters, numbers and hyphens.
+        Your site link becomes dossier-cv.com/u/{normalized && USERNAME_PATTERN.test(normalized) ? normalized : "your-name"} when you have one published site (with
+        several, it opens the newest). If you change it later, your old link keeps redirecting here. 3 to 30 characters: lowercase letters, numbers and
+        hyphens.
       </p>
       {message ? (
         <p role="status" className={message.kind === "ok" ? "text-sm font-medium text-[var(--site-ink)]" : "text-sm font-medium text-[#b42318]"}>

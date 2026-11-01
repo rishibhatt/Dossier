@@ -7,6 +7,10 @@ import { Copy, Download, ExternalLink, Globe, Link2, Loader2, Lock, Save, Trash2
 import { useAccountSummary } from "@/features/billing/useAccountSummary"
 import { openUpgrade } from "@/features/billing/useUpgrade"
 import { PanelFrame, PanelGroup } from "@/features/studio/panels/PanelFrame"
+import { GalleryOptIn } from "@/features/studio/share/GalleryOptIn"
+import { NameLink } from "@/features/studio/share/NameLink"
+import { PublishChecklist } from "@/features/studio/share/PublishChecklist"
+import { ShareSteps, useStudioShareFacts } from "@/features/studio/share/ShareSteps"
 import { copyText, exportZip, openPreview, persistNow, publish, saveDraft, setSearchVisibility } from "@/features/studio/studioActions"
 import { useStudioStatus } from "@/features/studio/studioStatus"
 import { useStudioUiStore } from "@/store/useStudioUiStore"
@@ -38,6 +42,8 @@ function StartOver({ onStartOver }: { onStartOver: () => void }) {
 export function SharePanel({ onStartOver }: { onStartOver: () => void }) {
   const router = useRouter()
   const publishedPath = useStudioUiStore((s) => s.publishedPath)
+  const publishedSlug = useStudioUiStore((s) => s.publishedSlug)
+  const facts = useStudioShareFacts()
   const indexable = useStudioUiStore((s) => s.publishedIndexable)
   const [savingSearch, setSavingSearch] = useState(false)
   const busy = useStudioUiStore((s) => s.busy)
@@ -65,7 +71,10 @@ export function SharePanel({ onStartOver }: { onStartOver: () => void }) {
             </div>
           </div>
         ) : (
-          <p className="mb-3 text-sm text-[var(--site-ink-2)]">Publishing makes a link anyone can open. Publish again after edits and the link stays the same.</p>
+          <>
+            <PublishChecklist />
+            <p className="mb-3 text-sm text-[var(--site-ink-2)]">Publishing makes a link anyone can open. Publish again after edits and the link stays the same.</p>
+          </>
         )}
         <button type="button" disabled={busy.publish} onClick={() => void publish(router)} className="site-btn site-btn-primary w-full">
           {busy.publish ? <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden /> : <Globe className="size-4" aria-hidden />}
@@ -93,6 +102,27 @@ export function SharePanel({ onStartOver }: { onStartOver: () => void }) {
           <p className="sp-data mt-2">New pages are hidden from search engines. You can change that after publishing.</p>
         )}
       </PanelGroup>
+
+      {full ? (
+        <PanelGroup title="Put it where recruiters look">
+          {publishedSlug && summary.signedIn ? (
+            <div className="mb-4">
+              <NameLink
+                url={full}
+                slug={publishedSlug}
+                fullName={facts.name}
+                onClaimed={(path) => useStudioUiStore.getState().setPublished({ path, slug: publishedSlug, indexable })}
+              />
+            </div>
+          ) : null}
+          <ShareSteps url={full} source="share_panel" facts={facts} />
+          {publishedSlug && summary.signedIn ? (
+            <div className="mt-4 border-t border-[var(--site-rule)] pt-4">
+              <GalleryOptIn slug={publishedSlug} source="share_panel" />
+            </div>
+          ) : null}
+        </PanelGroup>
+      ) : null}
 
       <PanelGroup title="Download" aside={loading ? <span className="sp-data">Checking plan</span> : free ? <span className="sp-data">Starter and Pro</span> : null}>
         <p className="mb-3 text-sm text-[var(--site-ink-2)]">The whole site as a ZIP, to host anywhere.</p>

@@ -35,6 +35,8 @@ export type Database = {
           plan_expires_at: string | null
           starter_unlocked_via_credits: boolean
           signup_ip_hash: string | null
+          signup_source: Json | null
+          heard_from: string | null
           is_test: boolean
           owns_starter: boolean
           email_product: boolean
@@ -53,6 +55,8 @@ export type Database = {
           plan_expires_at?: string | null
           starter_unlocked_via_credits?: boolean
           signup_ip_hash?: string | null
+          signup_source?: Json | null
+          heard_from?: string | null
           is_test?: boolean
           owns_starter?: boolean
           email_product?: boolean
@@ -71,6 +75,8 @@ export type Database = {
           plan_expires_at?: string | null
           starter_unlocked_via_credits?: boolean
           signup_ip_hash?: string | null
+          signup_source?: Json | null
+          heard_from?: string | null
           is_test?: boolean
           owns_starter?: boolean
           email_product?: boolean
@@ -269,6 +275,12 @@ export type Database = {
         }
         Relationships: []
       }
+      username_history: {
+        Row: { username: string; user_id: string; released_at: string }
+        Insert: { username: string; user_id: string; released_at?: string }
+        Update: { username?: string; user_id?: string; released_at?: string }
+        Relationships: []
+      }
       published_portfolios: {
         Row: {
           id: string
@@ -276,6 +288,8 @@ export type Database = {
           payload: Json
           user_id: string | null
           indexable: boolean
+          gallery_status: string | null
+          gallery_requested_at: string | null
           created_at: string
           updated_at: string
         }
@@ -285,6 +299,8 @@ export type Database = {
           payload: Json
           user_id?: string | null
           indexable?: boolean
+          gallery_status?: string | null
+          gallery_requested_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -294,6 +310,8 @@ export type Database = {
           payload?: Json
           user_id?: string | null
           indexable?: boolean
+          gallery_status?: string | null
+          gallery_requested_at?: string | null
           created_at?: string
           updated_at?: string
         }

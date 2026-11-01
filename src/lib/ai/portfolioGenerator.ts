@@ -196,7 +196,7 @@ export function buildPortfolioFromStructured(structured: StructuredResume & Part
   sections.push({
     id: `${slug}-contact`,
     type: "contact",
-    data: { email, phone, links, headline: messages.dossier.sectionContact, ...(location ? { location } : {}) },
+    data: { email, phone, links, headline: messages.dossier.sectionContact, showSocialInHero: true, ...(location ? { location } : {}) },
   })
 
   const doc: PortfolioDocument = {

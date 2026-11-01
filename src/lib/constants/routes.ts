@@ -8,6 +8,7 @@ export const ROUTES = {
   resumeTemplates: "/resume-templates",
   looks: "/looks",
   resumeExamples: "/resume-examples",
+  portfolioExamples: "/portfolio-examples",
   resumeNew: "/resume/new",
   resumeEdit: "/resume/edit",
   authCallback: "/auth/callback",

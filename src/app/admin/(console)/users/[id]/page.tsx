@@ -5,6 +5,7 @@ import { z } from "zod"
 import { BarList } from "@/components/admin/Charts"
 import { requireAdmin } from "@/lib/admin/auth"
 import { getUserDetail } from "@/lib/admin/data"
+import { sourceLabel, toSignupSource } from "@/lib/attribution"
 import { resolveEffectivePlan } from "@/lib/billing/plans"
 
 import { setTestAction } from "../../../actions"
@@ -23,6 +24,7 @@ export default async function AdminUser({ params }: { params: Promise<{ id: stri
   if (!d) notFound()
   const { user } = d
   const expires = user.plan_expires_at ? user.plan_expires_at.slice(0, 10) : ""
+  const source = toSignupSource(user.signup_source)
   const expired = user.plan !== "free" && resolveEffectivePlan(user.plan, user.plan_expires_at, user.owns_starter) !== user.plan
 
   return (
@@ -38,6 +40,27 @@ export default async function AdminUser({ params }: { params: Promise<{ id: stri
         <p className="sp-data mt-2 break-all">
           {user.id} · joined {when(user.created_at)}
           {user.username ? ` · /u/${user.username}` : ""}
+        </p>
+        <p className="mt-2 text-sm">
+          Came from <b>{source ? sourceLabel(source) : "unknown (joined before tracking)"}</b>
+          {source ? (
+            <span className="sp-data ml-2 break-all">
+              {[
+                source.utm_campaign && `campaign ${source.utm_campaign}`,
+                source.utm_content && `content ${source.utm_content}`,
+                source.utm_term && `term ${source.utm_term}`,
+                source.referrer && `via ${source.referrer}`,
+                source.ref && `badge on /p/${source.ref}`,
+                `landed on ${source.landing}`,
+                source.at && `first visit ${when(source.at)}`,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </span>
+          ) : null}
+        </p>
+        <p className="mt-1 text-sm">
+          Said they heard about Dossier from <b>{user.heard_from ?? "no answer yet"}</b>
         </p>
         <form action={setTestAction} className="mt-4 flex flex-wrap items-center gap-3 text-sm">
           <input type="hidden" name="userId" value={user.id} />

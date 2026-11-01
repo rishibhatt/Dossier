@@ -2,6 +2,7 @@ import Link from "next/link"
 
 import { requireAdmin } from "@/lib/admin/auth"
 import { listUsers, PAGE_SIZE } from "@/lib/admin/data"
+import { sourceLabel, toSignupSource } from "@/lib/attribution"
 
 export const dynamic = "force-dynamic"
 
@@ -83,10 +84,10 @@ export default async function AdminUsers({ searchParams }: Props) {
 
       <p className="sp-data mt-6">{total} users</p>
       <div className="mt-2 overflow-x-auto">
-        <table className="w-full min-w-[40rem] border-collapse text-sm">
+        <table className="w-full min-w-[48rem] border-collapse text-sm">
           <thead>
             <tr className="border-b border-[var(--site-ink)] text-left">
-              {["Email", "Username", "Plan", "Expires", "Credits", "Sites", "Joined"].map((h) => (
+              {["Email", "Username", "Source", "Plan", "Expires", "Credits", "Sites", "Joined"].map((h) => (
                 <th key={h} scope="col" className="sp-data py-2 pr-4 font-normal">
                   {h}
                 </th>
@@ -103,6 +104,7 @@ export default async function AdminUsers({ searchParams }: Props) {
                   {u.is_test ? <span className="sp-data ml-2">test</span> : null}
                 </td>
                 <td className="py-3 pr-4 text-[var(--site-ink-2)]">{u.username ?? "-"}</td>
+                <td className="py-3 pr-4 text-[var(--site-ink-2)]">{u.signup_source ? sourceLabel(toSignupSource(u.signup_source)) : "-"}</td>
                 <td className="py-3 pr-4">{u.plan}</td>
                 <td className="py-3 pr-4 text-[var(--site-ink-2)]">{u.plan_expires_at ? day(u.plan_expires_at) : "-"}</td>
                 <td className="sp-no py-3 pr-4">{u.balance}</td>
@@ -112,7 +114,7 @@ export default async function AdminUsers({ searchParams }: Props) {
             ))}
             {users.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-8 text-[var(--site-ink-3)]">
+                <td colSpan={8} className="py-8 text-[var(--site-ink-3)]">
                   No users match.
                 </td>
               </tr>

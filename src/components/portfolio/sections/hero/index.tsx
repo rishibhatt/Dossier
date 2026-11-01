@@ -1,5 +1,8 @@
+import { linkText, socialLinks } from "@/lib/portfolio/links"
+
 import { firstOfType } from "../anchors"
 import { Arrow, cx, has, Media } from "../primitives"
+import { SocialIcon } from "../SocialIcon"
 import type { SectionModule, VariantProps } from "../types"
 
 type P = VariantProps<"hero">
@@ -46,6 +49,28 @@ function Ctas({ ctx }: { ctx: P["ctx"] }) {
   )
 }
 
+/**
+ * Icon row of the Contact section's web links. Shown only when `showSocialInHero` is true: new sites set it when
+ * their Contact section is created; sites published before the row existed have no value and stay as they were.
+ */
+function Socials({ ctx }: { ctx: P["ctx"] }) {
+  const contact = firstOfType(ctx.doc, "contact")
+  if (!contact || contact.data.showSocialInHero !== true) return null
+  const list = socialLinks(contact.data.links)
+  if (!list.length) return null
+  return (
+    <ul className="pf-social" aria-label="Profiles" data-pf-reveal="">
+      {list.map((l) => (
+        <li key={l.href}>
+          <a className="pf-social__link" href={l.href} target="_blank" rel="noopener noreferrer" aria-label={l.platform === "website" ? `Website, ${linkText(l.href)}` : `${l.label} profile`}>
+            <SocialIcon platform={l.platform} className="pf-social__icon" />
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 /** Name first, role and tagline in a foot row. `banner` only sets the name larger. */
 const big = (kind: "statement" | "banner") =>
   function BigHero(p: P) {
@@ -57,6 +82,7 @@ const big = (kind: "statement" | "banner") =>
           <div>
             <Tagline {...p} />
             <Ctas ctx={p.ctx} />
+            <Socials ctx={p.ctx} />
           </div>
         </div>
       </div>
@@ -73,6 +99,7 @@ function Centered(p: P) {
       <Role {...p} />
       <Tagline {...p} />
       <Ctas ctx={p.ctx} />
+      <Socials ctx={p.ctx} />
     </div>
   )
 }
@@ -107,6 +134,7 @@ function Split(p: P) {
         <Role {...p} />
         <Tagline {...p} />
         <Ctas ctx={p.ctx} />
+        <Socials ctx={p.ctx} />
       </div>
       {aside ? <div className="pf-hero__aside">{aside}</div> : null}
     </div>
@@ -126,6 +154,7 @@ function Card(p: P) {
         <Role {...p} />
         <Tagline {...p} />
         <Ctas ctx={p.ctx} />
+        <Socials ctx={p.ctx} />
       </div>
     </div>
   )
@@ -146,6 +175,7 @@ function Terminal(p: P) {
       ) : null}
       <Tagline {...p} />
       <Ctas ctx={p.ctx} />
+      <Socials ctx={p.ctx} />
     </div>
   )
 }

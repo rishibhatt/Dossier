@@ -1,7 +1,9 @@
 "use client"
 
 import { EditorStack, Field, ImageField, RowsField } from "@/components/studio/editors/fields"
+import { HeroSocialToggle, SocialQuickAdd } from "@/components/studio/editors/socialFields"
 import { patchSection } from "@/features/studio/sectionOps"
+import { socialLinks } from "@/lib/portfolio/links"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
 import type { PortfolioAboutSection, PortfolioContactSection, PortfolioHeroSection } from "@/types/dossier"
 
@@ -34,6 +36,8 @@ export function ContactEditor({ s }: { s: PortfolioContactSection }) {
       <Field label="Phone" type="tel" value={s.data.phone} onChange={(phone) => set({ phone })} />
       <Field label="City or region" value={s.data.location ?? ""} onChange={(location) => set({ location })} />
       <RowsField label="Links" rows={s.data.links} placeholder="https://linkedin.com/in/you" addLabel="Add a link" onChange={(links) => set({ links })} />
+      <SocialQuickAdd links={s.data.links} onAdd={(url) => set({ links: [...s.data.links, url] })} />
+      <HeroSocialToggle checked={s.data.showSocialInHero === true} hasLinks={socialLinks(s.data.links).length > 0} onChange={(showSocialInHero) => set({ showSocialInHero })} />
     </EditorStack>
   )
 }

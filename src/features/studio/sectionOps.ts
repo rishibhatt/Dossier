@@ -64,7 +64,7 @@ export function seedSection(type: PortfolioSectionType): PortfolioSection {
     case "certifications":
       return { id, type, data: { items: [{ name: "Certificate name", issuer: "Issuer", year: "2024" }] } }
     case "contact":
-      return { id, type, data: { email: r?.contact?.email ?? "", phone: r?.contact?.phone ?? "", links: r?.contact?.links ?? [], headline: "Get in touch" } }
+      return { id, type, data: { email: r?.contact?.email ?? "", phone: r?.contact?.phone ?? "", links: r?.contact?.links ?? [], headline: "Get in touch", showSocialInHero: true } }
   }
 }
 

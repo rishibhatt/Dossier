@@ -143,3 +143,18 @@ export async function adminSignOutAction(): Promise<void> {
   await supabase.auth.signOut()
   redirect("/admin/login")
 }
+
+const galleryStatus = z.enum(["approved", "rejected", "pending"])
+
+/** Gallery review: approve (shown on /portfolio-examples), reject, or send back to the queue. */
+export async function setGalleryStatusAction(formData: FormData): Promise<void> {
+  const { user, admin } = await requireAdminAction()
+  const id = uuid.safeParse(formData.get("siteId"))
+  const status = galleryStatus.safeParse(formData.get("status"))
+  if (!id.success || !status.success) return
+  const { data } = await admin.from("published_portfolios").update({ gallery_status: status.data }).eq("id", id.data).not("gallery_status", "is", null).select("user_id, slug").maybeSingle()
+  if (!data) return
+  await audit(admin, user.id, "gallery_status", data.user_id, { slug: data.slug, status: status.data })
+  revalidatePath("/admin/gallery")
+  revalidatePath("/portfolio-examples")
+}

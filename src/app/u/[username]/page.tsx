@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
-import { notFound } from "next/navigation"
+import { notFound, permanentRedirect } from "next/navigation"
 
 import { loadPublishedByUsername, publishedMetadata, shouldShowCredit } from "@/lib/portfolio/published"
+import { renamedTo } from "@/lib/profile/usernameServer"
+import { createAdminSupabaseClient } from "@/lib/supabase/admin"
 
 import { PublishedPortfolioClient, type PublishedPayload } from "../../p/[slug]/published-client"
 
@@ -15,6 +17,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function UserPortfolioPage({ params }: PageProps) {
   const { username } = await params
   const row = await loadPublishedByUsername(username)
+  if (!row) {
+    // A link shared before the owner changed their username: send it on to the new name.
+    const admin = createAdminSupabaseClient()
+    const current = admin ? await renamedTo(admin, username.toLowerCase()) : null
+    if (current) permanentRedirect(`/u/${current}`)
+  }
   const payload = row?.payload as PublishedPayload | undefined
   if (!row || !payload?.document || !payload.designConfig) notFound()
 

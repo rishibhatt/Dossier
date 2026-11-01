@@ -193,6 +193,15 @@ export const PORTFOLIO_CSS = String.raw`
 .pf-hero--terminal .pf-hero__tagline::after{content:"";display:inline-block;width:.55em;height:1.1em;margin-left:.25em;vertical-align:-.15em;background:var(--de-primary)}
 @media (prefers-reduced-motion:no-preference){.pf-hero--terminal .pf-hero__tagline::after{animation:pf-caret 1.1s steps(1) infinite}}
 @keyframes pf-caret{50%{opacity:0}}
+.pf-social{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:clamp(1.25rem,3.5cqi,1.75rem)}
+.pf-social__link{display:grid;place-items:center;width:2.75rem;height:2.75rem;border:1px solid var(--de-border);border-radius:var(--de-radius);color:var(--de-fg);transition:color .2s,border-color .2s,background-color .2s}
+.pf-social__link:hover{color:var(--de-primary);border-color:currentColor}
+.pf-social__link:focus-visible{outline-offset:2px;border-color:var(--de-fg)}
+.pf-social__icon{width:1.25rem;height:1.25rem}
+.pf-hero--centered .pf-social{justify-content:center}
+.pf-hero__foot .pf-social{margin-top:1rem}
+.pf[data-pf-btn=block] .pf-social__link{border-width:2px;border-radius:0;border-color:var(--de-fg)}
+@media print{.pf-social__link{border:0;width:auto;height:auto}}
 
 /* ---------- contact ---------- */
 .pf-contact__headline{max-width:18ch;font-family:var(--de-font-display);font-weight:var(--de-w-display);font-size:clamp(2rem,7.5cqi,4.25rem);line-height:1.02;letter-spacing:var(--de-track-display);text-wrap:balance;overflow-wrap:anywhere}

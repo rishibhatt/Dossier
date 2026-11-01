@@ -6,6 +6,7 @@ import type { SupabaseClient, User } from "@supabase/supabase-js"
 
 import { siteConfig } from "@/config/site"
 import { hashIp } from "@/lib/api/guard"
+import { parseSignupSource, SOURCE_COOKIE, type SignupSource } from "@/lib/attribution"
 import {
   REFERRAL_CODE_PATTERN,
   REFERRAL_COOKIE,
@@ -13,6 +14,7 @@ import {
   REJECT_REASON_LABEL,
 } from "@/lib/credits/constants"
 import { getActiveShufflePacks, getCreditBalance } from "@/lib/credits/server"
+import { SLUG_PATTERN } from "@/lib/portfolio/published"
 import { createAdminSupabaseClient } from "@/lib/supabase/admin"
 import type { CreditReason, Database, ReferralStatus } from "@/types/database"
 
@@ -119,8 +121,8 @@ type CookieJar = {
 }
 
 /**
- * Runs after sign up, OAuth callback and sign in. Records the signup IP hash for brand-new accounts and,
- * when a `dx_ref` cookie is present, creates the `referrals` row (signed_up or rejected with a reason).
+ * Runs after sign up, OAuth callback and sign in. Records the signup IP hash and first-touch source for
+ * brand-new accounts and, when a `dx_ref` cookie is present, creates the `referrals` row (signed_up or rejected with a reason).
  * Clears the cookie either way. Never throws: a referral problem must not break sign in.
  */
 export async function captureReferralAfterAuth({
@@ -144,11 +146,17 @@ export async function captureReferralAfterAuth({
       await admin.from("users").update({ signup_ip_hash: ipHash }).eq("id", user.id).is("signup_ip_hash", null)
     }
 
-    const raw = cookies.get(REFERRAL_COOKIE)?.value
-    if (!raw) return
-    cookies.delete(REFERRAL_COOKIE)
+    // Where the person first came from (first-touch `dx_src` cookie set by the proxy). Written once.
+    const source = freshAccount ? parseSignupSource(cookies.get(SOURCE_COOKIE)?.value) : null
+    if (source) {
+      await admin.from("users").update({ signup_source: source }).eq("id", user.id).is("signup_source", null)
+    }
 
-    const ref = parseReferralCookie(raw)
+    const raw = cookies.get(REFERRAL_COOKIE)?.value
+    if (raw) cookies.delete(REFERRAL_COOKIE)
+
+    // An invite link wins; otherwise a "Made with Dossier" badge click credits the owner of that portfolio.
+    const ref = raw ? parseReferralCookie(raw) : freshAccount ? await badgeReferral(admin, source) : null
     if (!ref) return
 
     const { data: owner } = await admin.from("referral_codes").select("user_id").eq("code", ref.code).maybeSingle()
@@ -175,6 +183,21 @@ export async function captureReferralAfterAuth({
   } catch {
     /* Swallowed on purpose: attribution is best effort. */
   }
+}
+
+/**
+ * A signup whose first visit came from a portfolio's "Made with Dossier" badge (utm_source=portfolio, ref=<slug>)
+ * counts as an invite from that portfolio's owner, under the same rules (window, self and abuse checks, credit on
+ * first publish). The click time is the first visit, so the usual invite window applies.
+ */
+async function badgeReferral(admin: Client, source: SignupSource | null): Promise<ReferralCookie | null> {
+  if (!source?.ref || source.utm_source !== "portfolio" || !SLUG_PATTERN.test(source.ref)) return null
+  const clickedAt = Date.parse(source.at)
+  if (!Number.isFinite(clickedAt) || Date.now() - clickedAt > REFERRAL_WINDOW_DAYS * DAY_MS) return null
+  const { data: site } = await admin.from("published_portfolios").select("user_id").eq("slug", source.ref).maybeSingle()
+  if (!site?.user_id) return null
+  const code = await ensureReferralCode(admin, site.user_id)
+  return code ? { code, clickedAt } : null
 }
 
 async function rejectReason(

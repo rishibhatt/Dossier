@@ -99,6 +99,7 @@ export type UserRow = {
   plan_expires_at: string | null
   created_at: string
   is_test: boolean
+  signup_source: Json | null
   balance: number
   portfolios: number
 }
@@ -123,7 +124,7 @@ export async function listUsers(admin: Admin, { q, page, plan, who, joined, sort
   // "estimated" counts are exact up to the API row cap (1k) and a planner estimate past that, so paging stays fast as the table grows.
   let query = admin
     .from("users")
-    .select("id, email, username, plan, plan_expires_at, created_at, is_test", { count: "estimated" })
+    .select("id, email, username, plan, plan_expires_at, created_at, is_test, signup_source", { count: "estimated" })
     .order("created_at", { ascending: sort === "oldest" })
   const s = cleanQuery(q)
   if (s) query = query.or(`email.ilike.%${s}%,username.ilike.%${s}%`)
