@@ -115,6 +115,12 @@ function emailDomain(email: string | null | undefined) {
   return email?.trim().toLowerCase().split("@")[1] ?? null
 }
 
+/** Throwaway inbox, by domain. Signup refuses these; referrals reject them. */
+export function isDisposableEmail(email: string | null | undefined): boolean {
+  const domain = emailDomain(email)
+  return !!domain && DISPOSABLE_EMAIL_DOMAINS.has(domain)
+}
+
 type CookieJar = {
   get: (name: string) => { value: string } | undefined
   delete: (name: string) => unknown
@@ -216,8 +222,7 @@ async function rejectReason(
   if (!Number.isFinite(createdAt) || createdAt + CLOCK_SKEW_MS < ref.clickedAt) return "existing_account"
   if (createdAt - ref.clickedAt > REFERRAL_WINDOW_DAYS * DAY_MS) return "expired"
 
-  const domain = emailDomain(user.email)
-  if (domain && DISPOSABLE_EMAIL_DOMAINS.has(domain)) return "disposable_email"
+  if (isDisposableEmail(user.email)) return "disposable_email"
 
   const { data: referrer } = await admin
     .from("users")

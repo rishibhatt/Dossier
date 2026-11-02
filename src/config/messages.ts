@@ -182,7 +182,6 @@ export const messages = {
     goSignup: "Create one",
     goLogin: "Sign in",
     oauthGoogle: "Continue with Google",
-    oauthGithub: "Continue with GitHub",
     oauthDivider: "or use your email",
     forgotTitle: "Reset your password",
     forgotSubtitle: "Enter your email and we will send you a link to choose a new password.",
@@ -209,6 +208,8 @@ export const messages = {
       linkExpired: "That link has expired. Request a new one.",
       oauthFailed: "Sign in with that provider did not finish. Try again or use email.",
       notConfigured: "Sign in is not set up on this server yet.",
+      disposableEmail: "Use a permanent email address. Temporary inboxes are not accepted.",
+      emailSendFailed: "We could not send the confirmation email. Try again in a few minutes, or continue with Google.",
     },
   },
   dashboard: {

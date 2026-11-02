@@ -11,7 +11,7 @@ import { siteConfig } from "@/config/site"
 import { allowRate, clientIpFromHeaders, hashIp } from "@/lib/api/guard"
 import { safeNextPath } from "@/lib/auth/safeNext"
 import { notifyAfterAuth, notifyPasswordChanged } from "@/lib/email/events"
-import { captureReferralAfterAuth } from "@/lib/referrals/server"
+import { captureReferralAfterAuth, isDisposableEmail } from "@/lib/referrals/server"
 import { ROUTES } from "@/lib/constants/routes"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { emailSchema, loginSchema, passwordSchema, signupSchema } from "@/lib/validations/auth"
@@ -52,6 +52,7 @@ function describeAuthError(error: SupabaseLikeError, fallback: string): string {
   if (code === "email_not_confirmed" || msg.includes("email not confirmed")) return e.emailNotConfirmed
   if (code === "user_already_exists" || msg.includes("already registered") || msg.includes("already been registered")) return e.emailTaken
   if (code === "weak_password" || msg.includes("password should")) return e.weakPassword
+  if (msg.includes("sending confirmation email") || msg.includes("sending recovery email")) return e.emailSendFailed
   if (msg.includes("fetch failed") || msg.includes("network")) return e.network
   return fallback
 }
@@ -135,6 +136,7 @@ export async function signUpWithCredentialsAction(
     password: formData.get("password"),
   })
   if (!parsed.success) return invalid(parsed.error.flatten().fieldErrors, email)
+  if (isDisposableEmail(parsed.data.email)) return invalid({ email: [e.disposableEmail] }, email)
 
   if (await overLimit("signup", parsed.data.email)) return { error: e.tooManyAttempts, email, nonce: Date.now() }
   const supabase = await getClientOrNull()
@@ -142,7 +144,11 @@ export async function signUpWithCredentialsAction(
 
   try {
     const { error } = await signUpWithPassword(supabase, { email: parsed.data.email, password: parsed.data.password })
-    if (error) return { error: describeAuthError(error as SupabaseLikeError, e.generic), email, nonce: Date.now() }
+    if (error) {
+      // The form shows a friendly message; the raw one goes to the server log so it can be diagnosed.
+      console.error("[auth] signUp failed", (error as SupabaseLikeError)?.code, error.message)
+      return { error: describeAuthError(error as SupabaseLikeError, e.generic), email, nonce: Date.now() }
+    }
   } catch {
     return { error: e.network, email, nonce: Date.now() }
   }
