@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 
+import { publicOrigin } from "@/lib/auth/publicOrigin"
 import { REFERRAL_CODE_PATTERN, REFERRAL_COOKIE, REFERRAL_WINDOW_DAYS } from "@/lib/credits/constants"
 import { ROUTES } from "@/lib/constants/routes"
 import { encodeReferralCookie, parseReferralCookie } from "@/lib/referrals/server"
@@ -14,7 +15,7 @@ export const runtime = "nodejs"
 export async function GET(request: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   const { code: rawCode } = await params
   const code = rawCode.trim().toLowerCase()
-  const origin = request.nextUrl.origin
+  const origin = publicOrigin(request)
 
   if (!REFERRAL_CODE_PATTERN.test(code)) {
     return NextResponse.redirect(new URL(ROUTES.home, origin))
