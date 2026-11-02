@@ -30,8 +30,17 @@ export const HOW_STEPS = [
 /**
  * Four steps, one proof plate each. On desktop the plate column sticks and swaps as each step reaches the
  * middle of the screen; on phones every step carries its own plate. Reduced motion swaps without animating.
+ * `no` is the home page's section number; pass `null` where the section stands alone (it drops the running head).
  */
-export function HowItWorks({ person, headingLevel: H = "h2" }: { person: SamplePerson; headingLevel?: "h1" | "h2" }) {
+export function HowItWorks({
+  person,
+  headingLevel: H = "h2",
+  no = "003",
+}: {
+  person: SamplePerson
+  headingLevel?: "h1" | "h2"
+  no?: string | null
+}) {
   const root = useRef<HTMLElement>(null)
   const [active, setActive] = useState(0)
 
@@ -63,7 +72,7 @@ export function HowItWorks({ person, headingLevel: H = "h2" }: { person: SampleP
   return (
     <section ref={root} id="how" aria-labelledby="how-title" className="scroll-mt-20 pb-20 pt-16 sm:pb-28 sm:pt-24">
       <div className="site-wrap">
-        <RunningHead label="How it works" no="003" />
+        {no ? <RunningHead label="How it works" no={no} /> : null}
         <div className="grid gap-6 border-b border-[var(--site-rule-strong)] pb-10 lg:grid-cols-12">
           <H id="how-title" className="site-h2 lg:col-span-7">
             From a PDF to a link in four steps.

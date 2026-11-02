@@ -44,6 +44,13 @@ export default function ToolsPage() {
             </li>
           ))}
         </ul>
+        <p className="site-body mt-8">
+          Writing a cover letter? The{" "}
+          <Link href={ROUTES.coverLetter} className="site-link-mark font-medium text-[var(--site-ink)]">
+            cover letter maker
+          </Link>{" "}
+          drafts it from your resume and the job ad, in the same design as your resume.
+        </p>
       </section>
       <FinalCta />
     </>

@@ -3,15 +3,20 @@ import type { Metadata } from "next"
 import { FinalCta } from "@/components/marketing/FinalCta"
 import { HowItWorks } from "@/components/marketing/HowItWorks"
 import { PageHead } from "@/components/marketing/PageHead"
+import { SiteButton } from "@/components/marketing/primitives"
 import { SAMPLE_PERSON } from "@/components/marketing/sample"
 import { buildPageMetadata } from "@/config/seo"
 import { ROUTES } from "@/lib/constants/routes"
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "How Dossier turns a resume into a website",
+  title: "Dossier Resume: How It Works, From PDF to Website",
   description:
-    "Upload a PDF, check what Dossier read, pick a look from the design engine and publish a link. What the AI does, what the rules do, and what stays private.",
+    "See how Dossier works: upload your resume PDF, check each field, pick a look and publish a link. Or build a new resume and download the PDF free.",
   path: ROUTES.howItWorks,
+  openGraph: {
+    title: "From resume PDF to a link you can send, in four steps.",
+    description: "Upload a PDF, check every field, pick a look, publish. Or build a new resume and download the PDF free.",
+  },
 })
 
 const SPLIT = [
@@ -32,6 +37,20 @@ const SPLIT = [
   },
 ] as const
 
+/** The two doors: upload a resume for the website, or start a resume from a template. */
+function Ctas() {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <SiteButton href={ROUTES.build} arrow>
+        Upload your resume
+      </SiteButton>
+      <SiteButton href={ROUTES.resumeNew} variant="secondary">
+        Build a resume, free
+      </SiteButton>
+    </div>
+  )
+}
+
 export default function HowItWorksPage() {
   return (
     <>
@@ -39,7 +58,19 @@ export default function HowItWorksPage() {
         running={["How it works", "4 steps"]}
         title="What happens between your PDF and your link."
         lead={<p>Two machines and one person. Here is exactly what each of them does, so nothing about your site is a surprise.</p>}
-      />
+      >
+        <div className="flex flex-col gap-3 pb-4">
+          <Ctas />
+          <p className="text-sm text-[var(--site-ink-2)]">Sign up only when you want to publish.</p>
+        </div>
+      </PageHead>
+
+      {/* The steps answer the page's question, so they come first; the split below is the trust section. */}
+      <HowItWorks person={SAMPLE_PERSON} no={null} />
+
+      <section aria-label="Try it" className="site-wrap -mt-8 pb-16 sm:-mt-12 sm:pb-20">
+        <Ctas />
+      </section>
 
       <section aria-labelledby="split-title" className="site-wrap pb-6">
         <h2 id="split-title" className="sr-only">
@@ -64,7 +95,6 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      <HowItWorks person={SAMPLE_PERSON} />
       <FinalCta title="Try it with your own resume." />
     </>
   )

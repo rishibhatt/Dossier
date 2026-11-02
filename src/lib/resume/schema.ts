@@ -7,8 +7,8 @@ import { z } from "zod"
  * Strings are length-capped and URLs are allow-listed because Typst writes links into the PDF.
  */
 
-const text = (max: number) => z.string().max(max)
-const id = z.string().min(1).max(40).regex(/^[A-Za-z0-9_-]+$/)
+export const text = (max: number) => z.string().max(max)
+export const id = z.string().min(1).max(40).regex(/^[A-Za-z0-9_-]+$/)
 
 /** "2024", "2024-03" or "" (unknown). Presets format these for display. */
 export const monthSchema = z.string().regex(/^$|^\d{4}(-(0[1-9]|1[0-2]))?$/)

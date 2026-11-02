@@ -18,11 +18,15 @@ async function initGlue(pkg: string, base: string) {
   return glue
 }
 
-export async function loadEngine({ renderer = false } = {}) {
+/**
+ * `fonts` limits the engine to those font files (names as in templates.ts, e.g. "Lato-700"), the way the browser
+ * worker only loads a template's own fonts. Omitted, every font is loaded.
+ */
+export async function loadEngine({ renderer = false, fonts: only }: { renderer?: boolean; fonts?: readonly string[] } = {}) {
   const compiler = await initGlue("typst-ts-web-compiler", "typst_ts_web_compiler")
   const fonts = fs
     .readdirSync(fontDir)
-    .filter((f) => f.endsWith(".ttf"))
+    .filter((f) => f.endsWith(".ttf") && (!only || only.includes(f.replace(/\.ttf$/, ""))))
     .map((f) => new Uint8Array(fs.readFileSync(path.join(fontDir, f))))
   const sources = fs
     .readdirSync(typstDir)

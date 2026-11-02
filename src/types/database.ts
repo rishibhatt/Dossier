@@ -349,6 +349,41 @@ export type Database = {
         }
         Relationships: []
       }
+      cover_letters: {
+        Row: {
+          id: string
+          user_id: string
+          resume_id: string | null
+          title: string
+          template_id: string
+          company: string
+          data: Json
+          design: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          resume_id?: string | null
+          title?: string
+          template_id: string
+          company?: string
+          data: Json
+          design: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          resume_id?: string | null
+          title?: string
+          template_id?: string
+          company?: string
+          data?: Json
+          design?: Json
+        }
+        Relationships: []
+      }
       referral_codes: {
         Row: {
           user_id: string

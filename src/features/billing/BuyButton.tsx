@@ -1,11 +1,11 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useState, useSyncExternalStore } from "react"
+import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 import { toast } from "sonner"
 
 import { track } from "@/lib/analytics"
-import { localCurrency } from "@/features/billing/useOffer"
+import { checkoutCurrency, DEFAULT_CURRENCY } from "@/features/billing/useOffer"
 import { formatPrice, INTERNATIONAL, priceFor, PRODUCTS, type Currency, type ProductId } from "@/lib/billing/pricing"
 
 type RzpResponse = {
@@ -25,10 +25,8 @@ declare global {
 
 const noop = () => () => {}
 
-/** India sees rupees (UPI, RuPay, Indian cards); everyone else pays in dollars. */
-export function guessCurrency(): Currency {
-  return INTERNATIONAL ? localCurrency() : "INR"
-}
+/** India sees rupees (UPI, RuPay, Indian cards); everyone else pays in dollars (rupees for all while international payments are off). */
+export const guessCurrency = checkoutCurrency
 
 function loadCheckout(): Promise<boolean> {
   if (window.Razorpay) return Promise.resolve(true)
@@ -41,9 +39,21 @@ function loadCheckout(): Promise<boolean> {
   })
 }
 
-export function BuyButton({ product, currency, className, label }: { product: ProductId; currency: Currency; className?: string; label?: string }) {
+type BuyButtonProps = {
+  product: ProductId
+  currency: Currency
+  className?: string
+  label?: string
+  /** Runs on click, before checkout opens (analytics, closing a sheet). */
+  onStart?: () => void
+  /** Open checkout as soon as the page is ready, once. Used when someone arrives from a pricing button after signing up. */
+  autoStart?: boolean
+}
+
+export function BuyButton({ product, currency, className, label, onStart, autoStart = false }: BuyButtonProps) {
   const router = useRouter()
   const [busy, setBusy] = useState(false)
+  const started = useRef(false)
   const now = useSyncExternalStore(
     noop,
     () => Math.floor(Date.now() / 60_000) * 60_000,
@@ -53,6 +63,7 @@ export function BuyButton({ product, currency, className, label }: { product: Pr
   const cost = now ? priceFor(product, currency, now) : full
 
   async function buy() {
+    started.current = true
     setBusy(true)
     track("checkout_started", { product, currency })
     try {
@@ -115,33 +126,79 @@ export function BuyButton({ product, currency, className, label }: { product: Pr
     }
   }
 
+  // `now` is 0 until hydration, when the currency and offer are still the server's guess.
+  useEffect(() => {
+    if (!autoStart || !now || started.current) return
+    started.current = true
+    // Drop `?buy=` so a reload or the back button does not open checkout again.
+    const url = new URL(window.location.href)
+    url.searchParams.delete("buy")
+    window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`)
+    const id = setTimeout(() => void buy(), 0)
+    return () => clearTimeout(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, after hydration
+  }, [autoStart, now])
+
   return (
-    <button type="button" onClick={buy} disabled={busy} className={className}>
-      {busy ? "Opening checkout…" : (label ?? `Buy ${PRODUCTS[product].name}`)} ·{" "}
-      {cost < full ? <s className="opacity-60">{formatPrice(full, currency)}</s> : null} {formatPrice(cost, currency)}
+    <button
+      type="button"
+      onClick={() => {
+        onStart?.()
+        void buy()
+      }}
+      disabled={busy}
+      className={className}
+    >
+      {/* One wrapper, so `.site-btn` keeps the label above its hover fill. */}
+      <span>
+        {busy ? "Opening checkout…" : (label ?? `Buy ${PRODUCTS[product].name}`)} ·{" "}
+        {cost < full ? <s className="opacity-60">{formatPrice(full, currency)}</s> : null} {formatPrice(cost, currency)}
+      </span>
     </button>
   )
 }
 
+type PlanBuyProps = {
+  plan: "starter" | "pro"
+  /** Opens this product's checkout on arrival (from `?buy=`). Ignored when it is not one of this plan's buttons. */
+  autoBuy?: ProductId
+  /** Called with the product when a button is clicked. */
+  onStart?: (product: ProductId) => void
+  /** Button classes: the main one, the second Pro button, and the currency switch link. Default: the dashboard look. */
+  primaryClass?: string
+  secondaryClass?: string
+  switchClass?: string
+}
+
 /** Buy buttons for one plan card, with a rupee/dollar switch (guessed from the time zone). */
-export function PlanBuy({ plan }: { plan: "starter" | "pro" }) {
-  // Server render says USD; the browser switches to its guess on hydration, and the link below overrides it.
-  const guessed = useSyncExternalStore(noop, guessCurrency, () => "USD" as Currency)
+export function PlanBuy({
+  plan,
+  autoBuy,
+  onStart,
+  primaryClass = "dx-btn dx-btn-primary w-full",
+  secondaryClass = "dx-btn dx-btn-outline w-full",
+  switchClass = "text-[var(--site-ink-2)]",
+}: PlanBuyProps) {
+  // Server render shows the default currency; the browser switches to its guess on hydration, and the link below overrides it.
+  const guessed = useSyncExternalStore(noop, guessCurrency, () => DEFAULT_CURRENCY)
   const [picked, setCurrency] = useState<Currency | null>(null)
   const currency = picked ?? guessed
   const other: Currency = currency === "INR" ? "USD" : "INR"
+  const button = (product: ProductId, label: string, className: string) => (
+    <BuyButton product={product} currency={currency} label={label} className={className} onStart={() => onStart?.(product)} autoStart={autoBuy === product} />
+  )
   return (
     <div className="grid gap-2">
       {plan === "starter" ? (
-        <BuyButton product="starter" currency={currency} label="Get Starter" className="dx-btn dx-btn-primary w-full" />
+        button("starter", "Get Starter", primaryClass)
       ) : (
         <>
-          <BuyButton product="pro_year" currency={currency} label="Pro for a year" className="dx-btn dx-btn-primary w-full" />
-          <BuyButton product="pro_month" currency={currency} label="Pro for a month" className="dx-btn dx-btn-outline w-full" />
+          {button("pro_year", "Pro for a year", primaryClass)}
+          {button("pro_month", "Pro for a month", secondaryClass)}
         </>
       )}
       {INTERNATIONAL ? (
-        <button type="button" onClick={() => setCurrency(other)} className="text-center text-xs text-[var(--site-ink-2)] underline underline-offset-4">
+        <button type="button" onClick={() => setCurrency(other)} className={`text-center text-xs underline underline-offset-4 ${switchClass}`}>
           Pay in {other === "INR" ? "rupees (UPI, cards)" : "US dollars"} instead
         </button>
       ) : null}

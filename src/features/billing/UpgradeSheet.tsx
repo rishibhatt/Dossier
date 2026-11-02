@@ -8,6 +8,8 @@ import { toast } from "sonner"
 
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog"
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet"
+import { PlanBuy } from "@/features/billing/BuyButton"
+import { PriceTag } from "@/features/billing/PlanPrice"
 import { useAccountSummary } from "@/features/billing/useAccountSummary"
 import { useUpgrade, type UpgradeOptions, type UpgradeTrigger } from "@/features/billing/useUpgrade"
 import { track } from "@/lib/analytics/track"
@@ -162,7 +164,8 @@ function UpgradeBody({
   const canShufflePack = canCredit && trigger === "shuffle_limit" && summary.balance >= 1
   const canStarter = canCredit && summary.balance >= STARTER_UNLOCK_COST
 
-  const ctaHref = summary.signedIn ? ROUTES.billing : `${ROUTES.signup}?next=${encodeURIComponent(ROUTES.billing)}`
+  // Signed out: sign up first, then billing opens this plan's checkout (see the signup page).
+  const signupHref = `${ROUTES.signup}?plan=${copy.plan}`
   const Title = wide ? DialogTitle : SheetTitle
   const Description = wide ? DialogDescription : SheetDescription
 
@@ -209,10 +212,7 @@ function UpgradeBody({
         <section aria-label={`${card.name} plan`} className="rounded-xl border border-[var(--site-rule-strong)] p-4">
           <div className="flex items-baseline justify-between gap-3">
             <p className="text-base font-bold">{card.name}</p>
-            <p className="text-sm">
-              <span className="text-lg font-bold tabular-nums">{card.price}</span>{" "}
-              <span className="text-[var(--site-ink-2)]">{card.cadence}</span>
-            </p>
+            <PriceTag plan={copy.plan} cadence={card.cadence} />
           </div>
           <ul className="mt-3 space-y-2 text-sm">
             {points.map((f) => (
@@ -234,17 +234,28 @@ function UpgradeBody({
       <div className="flex flex-col gap-2">
         {!covered ? (
           <>
-            <Link
-              href={ctaHref}
-              onClick={() => {
-                options.beforeLeave?.()
-                track("upgrade_sheet_cta", { trigger, plan: copy.plan, signedIn: summary.signedIn })
-                onClose()
-              }}
-              className="dx-btn dx-btn-primary w-full"
-            >
-              {summary.signedIn ? `See ${card.name}` : "Create a free account to see plans"}
-            </Link>
+            {summary.signedIn ? (
+              // Checkout opens over this page. The sheet closes first, so its focus trap does not block Razorpay's window.
+              <PlanBuy
+                plan={copy.plan}
+                onStart={(product) => {
+                  track("upgrade_sheet_cta", { trigger, plan: copy.plan, product, signedIn: true })
+                  onClose()
+                }}
+              />
+            ) : (
+              <Link
+                href={signupHref}
+                onClick={() => {
+                  options.beforeLeave?.()
+                  track("upgrade_sheet_cta", { trigger, plan: copy.plan, signedIn: false })
+                  onClose()
+                }}
+                className="dx-btn dx-btn-primary w-full"
+              >
+                Create a free account to get {card.name}
+              </Link>
+            )}
             <p className="text-center text-xs text-[var(--site-ink-2)]">
               Pay once with UPI or a card. Nothing renews by itself.
             </p>

@@ -1,10 +1,10 @@
 import { Check, Minus } from "lucide-react"
+import Link from "next/link"
 
 import { RunningHead } from "@/components/marketing/PageHead"
-import { SiteButton } from "@/components/marketing/primitives"
 import { PlanPrice } from "@/features/billing/PlanPrice"
-import { PLAN_CARDS } from "@/lib/billing/pricing"
-import { ROUTES } from "@/lib/constants/routes"
+import { PricingCta } from "@/features/billing/PricingCta"
+import { INTERNATIONAL, PLAN_CARDS } from "@/lib/billing/pricing"
 import { cn } from "@/lib/utils"
 
 const COMPARE: { row: string; free: string | boolean; starter: string | boolean; pro: string | boolean; soon?: boolean }[] = [
@@ -75,22 +75,27 @@ export function Pricing({ as: Heading = "h2", full = false }: { as?: "h1" | "h2"
                   ))}
                 </ul>
 
-                <SiteButton
-                  href={plan.id === "free" ? ROUTES.build : `${ROUTES.signup}?plan=${plan.id}`}
+                <PricingCta
+                  plan={plan.id}
+                  label={plan.cta}
                   variant={marked ? "paper" : plan.id === "free" ? "primary" : "secondary"}
-                  arrow
-                  className="mt-8 w-full justify-between"
-                >
-                  {plan.cta}
-                </SiteButton>
+                  onInk={marked}
+                  position={full ? "pricing_page" : "home"}
+                />
               </article>
             )
           })}
         </div>
 
-        <p className="mt-6 max-w-2xl text-sm text-[var(--site-ink-2)]">
-          Pay with UPI, a card or net banking through Razorpay. Prices are in US dollars, or rupees in India. Every payment is one time: Starter is
-          yours for good, and Pro runs for the month or year you paid for. Nothing renews by itself.
+        <p className="mt-6 max-w-2xl text-[0.9375rem] font-medium">
+          Changed your mind? Write to us within 7 days of paying and we refund the full amount. No reason needed.{" "}
+          <Link href="/refund-policy" className="site-link-mark">
+            Refund policy
+          </Link>
+        </p>
+        <p className="mt-2 max-w-2xl text-sm text-[var(--site-ink-2)]">
+          Pay with UPI, a card or net banking through Razorpay. {INTERNATIONAL ? "Prices are in US dollars, or rupees in India." : "Prices are in Indian rupees."} Every
+          payment is one time: Starter is yours for good, and Pro runs for the month or year you paid for. Nothing renews by itself.
         </p>
 
         {full ? (

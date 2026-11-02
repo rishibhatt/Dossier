@@ -1,8 +1,9 @@
 "use client"
 
+import { usePathname } from "next/navigation"
 import { useEffect } from "react"
 
-import { HUMAN_EVENTS, isTestVisit, looksAutomated, setNoTrack } from "@/lib/analytics"
+import { AUTH_EVENT_COOKIE, HUMAN_EVENTS, isTestVisit, looksAutomated, setNoTrack, track } from "@/lib/analytics"
 
 /**
  * Loads Google Analytics 4, Microsoft Clarity and PostHog.
@@ -85,6 +86,25 @@ export function Analytics() {
     // would drop them in Strict Mode's second effect run, which the flag above skips).
     for (const e of HUMAN_EVENTS) window.addEventListener(e, load, { once: true, passive: true })
   }, [])
+
+  return null
+}
+
+/**
+ * Sends the `sign_up`, `login` or `email_confirmed` event the server left in a cookie, then clears it. Checked on
+ * every route change, because a sign in from a server action arrives by client-side navigation. Mounted after
+ * `Analytics`, so the GA and Clarity queues exist and keep the event until their scripts load.
+ */
+export function AuthEventTracker() {
+  const pathname = usePathname()
+
+  useEffect(() => {
+    const match = document.cookie.match(new RegExp(`(?:^|; )${AUTH_EVENT_COOKIE}=([^;]+)`))
+    if (!match) return
+    document.cookie = `${AUTH_EVENT_COOKIE}=; path=/; max-age=0`
+    const [event, method] = decodeURIComponent(match[1]).split(".")
+    if (event === "sign_up" || event === "login" || event === "email_confirmed") track(event, { method })
+  }, [pathname])
 
   return null
 }

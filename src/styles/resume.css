@@ -1406,4 +1406,31 @@
       transition: none;
     }
   }
+
+  /* ------------------------------------------------------------ Cover letter start screen */
+  /* 768: "Use my resume" spans the row, the other two ways sit side by side under it. */
+  @media (min-width: 640px) and (max-width: 900px) {
+    .rz-ways[data-layout="letter"] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .rz-ways[data-layout="letter"] > :first-child {
+      grid-column: 1 / -1;
+    }
+  }
+  .rz-inline-link {
+    display: inline;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--site-accent-ink);
+    font: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--site-rule-strong);
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+  }
+  .rz-inline-link:hover {
+    text-decoration-color: currentColor;
+  }
 }

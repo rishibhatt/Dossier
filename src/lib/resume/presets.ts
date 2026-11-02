@@ -87,7 +87,7 @@ export const PRESETS: Record<PresetId, Preset> = {
     dateStyle: "short-month",
     personal: [],
     photo: false,
-    note: "Two to three pages is normal. No photo or date of birth.",
+    note: "Two to four pages is common; follow the job ad. No photo or date of birth.",
   },
 }
 

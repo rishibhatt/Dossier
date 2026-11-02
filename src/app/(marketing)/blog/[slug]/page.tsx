@@ -6,7 +6,7 @@ import { notFound } from "next/navigation"
 import { Byline } from "@/components/blog/Byline"
 import { Prose } from "@/components/blog/Prose"
 import { PageHead } from "@/components/marketing/PageHead"
-import { buildPageMetadata } from "@/config/seo"
+import { buildPageMetadata, SCHEMA_IDS } from "@/config/seo"
 import { siteConfig } from "@/config/site"
 import { AUTHOR, formatDate, getPost, POSTS, readingMinutes } from "@/content/blog/posts"
 import { getFreeTool } from "@/features/tools/catalog"
@@ -29,6 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: post.description,
     path: `${ROUTES.blog}/${post.slug}`,
     image: post.hero ?? `/og/blog/${post.slug}`,
+    openGraph: { title: post.ogTitle, description: post.ogDescription },
   })
   return {
     ...base,
@@ -44,11 +45,13 @@ export default async function PostPage({ params }: Props) {
 
   const url = `${siteConfig.url}${ROUTES.blog}/${post.slug}`
   const heroSrc = post.hero ?? `/og/blog/${post.slug}`
-  const freeTool = post.tool === "resume-builder" ? undefined : getFreeTool(post.tool)
+  const freeTool = post.tool === "resume-builder" || post.tool === "cover-letter" ? undefined : getFreeTool(post.tool)
   const tool =
     post.tool === "resume-builder"
       ? { name: "Free resume builder", href: ROUTES.resume, cta: "Build your resume free" }
-      : freeTool && { name: freeTool.name, href: `${ROUTES.tools}/${freeTool.slug}`, cta: "Try it free" }
+      : post.tool === "cover-letter"
+        ? { name: "Cover letter maker", href: ROUTES.coverLetterNew, cta: "Write my cover letter" }
+        : freeTool && { name: freeTool.name, href: `${ROUTES.tools}/${freeTool.slug}`, cta: "Try it free" }
   const others = POSTS.filter((p) => p.slug !== post.slug)
   const related = [...others.filter((p) => p.category === post.category), ...others.filter((p) => p.category !== post.category)].slice(0, 3)
 
@@ -62,8 +65,10 @@ export default async function PostPage({ params }: Props) {
       datePublished: post.published,
       dateModified: post.updated ?? post.published,
       mainEntityOfPage: url,
+      inLanguage: post.inLanguage ?? "en",
       author: { "@type": "Person", name: AUTHOR.name, url: AUTHOR.url },
-      publisher: { "@type": "Organization", name: siteConfig.name, url: siteConfig.url },
+      publisher: { "@type": "Organization", "@id": SCHEMA_IDS.org, name: siteConfig.name, url: siteConfig.url },
+      ...(post.sources?.length ? { citation: post.sources.map((s) => ({ "@type": "CreativeWork", name: s.label, url: s.url })) } : {}),
     },
     {
       "@context": "https://schema.org",
@@ -112,11 +117,27 @@ export default async function PostPage({ params }: Props) {
                 </dl>
               </section>
             ) : null}
+            {post.sources?.length ? (
+              <section aria-labelledby="post-sources" className="mt-14 max-w-[40rem] border-t border-[var(--site-rule)] pt-8">
+                <h2 id="post-sources" className="site-h3">
+                  Sources
+                </h2>
+                <ol className="mt-4 list-decimal space-y-2 pl-6 text-[0.9375rem] leading-relaxed text-[var(--site-ink-2)]">
+                  {post.sources.map((s) => (
+                    <li key={s.url}>
+                      <a href={s.url} rel="noopener" target="_blank" className="underline decoration-[var(--site-rule-strong)] underline-offset-4 hover:text-[var(--site-accent-ink)]">
+                        {s.label}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            ) : null}
           </div>
           {tool ? (
             <aside className="lg:col-span-4" aria-label="Free tool">
               <div className="border border-[var(--site-ink)] bg-[var(--site-sheet)] p-5 lg:sticky lg:top-24">
-                <p className="sp-data">{post.tool === "resume-builder" ? "Dossier Resume" : "Free tool"}</p>
+                <p className="sp-data">{post.tool === "resume-builder" ? "Dossier Resume" : post.tool === "cover-letter" ? "Dossier Cover Letter" : "Free tool"}</p>
                 <p className="site-h3 mt-1">{tool.name}</p>
                 <p className="mt-2 text-[0.9375rem] text-[var(--site-ink-2)]">{post.toolPitch}</p>
                 <Link href={tool.href} className="site-btn site-btn-primary mt-5 w-full">

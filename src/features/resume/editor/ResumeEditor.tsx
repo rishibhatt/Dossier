@@ -191,7 +191,7 @@ export function ResumeEditor() {
       } catch {
         /* storage blocked */
       }
-      track("pdf_downloaded", { template: d.design.templateId, preset: d.design.preset })
+      track("pdf_downloaded", { doc: "resume", template: d.design.templateId, preset: d.design.preset })
       setDialog({ kind: "done", fileName })
     } catch (e) {
       toast.error(e instanceof Error ? `Couldn't make the PDF: ${e.message}` : "Couldn't make the PDF. Try again.")
@@ -202,7 +202,7 @@ export function ResumeEditor() {
 
   const onDownload = useCallback(() => {
     if (!draft) return
-    track("download_click", { signedIn: Boolean(user) })
+    track("download_click", { doc: "resume", signedIn: Boolean(user) })
     if (user) {
       void doDownload()
       return
@@ -358,7 +358,14 @@ export function ResumeEditor() {
         ))}
       </nav>
 
-      <DownloadDialog state={dialog} onClose={() => setDialog({ kind: "closed" })} onMakeWebsite={makeWebsite} makingWebsite={makingWebsite} />
+      <DownloadDialog
+        state={dialog}
+        onClose={() => setDialog({ kind: "closed" })}
+        onMakeWebsite={makeWebsite}
+        makingWebsite={makingWebsite}
+        letterHref={draft ? `/cover-letter/new?resume=${encodeURIComponent(draft.id)}` : undefined}
+        onLetterClick={() => track("resume_to_letter_click", { from: "resume_download" })}
+      />
     </>
   )
 }

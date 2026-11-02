@@ -9,6 +9,7 @@ import { siteConfig } from "@/config/site"
 import { AboutBuilder } from "@/features/tools/AboutBuilder"
 import { AtsChecker } from "@/features/tools/AtsChecker"
 import { BulletGenerator } from "@/features/tools/BulletGenerator"
+import { CoverLetterChecker } from "@/features/tools/CoverLetterChecker"
 import { FREE_TOOLS, getFreeTool, type FreeToolSlug } from "@/features/tools/catalog"
 import { HeadlineWriter } from "@/features/tools/HeadlineWriter"
 import { LinkInBio } from "@/features/tools/LinkInBio"
@@ -73,6 +74,12 @@ const HOW: Record<FreeToolSlug, string[]> = {
     "No number? The tool says so. Recruiters skim, and a number is what stops the skim. An honest estimate is fine.",
     "Everything runs in your browser. Polish with AI is optional, capped per day, and rejects any rewrite that adds a number you did not give it.",
   ],
+  "cover-letter-checker": [
+    "The check finds the greeting, the body paragraphs and the sign-off, then looks for the company and the job title. With a job post it takes both from the post. Without one it looks for a name after \"the role at\" or \"join\".",
+    "Six parts make the score: job match, how personal the letter is, structure, length, specific examples, and clichés and tone. Job match counts only when the job post is at least 120 characters. About 60% of the post's top ten key words earns full marks, since a letter should read as a letter, and a paragraph that lists more than eight skills is flagged.",
+    "Each issue shows what was found and what to change. Stock phrases such as \"I am writing to apply\" and \"team player\" get their own rewrite notes.",
+    "It reads text only and runs in your browser. It does not check spelling or grammar, and it cannot tell whether the story is true.",
+  ],
 }
 
 function ToolBody({ slug }: { slug: FreeToolSlug }) {
@@ -89,6 +96,8 @@ function ToolBody({ slug }: { slug: FreeToolSlug }) {
       return <SummaryGenerator />
     case "resume-bullet-point-generator":
       return <BulletGenerator />
+    case "cover-letter-checker":
+      return <CoverLetterChecker />
     case "resume-to-website":
       return (
         <div className="grid gap-10 lg:grid-cols-12">

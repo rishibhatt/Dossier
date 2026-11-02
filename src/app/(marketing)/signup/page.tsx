@@ -15,6 +15,9 @@ export const metadata: Metadata = buildPageMetadata({
   path: ROUTES.signup,
 })
 
+/** Billing with checkout opening for the plan's main product (Pro: the year pass, as /pricing shows). */
+const buyPath = (plan: "starter" | "pro") => `${ROUTES.billing}?buy=${plan === "pro" ? "pro_year" : "starter"}`
+
 type PageProps = { searchParams: Promise<{ next?: string; plan?: string }> }
 
 /** One calm line above the form when the visitor arrived for a reason: a paid plan, or a friend's invite. */
@@ -26,7 +29,7 @@ function contextNote(plan: string | undefined, invited: boolean, next: string | 
   }
   if (plan === "starter" || plan === "pro") {
     const name = plan === "starter" ? "Starter" : "Pro"
-    return `Create a free account first. Then you can buy ${name} on the next page with UPI or a card.`
+    return `Create a free account first. Then checkout for ${name} opens, and you can pay with UPI or a card.`
   }
   if (invited) return "You were invited by a friend. Publish your first portfolio and you both get a credit."
   return undefined
@@ -37,8 +40,8 @@ export default async function SignupPage({ searchParams }: PageProps) {
   const safeNext = next ? safeNextPath(next) : undefined
   const invited = Boolean((await cookies()).get("dx_ref")?.value)
   const note = contextNote(plan, invited, safeNext)
-  // Buying a plan: after signup, land on billing instead of the dashboard.
-  const target = safeNext ?? (plan === "starter" || plan === "pro" ? ROUTES.billing : undefined)
+  // Buying a plan: after signup, land on billing with that plan's checkout open instead of the dashboard.
+  const target = safeNext ?? (plan === "starter" || plan === "pro" ? buyPath(plan) : undefined)
 
   return (
     <AuthShell title={messages.auth.signupTitle} subtitle={messages.auth.signupSubtitle} info={note}>

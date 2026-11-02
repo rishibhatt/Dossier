@@ -382,6 +382,21 @@ export default function ResumeLandingPage() {
               </li>
             ))}
           </ol>
+
+          <div className="mt-10 grid gap-5 border border-[var(--site-ink)] bg-[var(--site-sheet)] p-6 sm:p-8 lg:grid-cols-12 lg:items-center">
+            <div className="lg:col-span-8">
+              <h3 className="site-h3">Need a cover letter for the same job?</h3>
+              <p className="site-body mt-2">
+                The cover letter maker starts from this resume and the job ad. Your details and results carry over, and the letterhead uses the
+                same template, so the two PDFs read as a set.
+              </p>
+            </div>
+            <div className="lg:col-span-4 lg:justify-self-end">
+              <SiteButton href={ROUTES.coverLetter} variant="secondary" arrow>
+                See the cover letter maker
+              </SiteButton>
+            </div>
+          </div>
         </div>
       </section>
 

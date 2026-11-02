@@ -13,8 +13,21 @@ const ERRORS: Record<number, string> = {
   503: "AI rewrites are unavailable right now. The drafts above still work.",
 }
 
-/** Optional AI rewrite of one rule-based draft. The draft itself never changes; the rewrite shows underneath. */
-export function PolishButton({ kind, text, role }: { kind: "summary" | "bullet"; text: string; role?: string }) {
+/**
+ * Optional AI rewrite of one rule-based draft. The draft itself never changes; the rewrite shows underneath.
+ * With `onAccept`, the rewrite also gets a "Use this" button that hands the text back (the cover letter editor).
+ */
+export function PolishButton({
+  kind,
+  text,
+  role,
+  onAccept,
+}: {
+  kind: "summary" | "bullet" | "letter"
+  text: string
+  role?: string
+  onAccept?: (text: string) => void
+}) {
   const [state, setState] = useState<State>({ kind: "idle" })
 
   const run = async () => {
@@ -38,6 +51,18 @@ export function PolishButton({ kind, text, role }: { kind: "summary" | "bullet";
           <p className="leading-relaxed">{state.text}</p>
           <CopyText text={state.text} />
         </div>
+        {onAccept ? (
+          <button
+            type="button"
+            onClick={() => {
+              onAccept(state.text)
+              setState({ kind: "idle" })
+            }}
+            className="dx-btn dx-btn-outline dx-btn-sm mt-3"
+          >
+            Use this
+          </button>
+        ) : null}
       </div>
     )
   }

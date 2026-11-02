@@ -56,7 +56,7 @@ export const ACCENT_HEX: Record<Accent, string> = {
   slate: "#3d4a5c",
 }
 
-const DENSITY: Record<Density, { size: number; leading: number; margin: number; gap: number }> = {
+export const DENSITY: Record<Density, { size: number; leading: number; margin: number; gap: number }> = {
   comfortable: { size: 10.5, leading: 0.72, margin: 20, gap: 1.15 },
   standard: { size: 10, leading: 0.62, margin: 16, gap: 1 },
   compact: { size: 9.5, leading: 0.52, margin: 12, gap: 0.78 },

@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Bricolage_Grotesque, Geist_Mono, Inter, Inter_Tight, Mr_Dafoe } from "next/font/google"
 
-import { Analytics } from "@/components/analytics/Analytics"
+import { Analytics, AuthEventTracker } from "@/components/analytics/Analytics"
 import { AppProviders } from "@/components/providers/app-providers"
 import { buildPageMetadata } from "@/config/seo"
 import { messages } from "@/config/messages"
@@ -73,6 +73,7 @@ export default function RootLayout({
       <body className="min-h-full" suppressHydrationWarning>
         <AppProviders>{children}</AppProviders>
         <Analytics />
+        <AuthEventTracker />
       </body>
     </html>
   )

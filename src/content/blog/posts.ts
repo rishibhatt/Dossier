@@ -2,6 +2,7 @@
  * Blog posts as typed data: no MDX dependency, every post renders to semantic HTML and Article JSON-LD.
  * Inline links use [label](/path). Add a post by appending to GUIDES, to RESUME_BUILDER_POSTS when it hands off to the builder, or to JOB_SEARCH_POSTS for mid-search problems. Keep claims checkable: no invented statistics.
  */
+import { COVER_LETTER_POSTS } from "./cover-letter-posts"
 import { JOB_SEARCH_POSTS } from "./job-search-posts"
 import { RESUME_BUILDER_POSTS } from "./resume-builder-posts"
 
@@ -15,22 +16,29 @@ export type Block =
 export type Post = {
   slug: string
   title: string
-  /** Meta title. Falls back to `title`. */
+  /** Meta title, 50 characters at most: the page adds " | Dossier". Falls back to `title`. */
   seoTitle?: string
   description: string
+  /** Social share copy (Open Graph and X). Fall back to the meta title and description. */
+  ogTitle?: string
+  ogDescription?: string
+  /** BCP 47 language tag for Article schema, such as "en-IE". Defaults to "en". */
+  inLanguage?: string
   /** The search phrase the post targets. */
   query: string
-  category: "ATS" | "Resume" | "Portfolio" | "LinkedIn"
+  category: "ATS" | "Resume" | "Portfolio" | "LinkedIn" | "Cover letter"
   published: string
   updated?: string
   /** Optional hand-made or AI-generated image in /public. When absent, an on-brand card is generated. */
   hero?: string
-  /** Slug of the free tool the post hands off to, or the resume builder. */
-  tool: "ats-checker" | "headline-writer" | "linkedin-about" | "resume-to-website" | "resume-summary-generator" | "resume-bullet-point-generator" | "resume-builder"
+  /** Slug of the free tool the post hands off to, the resume builder, or the cover letter maker. */
+  tool: "cover-letter" | "cover-letter-checker" | "ats-checker" | "headline-writer" | "linkedin-about" | "resume-to-website" | "resume-summary-generator" | "resume-bullet-point-generator" | "resume-builder"
   toolPitch: string
   body: Block[]
   /** Questions people also search. Rendered under the post and as FAQPage JSON-LD. Answers are plain text. */
   faq?: { q: string; a: string }[]
+  /** Pages the post's rules were checked against. Rendered as a Sources list and as Article `citation`. Only list pages actually read. */
+  sources?: { label: string; url: string }[]
 }
 
 export const AUTHOR = {
@@ -624,7 +632,7 @@ const GUIDES: readonly Post[] = [
   },
 ]
 
-export const POSTS: readonly Post[] = [...GUIDES, ...RESUME_BUILDER_POSTS, ...JOB_SEARCH_POSTS]
+export const POSTS: readonly Post[] = [...GUIDES, ...RESUME_BUILDER_POSTS, ...JOB_SEARCH_POSTS, ...COVER_LETTER_POSTS]
 
 export function getPost(slug: string): Post | undefined {
   return POSTS.find((p) => p.slug === slug)

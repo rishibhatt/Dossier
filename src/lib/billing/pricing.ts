@@ -13,6 +13,11 @@ export const PRODUCTS: Record<ProductId, { name: string; plan: Exclude<PlanId, "
   pro_year: { name: "Pro, 1 year", plan: "pro", days: 365, price: { INR: 149900, USD: 3900 } },
 }
 
+/** True for a real product id, e.g. from a `?buy=` link. */
+export function isProductId(v: unknown): v is ProductId {
+  return typeof v === "string" && Object.hasOwn(PRODUCTS, v)
+}
+
 /**
  * Festival offers. A percentage off every paid product while the window is open, applied by the server at
  * order time. `currency` limits an offer to one market (Diwali: rupee buyers). Max ~4 a year, or the

@@ -12,7 +12,9 @@
     "indexnow": "INDEXNOW_KEY=faf64ad717e6887e5fc3fcb5facfdea9 node scripts/indexnow.mjs",
     "predev": "node scripts/resume/sync-typst-assets.mjs",
     "resume:verify": "node scripts/resume/sync-typst-assets.mjs && jiti scripts/resume/verify.ts",
-    "resume:thumbs": "jiti scripts/resume/thumbnails.ts"
+    "resume:thumbs": "jiti scripts/resume/thumbnails.ts",
+    "letter:verify": "node scripts/resume/sync-typst-assets.mjs && jiti scripts/cover-letter/verify-letter.ts",
+    "letter:check": "jiti scripts/cover-letter/letterGen.check.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",

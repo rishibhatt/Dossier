@@ -74,7 +74,7 @@ export default async function DashboardHomePage() {
   const ctx = await getDashboardContext()
 
   // Sites and resumes load together. Sites read only the parts of the payload this page shows, not the whole site.
-  const [{ data: portfolios }, { data: resumeRows }] =
+  const [{ data: portfolios }, { data: resumeRows }, { data: letterRows }] =
     ctx.supabase && ctx.userId
       ? await Promise.all([
           ctx.supabase
@@ -88,10 +88,19 @@ export default async function DashboardHomePage() {
             .eq("user_id", ctx.userId)
             .order("updated_at", { ascending: false })
             .limit(50),
+          ctx.supabase
+            .from("cover_letters")
+            .select("id, title, company, updated_at")
+            .eq("user_id", ctx.userId)
+            .order("updated_at", { ascending: false })
+            .limit(50),
         ])
-      : [{ data: [] }, { data: [] }]
+      : [{ data: [] }, { data: [] }, { data: [] }]
   const resumes = resumeRows ?? []
   const resumeLimit = ctx.plan === "free" ? 2 : null
+  // Empty (not an error) until the cover_letters migration has run.
+  const letters = letterRows ?? []
+  const letterLimit = ctx.plan === "free" ? 3 : null
 
   const rows = (portfolios ?? []).map(({ title, sections, tokens, ...r }) => ({
     ...r,
@@ -337,7 +346,40 @@ export default async function DashboardHomePage() {
           </Link>
         </section>
 
-        <section aria-labelledby="plan-h">
+        <section aria-labelledby="letters-h" className="lg:col-start-1">
+          <div className="flex items-end justify-between gap-4 border-b border-[var(--site-ink)] pb-2">
+            <h2 id="letters-h" className="text-[clamp(1.25rem,2vw,1.625rem)] font-[650] tracking-[-0.025em]" style={display}>
+              Cover letters
+            </h2>
+            <span className="sp-data">{letterLimit ? `${letters.length} of ${letterLimit}` : letters.length}</span>
+          </div>
+          {letters.length === 0 ? (
+            <p className="py-4 text-sm text-[var(--site-ink-2)]">Write a cover letter that matches your resume&apos;s template, from your own facts.</p>
+          ) : (
+            <ul className="divide-y divide-[var(--site-rule)]">
+              {letters.map((l) => (
+                <li key={l.id}>
+                  <Link href={`${ROUTES.coverLetterEdit}?id=${l.id}`} className="flex min-h-14 items-center justify-between gap-4 py-3 transition-colors hover:bg-[var(--site-sheet)]">
+                    <span className="min-w-0">
+                      <span className="block truncate font-semibold">{l.title || (l.company ? `Letter to ${l.company}` : "Untitled cover letter")}</span>
+                      <span className="sp-data">Edited {dateFormat.format(new Date(l.updated_at))}</span>
+                    </span>
+                    <span className="flex shrink-0 items-center gap-1.5 text-sm font-semibold">
+                      <Pencil className="size-4" aria-hidden />
+                      Edit
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+          <Link href={ROUTES.coverLetterNew} className="dx-btn dx-btn-outline dx-btn-sm mt-4 w-full sm:w-auto">
+            <FilePlus2 className="size-4" aria-hidden />
+            New cover letter
+          </Link>
+        </section>
+
+        <section aria-labelledby="plan-h" className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
           <div className="flex items-end justify-between gap-4 border-b border-[var(--site-ink)] pb-2">
             <h2 id="plan-h" className="text-[clamp(1.25rem,2vw,1.625rem)] font-[650] tracking-[-0.025em]" style={display}>
               Plan and usage
@@ -349,6 +391,7 @@ export default async function DashboardHomePage() {
               [
                 ["Sites", `${rows.length} of ${limit}`],
                 ["Saved resumes", resumeLimit ? `${resumes.length} of ${resumeLimit}` : `${resumes.length}`],
+                ["Saved cover letters", letterLimit ? `${letters.length} of ${letterLimit}` : `${letters.length}`],
                 ["Design shuffles today", shuffleLimit >= 100 ? "Unlimited" : ctx.shufflesUsed === null ? `${shuffleLimit} a day` : `${ctx.shufflesUsed} of ${shuffleLimit}`],
                 ["Dossier badge", ctx.plan === "free" ? "Shown" : "Removed"],
                 ["ZIP download", ctx.limits.zipExport ? "Included" : "Starter and Pro"],

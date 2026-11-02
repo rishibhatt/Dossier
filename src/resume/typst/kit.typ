@@ -31,20 +31,14 @@
   band: rgb("#f1f0ec"),
 )
 
-#let render(m, opts) = {
-  let o = defaults + opts
+// The masthead: name, headline, contact and personal line, in one of the header styles. Shared by the
+// resume (render) and the cover letter (render-letter), so a letter's header matches its resume. `o` is the
+// full option set (defaults + template options).
+#let masthead(m, o) = {
   let st = m.style
   let accent = rgb(st.accent)
   let head-font = if o.head-font == none { o.font } else { o.head-font }
   let name-font = if o.name-font == none { head-font } else { o.name-font }
-
-  set document(title: m.meta.title, author: m.meta.author, keywords: m.meta.keywords, date: none)
-  set page(paper: st.paper, margin: st.margin * 1mm)
-  set text(font: o.font, size: st.size * 1pt, ligatures: false, lang: "en", fill: ink, hyphenate: false)
-  set par(leading: st.leading * 1em, spacing: st.leading * 1.6em)
-  set list(marker: o.marker, indent: 0.1em, body-indent: 0.6em, spacing: st.leading * 1em)
-
-  // ---------------------------------------------------------------- Header
   let name = text(
     font: name-font,
     size: st.size * o.name-scale * 1pt,
@@ -79,6 +73,22 @@
   } else {
     stacked(name, headline, contact, personal)
   }
+}
+
+#let render(m, opts) = {
+  let o = defaults + opts
+  let st = m.style
+  let accent = rgb(st.accent)
+  let head-font = if o.head-font == none { o.font } else { o.head-font }
+
+  set document(title: m.meta.title, author: m.meta.author, keywords: m.meta.keywords, date: none)
+  set page(paper: st.paper, margin: st.margin * 1mm)
+  set text(font: o.font, size: st.size * 1pt, ligatures: false, lang: "en", fill: ink, hyphenate: false)
+  set par(leading: st.leading * 1em, spacing: st.leading * 1.6em)
+  set list(marker: o.marker, indent: 0.1em, body-indent: 0.6em, spacing: st.leading * 1em)
+
+  // ---------------------------------------------------------------- Header
+  masthead(m, o)
 
   // ---------------------------------------------------------------- Headings
   let head-text(title, weight: 700, upper-case: true) = text(
@@ -199,4 +209,45 @@
         grid.cell(x: 0, y: 0, side-col))
     }
   }
+}
+
+// Cover letter: the template's masthead, then date and recipient (order and alignment from the preset), an
+// optional subject line, the greeting, the paragraphs, the sign-off and the signature. One text flow in that
+// order. Every value is a JSON string from src/lib/cover-letter/renderModel.ts, set as literal text.
+#let render-letter(m, opts) = {
+  let o = defaults + opts
+  let st = m.style
+  let d = m.doc
+  let head-font = if o.head-font == none { o.font } else { o.head-font }
+
+  set document(title: m.meta.title, author: m.meta.author, keywords: m.meta.keywords, date: none)
+  set page(paper: st.paper, margin: st.margin * 1mm)
+  // Inter after the look's font covers symbols some faces lack (₹ in Crimson Text). letterFonts() loads it.
+  set text(font: (o.font, "Inter"), size: st.size * 1pt, ligatures: false, lang: "en", fill: ink, hyphenate: false)
+  set par(leading: st.leading * 1em, spacing: st.leading * 1.6em)
+
+  masthead(m, o)
+
+  let lines(xs) = if xs.len() > 0 { xs.join(linebreak()) }
+  let step = st.gap * 1.5em
+  let date-block(above) = if d.date != "" {
+    block(above: above, width: 100%, align(if m.layout.dateAlign == "right" { right } else { left }, d.date))
+  }
+  let recipient-block(above) = if d.recipient.len() > 0 { block(above: above, lines(d.recipient)) }
+
+  let top = st.gap * 20pt
+  if m.layout.date == "before" {
+    date-block(top)
+    recipient-block(if d.date != "" { step } else { top })
+  } else {
+    recipient-block(top)
+    date-block(if d.recipient.len() > 0 { step } else { top })
+  }
+  if d.subject != "" { block(above: step, text(font: head-font, weight: 700, d.subject)) }
+  block(above: step, d.greeting)
+  for p in d.paragraphs { block(above: st.gap * 1.2em, lines(p.lines)) }
+  block(above: step, breakable: false, {
+    d.signOff
+    if d.signature != "" { block(above: 3.2em, d.signature) }
+  })
 }

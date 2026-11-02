@@ -1,17 +1,23 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useEffect } from "react"
 import Link from "next/link"
 
 import { AuthField, AuthSubmit, FormBanner, useAuthToast } from "@/features/auth/components/AuthFields"
 import { signUpWithCredentialsAction } from "@/features/auth/actions/auth.actions"
 import { authFormInitialState } from "@/features/auth/auth-form-state"
 import { messages } from "@/config/messages"
+import { track } from "@/lib/analytics"
 import { ROUTES } from "@/lib/constants/routes"
 
 export function SignupForm({ next }: { next?: string }) {
   const [state, action, pending] = useActionState(signUpWithCredentialsAction, authFormInitialState)
   useAuthToast(state)
+
+  // With email confirmation on, the account exists but no page change follows, so the event is sent here.
+  useEffect(() => {
+    if (state.success) track("sign_up", { method: "email" })
+  }, [state.success, state.nonce])
 
   return (
     <form action={action} className="flex flex-col gap-5" noValidate>

@@ -27,8 +27,11 @@ const PROVIDERS: { id: OAuthProvider; label: string; Mark: () => React.JSX.Eleme
   { id: "google", label: messages.auth.oauthGoogle, Mark: GoogleMark },
 ]
 
-/** `next`: where to land after sign-in. The page passes it when it knows more than the URL (a plan bought from pricing). */
-export function OAuthSection({ next: target }: { next?: string } = {}) {
+/**
+ * `next`: where to land after sign-in. The page passes it when it knows more than the URL (a plan bought from pricing).
+ * `primary`: Google is the main action, as in the download dialog, where it never leaves for an inbox.
+ */
+export function OAuthSection({ next: target, primary = false }: { next?: string; primary?: boolean } = {}) {
   const [pending, setPending] = useState<OAuthProvider | null>(null)
 
   async function signIn(provider: OAuthProvider) {
@@ -61,7 +64,7 @@ export function OAuthSection({ next: target }: { next?: string } = {}) {
             disabled={pending !== null}
             aria-busy={pending === id}
             onClick={() => void signIn(id)}
-            className={siteBtnClass({ variant: id === "google" ? "secondary" : "ghost", className: "w-full !justify-center" })}
+            className={siteBtnClass({ variant: id === "google" ? (primary ? "primary" : "secondary") : "ghost", className: "w-full !justify-center" })}
           >
             {pending === id ? <Loader2 className="size-[1.125rem] animate-spin" aria-hidden /> : <Mark />}
             <span className="site-btn-label">{label}</span>

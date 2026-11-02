@@ -111,7 +111,8 @@ export async function proxy(request: NextRequest) {
   // billing if they came from a paid plan button, else the dashboard. Refreshed session cookies go along.
   if (user && (pathname === ROUTES.login || pathname === ROUTES.signup)) {
     const plan = request.nextUrl.searchParams.get("plan")
-    const fallback = plan === "starter" || plan === "pro" ? ROUTES.billing : ROUTES.dashboard
+    // `?buy=` opens that plan's checkout on arrival (the year pass for Pro, as /pricing shows).
+    const fallback = plan === "starter" || plan === "pro" ? `${ROUTES.billing}?buy=${plan === "pro" ? "pro_year" : "starter"}` : ROUTES.dashboard
     const redirect = NextResponse.redirect(new URL(safeNextPath(request.nextUrl.searchParams.get("next"), fallback), request.url))
     for (const c of client.getResponse().cookies.getAll()) redirect.cookies.set(c)
     return tag(redirect)

@@ -35,6 +35,14 @@ const templateFromUrl = () => {
   const id = new URLSearchParams(window.location.search).get("template")
   return id && RESUME_TEMPLATES.some((t) => t.id === id) ? id : null
 }
+/** Country aliases a blog post may link with (?format=ie) mapped to the preset that covers them. */
+const FORMAT_ALIASES: Record<string, PresetId> = { gb: "uk", ie: "uk", ca: "us", nz: "au" }
+// A country guide links here as /resume/new?format=<preset or country>; it overrides the browser-language guess.
+const formatFromUrl = (): PresetId | null => {
+  const raw = new URLSearchParams(window.location.search).get("format")?.toLowerCase()
+  if (!raw) return null
+  return (PRESET_IDS as readonly string[]).includes(raw) ? (raw as PresetId) : (FORMAT_ALIASES[raw] ?? null)
+}
 let detectedPreset: PresetId | null = null
 let recentCache: DraftSummary[] | null = null
 const EMPTY: DraftSummary[] = []
@@ -64,8 +72,9 @@ export function StartScreen() {
   const templateId = picked ?? fromUrl ?? DEFAULT_TEMPLATE_ID
   const templateChosen = Boolean(picked ?? fromUrl)
   const detected = useSyncExternalStore(noSubscribe, () => (detectedPreset ??= guessPreset()), () => "us" as PresetId)
+  const formatParam = useSyncExternalStore(noSubscribe, formatFromUrl, () => null)
   const [chosenPreset, setPreset] = useState<PresetId | null>(null)
-  const preset = chosenPreset ?? detected
+  const preset = chosenPreset ?? formatParam ?? detected
   const [over, setOver] = useState(false)
   const [importing, setImporting] = useState(false)
   const [importError, setImportError] = useState("")

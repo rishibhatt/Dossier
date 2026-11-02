@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react"
 
-import { activeOffer, OFFERS, type Currency, type Offer } from "@/lib/billing/pricing"
+import { activeOffer, INTERNATIONAL, OFFERS, type Currency, type Offer } from "@/lib/billing/pricing"
 
 const DAY_MS = 86_400_000
 const noop = () => () => {}
@@ -21,6 +21,17 @@ export function localCurrency(): Currency {
   }
 }
 
+/**
+ * The currency this visitor sees and pays in. With international payments on, India sees rupees and everyone
+ * else dollars; with them off, everyone pays in rupees. Prices, offers and checkout all read this one value.
+ */
+export function checkoutCurrency(): Currency {
+  return INTERNATIONAL ? localCurrency() : "INR"
+}
+
+/** What the server renders before the browser knows the visitor's currency. */
+export const DEFAULT_CURRENCY: Currency = INTERNATIONAL ? "USD" : "INR"
+
 /** Dev only: `?offer=<id>` shows that offer as running, to review the design before it starts. Prices charged never change. */
 function previewId(): string {
   if (process.env.NODE_ENV === "production") return ""
@@ -34,7 +45,7 @@ function previewId(): string {
 /** The festival offer running now for this visitor (null before hydration and between offers), ticking every second. */
 export function useOffer(): { now: number; currency: Currency | null; offer: Offer | null } {
   const now = useSyncExternalStore(tick, second, () => 0)
-  const currency = useSyncExternalStore(noop, localCurrency, () => null)
+  const currency = useSyncExternalStore(noop, checkoutCurrency, () => null)
   const preview = useSyncExternalStore(noop, previewId, () => "")
   if (!now) return { now, currency, offer: null }
   const forced = OFFERS.find((o) => o.id === preview)

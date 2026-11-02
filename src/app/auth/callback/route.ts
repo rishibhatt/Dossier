@@ -2,6 +2,7 @@
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 
+import { AUTH_EVENT_COOKIE } from "@/lib/analytics"
 import { clientIpFromHeaders } from "@/lib/api/guard"
 import { publicOrigin } from "@/lib/auth/publicOrigin"
 import { safeNextPath } from "@/lib/auth/safeNext"
@@ -50,5 +51,18 @@ export async function GET(request: NextRequest) {
     after(() => notifyAfterAuth(user))
   }
 
-  return NextResponse.redirect(new URL(nextPath, origin))
+  const response = NextResponse.redirect(new URL(nextPath, origin))
+  // Google sign in and email confirmation both finish here. A password reset link also does, and is not counted.
+  if (user && nextPath !== ROUTES.resetPassword) {
+    const provider = user.app_metadata?.provider ?? "email"
+    const isNew = Date.now() - new Date(user.created_at).getTime() < 10 * 60 * 1000
+    const event = provider === "email" ? "email_confirmed" : isNew ? "sign_up" : "login"
+    response.cookies.set(AUTH_EVENT_COOKIE, `${event}.${provider}`, {
+      path: "/",
+      maxAge: 120,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    })
+  }
+  return response
 }

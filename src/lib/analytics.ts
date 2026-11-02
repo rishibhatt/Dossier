@@ -8,6 +8,12 @@ declare global {
   }
 }
 
+/**
+ * Set by the server after a sign in it finishes itself (`login.email`, `sign_up.google`, `email_confirmed.email`),
+ * because a server action or redirect cannot call `track`. `AuthEventTracker` sends it once and clears it.
+ */
+export const AUTH_EVENT_COOKIE = "dx_auth_event"
+
 /** Sends one product event to every analytics tool that is loaded. Safe to call when none are. */
 export function track(event: string, props: Props = {}) {
   if (typeof window === "undefined") return

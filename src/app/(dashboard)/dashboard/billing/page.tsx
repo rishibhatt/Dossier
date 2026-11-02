@@ -5,8 +5,9 @@ import { Check } from "lucide-react"
 import { buildPageMetadata } from "@/config/seo"
 import { PlanBuy } from "@/features/billing/BuyButton"
 import { OfferBar } from "@/features/billing/OfferBar"
+import { PlanPrice } from "@/features/billing/PlanPrice"
 import { messages } from "@/config/messages"
-import { PLAN_CARDS } from "@/lib/billing/pricing"
+import { isProductId, PLAN_CARDS, PRODUCTS } from "@/lib/billing/pricing"
 import type { PlanId } from "@/lib/billing/plans"
 import { ROUTES } from "@/lib/constants/routes"
 import { getDashboardContext } from "@/lib/dashboard/context"
@@ -22,8 +23,14 @@ export const metadata: Metadata = buildPageMetadata({
 const display = { fontFamily: "var(--site-display)" } as const
 const RANK: Record<PlanId, number> = { free: 0, starter: 1, pro: 2 }
 
-export default async function BillingPage() {
+type PageProps = { searchParams: Promise<{ buy?: string }> }
+
+export default async function BillingPage({ searchParams }: PageProps) {
   const ctx = await getDashboardContext()
+  // `?buy=<product>`: sent here from a pricing button after signing up. That product's checkout opens on arrival.
+  const { buy } = await searchParams
+  const autoBuy = isProductId(buy) ? buy : undefined
+  const autoPlan = autoBuy ? PRODUCTS[autoBuy].plan : undefined
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -62,13 +69,7 @@ export default async function BillingPage() {
                   </span>
                 ) : null}
               </div>
-              <p className="mt-3 flex items-baseline gap-1.5">
-                <span className="text-4xl font-bold tracking-[-0.04em]" style={display}>
-                  {p.price}
-                </span>
-                <span className="text-sm text-[var(--site-ink-2)]">{p.cadence}</span>
-              </p>
-              <p className="mt-1 text-xs text-[var(--site-ink-2)]">{p.inr}</p>
+              <PlanPrice plan={p.id} size="md" cadence={p.cadence} />
               <p className="mt-2 text-sm text-[var(--site-ink-2)]">{p.summary}</p>
               <ul className="mt-5 flex-1 space-y-2.5 border-t border-[var(--site-rule)] pt-5 text-sm">
                 {p.features.map((f) => (
@@ -83,13 +84,13 @@ export default async function BillingPage() {
               </ul>
               <div className="mt-6">
                 {current && p.id === "pro" ? (
-                  <PlanBuy plan="pro" />
+                  <PlanBuy plan="pro" autoBuy={autoPlan === "pro" ? autoBuy : undefined} />
                 ) : current ? (
                   <p className="text-center text-sm font-medium text-[var(--site-ink-2)]">You are on this plan</p>
                 ) : included || p.id === "free" ? (
                   <p className="text-center text-sm font-medium text-[var(--site-ink-2)]">Included in your plan</p>
                 ) : (
-                  <PlanBuy plan={p.id} />
+                  <PlanBuy plan={p.id} autoBuy={autoPlan === p.id ? autoBuy : undefined} />
                 )}
               </div>
             </li>

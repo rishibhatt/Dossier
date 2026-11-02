@@ -214,6 +214,7 @@ export function SiteHeader({ user }: { user: SessionUser | null | undefined }) {
   const onDetailWithBar = pathname?.startsWith(`${ROUTES.resumeTemplates}/`) || pathname?.startsWith(`${ROUTES.resumeExamples}/`)
   const onResumePages = pathname === ROUTES.resume || pathname === ROUTES.resumeTemplates || pathname === ROUTES.resumeExamples
   const onResumeSide = pathname === ROUTES.resume || pathname?.startsWith(ROUTES.resumeTemplates) || pathname?.startsWith(ROUTES.resumeExamples)
+  const onLetterPage = pathname === ROUTES.coverLetter
   const hideFloating = pathname === ROUTES.login || pathname === ROUTES.signup || onDetailWithBar
   const account = user ? { href: ROUTES.dashboard, label: "Dashboard" } : { href: ROUTES.login, label: "Log in" }
 
@@ -249,7 +250,12 @@ export function SiteHeader({ user }: { user: SessionUser | null | undefined }) {
                 {account.label}
               </SiteButton>
               {/* On resume pages the main action is the resume; everywhere else it is the website. */}
-              {onResumeSide ? (
+              {onLetterPage ? (
+                <SiteButton href={ROUTES.coverLetterNew} size="sm" arrow className="hidden sm:inline-flex">
+                  <span className="xl:hidden">Write mine</span>
+                  <span className="hidden xl:inline">Write my letter</span>
+                </SiteButton>
+              ) : onResumeSide ? (
                 <SiteButton href={ROUTES.resumeNew} size="sm" arrow className="hidden sm:inline-flex">
                   <span className="xl:hidden">Build mine</span>
                   <span className="hidden xl:inline">Build my resume</span>
@@ -278,11 +284,13 @@ export function SiteHeader({ user }: { user: SessionUser | null | undefined }) {
       </header>
       <FloatingCta
         hidden={hideFloating}
-        {...(onResumePages
-          ? { href: pathname === ROUTES.resume ? ROUTES.resumeTemplates : ROUTES.resumeNew, label: pathname === ROUTES.resume ? "Pick a template" : "Start my resume" }
-          : user
-            ? { href: ROUTES.dashboard, label: "Open my dashboard" }
-            : {})}
+        {...(onLetterPage
+          ? { href: ROUTES.coverLetterNew, label: "Write my cover letter" }
+          : onResumePages
+            ? { href: pathname === ROUTES.resume ? ROUTES.resumeTemplates : ROUTES.resumeNew, label: pathname === ROUTES.resume ? "Pick a template" : "Start my resume" }
+            : user
+              ? { href: ROUTES.dashboard, label: "Open my dashboard" }
+              : {})}
       />
     </>
   )

@@ -10,6 +10,7 @@ export type FreeToolSlug =
   | "link-in-bio"
   | "resume-summary-generator"
   | "resume-bullet-point-generator"
+  | "cover-letter-checker"
 
 export type FreeTool = {
   slug: FreeToolSlug
@@ -143,6 +144,32 @@ export const FREE_TOOLS: readonly FreeTool[] = [
       { q: "What is the XYZ formula for resume bullets?", a: "Accomplished X, as measured by Y, by doing Z. The Result first version in this tool follows it: the outcome and number come first, then what you did." },
       { q: "What if I do not have numbers?", a: "Estimate honestly and say so: about 30 tickets a day, roughly 5 hours a week. You can also count people, sites, clients or documents. A bullet with a fair estimate beats one with none." },
       { q: "Does the AI make up numbers?", a: "No. The rule-based drafts only use your words. The optional AI polish rejects any rewrite that adds a number you did not type." },
+    ],
+  },
+  {
+    slug: "cover-letter-checker",
+    no: "008",
+    name: "Cover letter checker",
+    title: "Free cover letter checker: score and fixes | Dossier",
+    description:
+      "Paste your cover letter and the job ad. See what is missing: the role name, a result with a number, the ad's key words, length and a clear ask. Free.",
+    query: "cover letter checker",
+    h1: "Free cover letter checker",
+    intro: "Paste your letter and the job ad. The checker lists what a recruiter will notice in the first read: a missing role name, no numbers, words the ad repeats that your letter skips, and an opening that could go to any company. Your letter stays in this tab.",
+    output: "A score and a fix list, most important first",
+    cta: "Fix it in the cover letter maker",
+    examples: [
+      { label: "Opening", before: "I am writing to apply for the position advertised on your website.", after: "I'd like to bring five years of retail pricing work to the Data Analyst role at Northwind." },
+      { label: "Proof", before: "I am a hard-working team player with a passion for data.", after: "At Bluefin I built a markdown dashboard that store managers used to cut losses by 12% in two quarters." },
+      { label: "Close", before: "I look forward to hearing from you.", after: "Could we talk next week? I can walk you through the dashboard and how the tests were set up." },
+    ],
+    faq: [
+      { q: "What does the cover letter checker look for?", a: "Whether the letter names the company and the role, greets a person and has no template gaps left in. It also checks paragraph count, length, a closing ask, a result with a number, stock phrases and hedges. With a job post, it counts how many of the post's key words your letter uses." },
+      { q: "Does it check grammar?", a: "No. It reads structure and wording, not spelling or grammar. After you make the fixes here, run the letter through a grammar checker or the one built into your word processor." },
+      { q: "Is my letter saved?", a: "Your letter stays in this browser tab and is not sent to Dossier. The job post is kept in this browser so the ATS checker can reuse it. If you open the letter in the cover letter maker, it moves within this tab, never in the link." },
+      { q: "What is a good cover letter length?", a: "Most letters work at 250 to 400 words in three to five short paragraphs, which fits on one page. Under 150 words rarely says enough, and over 500 usually repeats the resume. A letter sent as an email body can be shorter." },
+      { q: "Should my cover letter repeat my resume?", a: "No. Pick two or three results that match what the job post asks for, and tell the story behind one of them: the problem, what you did and what changed. The resume holds the full list." },
+      { q: "Do ATS systems read cover letters?", a: "Some systems store cover letters and let recruiters search them, and many do not. A person reads the letter once it is opened, so use the job post's words where they fit naturally instead of listing them." },
     ],
   },
 ] as const

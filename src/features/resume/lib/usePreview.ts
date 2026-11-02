@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { toRenderModel } from "@/lib/resume/renderModel"
 import type { ResumeDesign, ResumeDocument } from "@/lib/resume/schema"
@@ -24,14 +24,34 @@ function measure(svg: string, paper: "a4" | "us-letter") {
 }
 
 /**
+ * One thing to typeset: the Typst source to compile (`/${templateId}.typ`), the fonts the worker must load,
+ * the JSON model, and the paper size (for measuring pages). Resumes use their template id; cover letters use
+ * "letter" with the matching template's fonts (see src/features/cover-letter/useLetterPreview.ts).
+ */
+export type TypesetJob = { templateId: string; fonts: string[]; data: string; paper: "a4" | "us-letter" }
+
+/** The typeset job for a resume. */
+export function resumeJob(doc: ResumeDocument, design: ResumeDesign): TypesetJob {
+  const model = toRenderModel(doc, design)
+  const t = getTemplate(design.templateId)
+  return { data: JSON.stringify(model), templateId: t.id, fonts: [...t.fonts], paper: model.style.paper }
+}
+
+/**
  * Live preview. Typesets the resume in the worker on every change (debounced, and never more than one compile
  * in flight: changes made during a compile are folded into the next one). The last good page stays on screen
  * while a new one is set, and when a compile fails.
  */
 export function usePreview(doc: ResumeDocument | null, design: ResumeDesign | null) {
+  const job = useMemo(() => (doc && design ? resumeJob(doc, design) : null), [doc, design])
+  return usePreviewJob(job)
+}
+
+/** Live preview of any typeset job. Pass a memoised job: a new object starts a new compile. */
+export function usePreviewJob(job: TypesetJob | null) {
   const [state, setState] = useState<PreviewState>({ status: "booting" })
   const inflight = useRef(false)
-  const queued = useRef<{ data: string; templateId: string; fonts: string[]; paper: "a4" | "us-letter" } | null>(null)
+  const queued = useRef<TypesetJob | null>(null)
   const lastUrl = useRef<string | null>(null)
   const alive = useRef(true)
 
@@ -87,15 +107,13 @@ export function usePreview(doc: ResumeDocument | null, design: ResumeDesign | nu
   }, [])
 
   useEffect(() => {
-    if (!doc || !design) return
-    const model = toRenderModel(doc, design)
-    const t = getTemplate(design.templateId)
-    queued.current = { data: JSON.stringify(model), templateId: t.id, fonts: [...t.fonts], paper: model.style.paper }
+    if (!job) return
+    queued.current = job
     // The first compile goes straight out; edits wait for a short pause in typing.
     const delay = inflight.current || lastUrl.current ? 90 : 0
     const timer = setTimeout(() => void pump(), delay)
     return () => clearTimeout(timer)
-  }, [doc, design, pump])
+  }, [job, pump])
 
   return state
 }
@@ -104,8 +122,14 @@ export function usePreview(doc: ResumeDocument | null, design: ResumeDesign | nu
 export async function typeset(doc: ResumeDocument, design: ResumeDesign, kind: "pdf"): Promise<Uint8Array>
 export async function typeset(doc: ResumeDocument, design: ResumeDesign, kind: "text"): Promise<{ text: string; pages: number; links: string[] }>
 export async function typeset(doc: ResumeDocument, design: ResumeDesign, kind: "pdf" | "text") {
-  const t = getTemplate(design.templateId)
-  const res = await getTypstClient().request({ type: kind, templateId: t.id, fonts: [...t.fonts], data: JSON.stringify(toRenderModel(doc, design)) })
+  return kind === "pdf" ? typesetJob(resumeJob(doc, design), "pdf") : typesetJob(resumeJob(doc, design), "text")
+}
+
+/** Typesets any job to PDF bytes, or to its extracted text. */
+export async function typesetJob(job: TypesetJob, kind: "pdf"): Promise<Uint8Array>
+export async function typesetJob(job: TypesetJob, kind: "text"): Promise<{ text: string; pages: number; links: string[] }>
+export async function typesetJob(job: TypesetJob, kind: "pdf" | "text") {
+  const res = await getTypstClient().request({ type: kind, templateId: job.templateId, fonts: job.fonts, data: job.data })
   if (res.type === "error") throw new Error(res.error)
   if (kind === "pdf" && res.type === "pdf") return res.bytes
   if (kind === "text" && res.type === "text") return { text: res.text, pages: res.pages, links: res.links }

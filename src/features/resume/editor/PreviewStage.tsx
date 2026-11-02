@@ -11,7 +11,18 @@ const PX_PER_PT = 96 / 72
  * The resume as printed sheets. One SVG holds every page; each sheet shows its slice of it. Pages are plain
  * <img> elements from a blob: URL, so nothing inside the SVG can run script.
  */
-export function PreviewStage({ state, paperLabel, templateLabel }: { state: PreviewState; paperLabel: string; templateLabel: string }) {
+export function PreviewStage({
+  state,
+  paperLabel,
+  templateLabel,
+  alt = "Preview of your resume",
+}: {
+  state: PreviewState
+  paperLabel: string
+  templateLabel: string
+  /** Alt text for page one ("Preview of your cover letter"). */
+  alt?: string
+}) {
   const [zoom, setZoom] = useState<"fit" | "actual">("fit")
 
   const url = state.status === "ready" ? state.url : state.status === "error" ? state.lastUrl : null
@@ -63,7 +74,7 @@ export function PreviewStage({ state, paperLabel, templateLabel }: { state: Prev
                   {/* eslint-disable-next-line @next/next/no-img-element -- local blob: SVG from the typesetter */}
                   <img
                     src={url}
-                    alt={i === 0 ? "Preview of your resume" : ""}
+                    alt={i === 0 ? alt : ""}
                     aria-hidden={i > 0}
                     draggable={false}
                     style={{ transform: `translateY(-${(i / pages) * 100}%)` }}

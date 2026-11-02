@@ -24,13 +24,15 @@ export async function signInWithPassword(
 
 export async function signUpWithPassword(
   client: PublicSupabaseClient,
-  params: { email: string; password: string; fullName?: string | null }
+  params: { email: string; password: string; fullName?: string | null; next?: string }
 ): Promise<AuthResult<{ userId: string | null }>> {
+  // The confirm link carries `next`, so a person who signed up to download lands back in the editor.
+  const callback = `${siteConfig.url}${ROUTES.authCallback}${params.next ? `?next=${encodeURIComponent(params.next)}` : ""}`
   const { data, error } = await client.auth.signUp({
     email: params.email,
     password: params.password,
     // The confirm link returns to this deployment (localhost in dev), not the Supabase Site URL.
-    options: { data: { full_name: params.fullName ?? null }, emailRedirectTo: `${siteConfig.url}${ROUTES.authCallback}` },
+    options: { data: { full_name: params.fullName ?? null }, emailRedirectTo: callback },
   })
 
   if (error) {

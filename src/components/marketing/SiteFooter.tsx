@@ -21,6 +21,7 @@ const COLUMNS = [
     links: [
       { label: "Resume builder", href: ROUTES.resume },
       { label: "Resume templates", href: ROUTES.resumeTemplates },
+      { label: "Cover letter maker", href: ROUTES.coverLetter },
       { label: "How it works", href: ROUTES.howItWorks },
       { label: "Features", href: ROUTES.features },
       { label: "Every look", href: ROUTES.looks },
@@ -34,6 +35,7 @@ const COLUMNS = [
     title: "Free tools",
     links: [
       { label: "ATS resume scanner", href: `${ROUTES.tools}/ats-checker` },
+      { label: "Cover letter checker", href: ROUTES.coverLetterChecker },
       { label: "Headline writer", href: `${ROUTES.tools}/headline-writer` },
       { label: "LinkedIn About builder", href: `${ROUTES.tools}/linkedin-about` },
       { label: "Link-in-bio page", href: `${ROUTES.tools}/link-in-bio` },

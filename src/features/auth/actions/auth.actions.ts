@@ -8,6 +8,7 @@ import { after } from "next/server"
 
 import { messages } from "@/config/messages"
 import { siteConfig } from "@/config/site"
+import { AUTH_EVENT_COOKIE } from "@/lib/analytics"
 import { allowRate, clientIpFromHeaders, hashIp } from "@/lib/api/guard"
 import { safeNextPath } from "@/lib/auth/safeNext"
 import { notifyAfterAuth, notifyPasswordChanged } from "@/lib/email/events"
@@ -80,6 +81,17 @@ async function overLimit(kind: "signin" | "signup" | "reset", email: string): Pr
   return !(await allowRate(`email:${hashIp(email.toLowerCase())}`, kind, perEmail, span))
 }
 
+/** Leaves `sign_up` or `login` for AuthEventTracker to send on the next page. */
+async function markAuthEvent(event: "sign_up" | "login") {
+  const cookieStore = await cookies()
+  cookieStore.set(AUTH_EVENT_COOKIE, `${event}.email`, {
+    path: "/",
+    maxAge: 120,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+  })
+}
+
 async function getClientOrNull() {
   try {
     return await createServerSupabaseClient()
@@ -120,6 +132,7 @@ export async function signInWithCredentialsAction(
     after(() => notifyAfterAuth(user))
   }
 
+  await markAuthEvent("login")
   revalidatePath(ROUTES.dashboard, "layout")
   redirect(next)
 }
@@ -143,7 +156,7 @@ export async function signUpWithCredentialsAction(
   if (!supabase) return { error: e.notConfigured, email, nonce: Date.now() }
 
   try {
-    const { error } = await signUpWithPassword(supabase, { email: parsed.data.email, password: parsed.data.password })
+    const { error } = await signUpWithPassword(supabase, { email: parsed.data.email, password: parsed.data.password, next })
     if (error) {
       // The form shows a friendly message; the raw one goes to the server log so it can be diagnosed.
       console.error("[auth] signUp failed", (error as SupabaseLikeError)?.code, error.message)
@@ -163,6 +176,7 @@ export async function signUpWithCredentialsAction(
 
   await captureReferral(user)
   after(() => notifyAfterAuth(user))
+  await markAuthEvent("sign_up")
   revalidatePath(ROUTES.dashboard, "layout")
   redirect(next)
 }

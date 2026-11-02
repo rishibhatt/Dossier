@@ -7,21 +7,24 @@ export const runtime = "nodejs"
 export const maxDuration = 30
 
 /**
- * AI polish for the free resume tools (summary and bullet generators). The rule-based draft stays the default;
+ * AI polish for the free resume tools (summary and bullet generators) and for one cover letter paragraph at a time. The rule-based draft stays the default;
  * this rewrites one draft for flow. Anonymous callers share a small per-IP daily cap (usage kind "polish").
  * The model may not add facts: an answer with a number that is not in the draft is rejected and the next model tries.
  */
-const bodySchema = z.object({
-  kind: z.enum(["summary", "bullet"]),
-  text: z.string().trim().min(12).max(700),
-  role: z.string().trim().max(120).optional(),
-})
+const LIMITS = { summary: 600, bullet: 200, letter: 1200 } as const
 
-const answerSchema = z.object({ text: z.string().trim().min(12).max(700) })
+const bodySchema = z
+  .object({
+    kind: z.enum(["summary", "bullet", "letter"]),
+    text: z.string().trim().min(12).max(LIMITS.letter),
+    role: z.string().trim().max(120).optional(),
+  })
+  // Resume drafts keep their original 700-character cap; only a letter paragraph may be longer.
+  .refine((b) => b.kind === "letter" || b.text.length <= 700)
 
-const LIMITS = { summary: 600, bullet: 200 } as const
+const answerSchema = z.object({ text: z.string().trim().min(12).max(LIMITS.letter + 40) })
 
-const SYSTEM: Record<"summary" | "bullet", string> = {
+const SYSTEM: Record<keyof typeof LIMITS, string> = {
   summary: `You edit resume summaries. The draft was assembled from a template and reads stiffly. Rewrite it so it sounds like a capable person wrote it: vary the sentence structure, merge or reorder sentences, and choose sharper verbs. Two or three sentences, under ${LIMITS.summary} characters. Never return the draft unchanged.
 Rules:
 - Keep every fact, number, tool and job title from the draft. Add no new facts, numbers, employers, skills or claims about impact (no "delivering insights", "driving growth" and the like).
@@ -36,6 +39,14 @@ Rules:
 - Implied first person: no "I", "my" or "me". No em dashes, no exclamation marks.
 - Never use: spearheaded, leveraged, synergy, utilized, responsible for, helped.
 Answer as JSON: {"text": "<the bullet>"}`,
+  letter: `You edit one paragraph of a cover letter. The draft was assembled from a template and the person's own resume, and reads stiffly. Rewrite it so it sounds like a capable person wrote it to a real hiring manager: vary the sentence structure, merge or reorder sentences, cut filler. Keep it about the same length, under ${LIMITS.letter} characters. Never return the draft unchanged.
+Rules:
+- Keep every fact, number, tool, employer, company name and job title from the draft. Add no new facts, numbers, employers, skills or claims about impact.
+- Keep any text in square brackets exactly as it is (it is a placeholder the person still has to fill in).
+- Plain first person ("I", "my"), active voice, short sentences.
+- Never use: "I am writing to apply", "I am writing to express", passionate, excited to apply, thrilled, results-driven, dynamic, synergy, leverage, seasoned, proven track record, go-getter, detail-oriented, team player, perfect fit.
+- No em dashes, no exclamation marks.
+Answer as JSON: {"text": "<the paragraph>"}`,
 }
 
 /** Content words in `answer` with no match in `draft` (compared on the first five letters, so "reduced" matches "reduce"). */
@@ -48,7 +59,7 @@ function novelWords(answer: string, draft: string) {
   return new Set(stems(answer).filter((w) => !known.has(w))).size
 }
 /** A rewrite may swap a few verbs and linking words. More new words than this means it is adding claims. */
-const MAX_NOVEL = { summary: 5, bullet: 3 } as const
+const MAX_NOVEL = { summary: 5, bullet: 3, letter: 8 } as const
 
 const firstWord = (s: string) => (s.trim().split(/\s+/)[0] ?? "").toLowerCase().replace(/[^a-z]/g, "")
 const squash = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "")
@@ -85,7 +96,7 @@ export async function POST(request: Request) {
         [...numbersIn(a.text)].every((n) => allowed.has(n)) &&
         !/—|!/.test(a.text),
       temperature: 0.7,
-      maxTokens: 400,
+      maxTokens: kind === "letter" ? 700 : 400,
       budgetMs: 20_000,
       signal: request.signal,
     })
