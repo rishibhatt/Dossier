@@ -223,6 +223,12 @@ export async function exportZip(nav: Nav) {
 
 type DesignResult = { ok: boolean }
 
+/** The motion tier is the person's choice, not the template's: a new look keeps it. */
+function keepTier(next: DesignConfig, prev: DesignConfig): DesignConfig {
+  const tier = prev.motion.tier
+  return tier && next.motion ? { ...next, motion: { ...next.motion, tier } } : next
+}
+
 /** Switch to a template (reordering sections to suit it), or reroll the current one. Undoable, and silent on success. */
 export async function changeDesign(nav: Nav, opts: { templateId?: string; shuffle?: boolean; templateName?: string }): Promise<DesignResult> {
   const ui = useStudioUiStore.getState()
@@ -258,7 +264,7 @@ export async function changeDesign(nav: Nav, opts: { templateId?: string; shuffl
     }
     useStudioStatus.getState().pushHistory()
     usePortfolioStore.setState({
-      designConfig: body.designConfig,
+      designConfig: keepTier(body.designConfig, designConfig),
       generationVariation: seed,
       ...(body.portfolioData ? { document: ensurePortfolioMeta(body.portfolioData) } : {}),
     })
@@ -288,7 +294,7 @@ export async function refineDesign(nav: Nav, message: string): Promise<boolean> 
       return false
     }
     useStudioStatus.getState().pushHistory()
-    usePortfolioStore.getState().setDesignConfig(body.designConfig)
+    usePortfolioStore.getState().setDesignConfig(keepTier(body.designConfig, designConfig))
     return true
   } catch {
     toast.error("Could not reach Dossier", OFFLINE)

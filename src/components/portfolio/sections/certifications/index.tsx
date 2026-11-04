@@ -17,6 +17,11 @@ const certifications = (kind: "list" | "grid") =>
                   <Meta ctx={ctx} parts={[[at("year"), c.year]]} />
                 </div>
                 {has(c.issuer) || ctx.editing ? <T as="p" className="pf-item__sub" path={at("issuer")} value={c.issuer} /> : null}
+                {has(c.number) ? (
+                  <p className="pf-meta">
+                    Reg. no. <T path={at("number")} value={c.number} />
+                  </p>
+                ) : null}
               </li>
             )
           })}

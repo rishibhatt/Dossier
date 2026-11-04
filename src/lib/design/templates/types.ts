@@ -11,6 +11,7 @@ import type {
   MotionPreset,
   NavStyle,
 } from "@/types/resolvedDesignConfig"
+import type { ProfessionGroup } from "@/lib/portfolio/professions"
 import type { PortfolioSectionType } from "@/types/dossier"
 
 export type TemplateTone = "calm" | "bold" | "playful" | "formal" | "techy" | "warm"
@@ -33,6 +34,7 @@ export type DesignTemplate = {
   direction: DesignDirectionId
   /** Section order the template prefers (hero first). */
   order: PortfolioSectionType[]
+  group: ProfessionGroup
 }
 
 export type DesignBrief = {
@@ -44,6 +46,9 @@ export type DesignBrief = {
   prefer?: string[]
   /** Soft bias toward templates built on this design direction. */
   direction?: DesignDirectionId
+  /** Profession id (lib/portfolio/professions.ts): templates made for it, then for its group, rank first. */
+  profession?: string
+  group?: ProfessionGroup
 }
 
 export type PaletteInput = {
@@ -55,8 +60,11 @@ export type PaletteInput = {
   accent: string
 }
 
+/** Sections every template styles. Newer, profession-specific sections are optional and fall back to their module default. */
+type CoreSectionType = "about" | "skills" | "experience" | "projects" | "contact" | "education" | "highlights" | "certifications"
+
 /** Exact variant ids from components/portfolio/sections/registry (VARIANT_IDS). */
-export type SectionVariants = Record<Exclude<PortfolioSectionType, "hero">, string>
+export type SectionVariants = Record<CoreSectionType, string> & Partial<Record<Exclude<PortfolioSectionType, "hero" | CoreSectionType>, string>>
 
 export type TemplateMatch = {
   /** Primary professions / pseudo-categories (student, executive, academic, switcher, freelance, sparse). */
@@ -117,4 +125,8 @@ export type TemplateSpec = {
   /** First palette is canonical; others are same-family alternates used by variationSeed. */
   palettes: PaletteInput[]
   match: TemplateMatch
+  /** How the page shows work (lib/portfolio/professions.ts). Every template belongs to one group. */
+  group: ProfessionGroup
+  /** Profession ids this template was designed for. */
+  professions?: string[]
 }

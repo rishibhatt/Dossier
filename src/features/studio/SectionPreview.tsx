@@ -3,7 +3,7 @@
 import { Component, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react"
 
 import { PlainText } from "@/components/portfolio/sections/PlainText"
-import { renderSectionVariant } from "@/components/portfolio/sections/registry"
+import { isSectionEmpty, renderSectionVariant } from "@/components/portfolio/sections/registry"
 import { PORTFOLIO_CSS } from "@/components/portfolio/styles/portfolioCss"
 import { firstVariant, seedSection } from "@/features/studio/sectionOps"
 import { portfolioCssVars, portfolioDataAttrs } from "@/lib/design/buildDesignTokens"
@@ -56,6 +56,13 @@ export function SectionPreview({ type }: { type: PortfolioSectionType }) {
   if (!doc || !cfg) return <div ref={box} className="ws-mini" />
   const c = cfg.tokens.colors
   const fallback = <Schematic bg={c.bg} fg={c.text} accent={c.accent} />
+  // Galleries and reels start empty (no stand-in pictures), so their card shows the schematic.
+  if (isSectionEmpty(section))
+    return (
+      <div ref={box} className="ws-mini" aria-hidden>
+        {fallback}
+      </div>
+    )
   const ctx = { config: cfg, doc: { ...doc, sections: [...doc.sections, section] }, T: PlainText, editing: false }
 
   return (

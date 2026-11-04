@@ -54,7 +54,10 @@ export async function POST(request: Request) {
   if (!docParsed.success || !cfgParsed.success) return apiError("invalid_payload", 400)
 
   const document = docParsed.data as PortfolioDocument
-  const designConfig = cfgParsed.data as DesignConfig
+  const parsedConfig = cfgParsed.data as DesignConfig
+  // Award-style motion is Pro. Below Pro it publishes as expressive, whatever the client sent.
+  const designConfig: DesignConfig =
+    parsedConfig.motion?.tier === "awwwards" && caller.plan !== "pro" ? { ...parsedConfig, motion: { ...parsedConfig.motion, tier: "expressive" } } : parsedConfig
   const view = portfolioViewSchema.safeParse({
     hiddenSectionIds: parsed.data.hiddenSectionIds,
     sectionSurfaceOverrides: parsed.data.sectionSurfaceOverrides,

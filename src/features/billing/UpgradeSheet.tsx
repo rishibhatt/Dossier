@@ -64,6 +64,12 @@ function copyFor(trigger: UpgradeTrigger, options: UpgradeOptions): Copy {
           value: "That is the most Pro holds. Unpublish one from your dashboard to make room for a new one.",
         },
       }
+    case "award_motion":
+      return {
+        headline: "Award-style motion on your page",
+        value: "Pro adds scroll-driven motion: images open as you scroll, the intro drifts away, covers move in depth. Calm and Expressive stay free.",
+        plan: "pro",
+      }
     case "pro_feature":
       return {
         headline: `${options.feature ?? "This"} is planned for Pro`,

@@ -9,12 +9,13 @@ import { createEmptySection } from "@/lib/portfolio/createEmptySection"
 export { listAddableSections, type AddableSection } from "@/lib/portfolio/createEmptySection"
 import { STUDIO_DESIGN_PRESETS, type StudioDesignPresetId } from "@/lib/portfolio/designTokenPresets"
 import { ensurePortfolioMeta } from "@/lib/portfolio/ensurePortfolioMeta"
+import { getProfession, GROUP_MEDIA_SECTION } from "@/lib/portfolio/professions"
 import { templateVariant } from "@/lib/portfolio/pairSections"
 import { insertIndex, patchSectionData, patchSectionItem, setTextField } from "@/lib/portfolio/sectionEdits"
-import type { ExperienceEntry, PortfolioDocument, PortfolioSection, PortfolioSectionType, ProjectEntry } from "@/types/dossier"
+import type { ExperienceEntry, PortfolioDocument, PortfolioMeta, PortfolioSection, PortfolioSectionType, ProjectEntry } from "@/types/dossier"
 import type { ParsedResume } from "@/lib/parseResume"
 import type { DesignConfig } from "@/types/designEngine"
-import type { DesignColorTokens, DesignEffectsTokens, DesignSpacingTokens, DesignTypographyTokens } from "@/types/resolvedDesignConfig"
+import type { DesignColorTokens, DesignEffectsTokens, DesignSpacingTokens, DesignTypographyTokens, MotionTier } from "@/types/resolvedDesignConfig"
 
 type SectionDataMap = { [K in PortfolioSectionType]: Extract<PortfolioSection, { type: K }>["data"] }
 
@@ -66,6 +67,11 @@ export type PortfolioStoreState = {
   deleteSection: (sectionId: string) => void
   cycleSectionVariant: (sectionId: string) => void
   updateMeta: (patch: Partial<PortfolioDocument["meta"]>) => void
+  /** Set the profession (and its group) and clear the build's question. */
+  setProfession: (professionId: string) => void
+  /** The person confirmed the detected profession: stop asking. */
+  confirmProfession: () => void
+  setMotionTier: (tier: MotionTier) => void
   /** Legacy: shallow-merge into the FIRST section of `type`. Prefer updateSectionById. */
   updateSection: <T extends PortfolioSectionType>(type: T, patch: Partial<SectionDataMap[T]>) => void
   /** Shallow-merge into one section's data, by id. */
@@ -123,6 +129,12 @@ export function selectPublishView(s: Pick<PortfolioStoreState, "hiddenSectionIds
     hiddenSectionIds: Object.entries(s.hiddenSectionIds).filter(([, v]) => v).map(([k]) => k),
     sectionSurfaceOverrides: s.sectionSurfaceOverrides,
   }
+}
+
+const withoutAsk = (meta: PortfolioMeta): PortfolioMeta => {
+  const out = { ...meta }
+  delete out.professionAsk
+  return out
 }
 
 const firstIdOf = (doc: PortfolioDocument, type: PortfolioSectionType) => doc.sections.find((s) => s.type === type)?.id
@@ -257,6 +269,29 @@ export const usePortfolioStore = create<PortfolioStoreState>((set, get) => {
     mockRegenerateSection: (sectionId) => setVariant(sectionId, nextVariant),
 
     updateMeta: (patch) => editDoc((doc) => ({ ...doc, meta: { ...doc.meta, ...patch } })),
+
+    setProfession: (professionId) => {
+      const p = getProfession(professionId)
+      if (!p) return
+      editDoc((doc) => {
+        const meta = withoutAsk(doc.portfolioMeta ?? ensurePortfolioMeta(doc).portfolioMeta!)
+        return { ...doc, portfolioMeta: { ...meta, profession: p.id, group: p.group } }
+      })
+      // Media-led fields get their (empty) gallery or showreel, ready to fill from Edit.
+      const media = GROUP_MEDIA_SECTION[p.group]
+      if (media && !get().document?.sections.some((s) => s.type === media)) get().addSection(media)
+    },
+
+    confirmProfession: () =>
+      editDoc((doc) => {
+        if (!doc.portfolioMeta?.professionAsk) return doc
+        return { ...doc, portfolioMeta: withoutAsk(doc.portfolioMeta) }
+      }),
+
+    setMotionTier: (tier) => {
+      const cfg = get().designConfig
+      if (cfg) set({ designConfig: { ...cfg, motion: { ...cfg.motion, tier } } })
+    },
 
     updateSectionById: (sectionId, patch) => editDoc((doc) => patchSectionData(doc, sectionId, patch)),
 

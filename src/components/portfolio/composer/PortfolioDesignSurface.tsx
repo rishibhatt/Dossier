@@ -42,7 +42,7 @@ export function PortfolioDesignSurface({ standalone, footer, credit = "free", on
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
-  const motionKey = `${designConfig.meta.templateId}|${designConfig.meta.variationSeed}|${designConfig.motion.preset}|${doc.sections.map((s) => s.id).join(",")}`
+  const motionKey = `${designConfig.meta.templateId}|${designConfig.meta.variationSeed}|${designConfig.motion.preset}|${designConfig.motion.tier}|${doc.sections.map((s) => s.id).join(",")}`
   usePortfolioMotion(rootRef, { disabled: editMode, key: motionKey })
 
   useEffect(() => {

@@ -4,12 +4,25 @@ import { useMemo } from "react"
 import { Check } from "lucide-react"
 
 import { linkHref } from "@/lib/portfolio/links"
+import { isImageSrc } from "@/lib/portfolio/media"
+import { portfolioGroup } from "@/lib/portfolio/professions"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
 import type { PortfolioDocument } from "@/types/dossier"
 
 type Item = { label: string; done: boolean }
 
 const filled = (v: string | null | undefined) => Boolean(v?.trim())
+
+/** Visual and performing fields are judged on the work itself: ask for pictures or a video. */
+function mediaItem(doc: PortfolioDocument | null, shown: PortfolioDocument["sections"]): Item[] {
+  const group = portfolioGroup(doc?.portfolioMeta)
+  if (group === "visual") {
+    const pictures = shown.some((s) => (s.type === "gallery" && s.data.items.some((g) => isImageSrc(g.imageUrl))) || (s.type === "projects" && s.data.items.some((p) => isImageSrc(p.imageUrl))))
+    return [{ label: "Pictures of your work (Gallery)", done: pictures }]
+  }
+  if (group === "performer") return [{ label: "A video of your work (Showreel)", done: shown.some((s) => s.type === "showreel" && s.data.items.some((v) => v.videoUrl.trim())) }]
+  return []
+}
 
 /** What a recruiter looks for on a portfolio, checked against the visible sections. */
 export function readiness(doc: PortfolioDocument | null, hidden: Record<string, boolean>): Item[] {
@@ -24,6 +37,7 @@ export function readiness(doc: PortfolioDocument | null, hidden: Record<string, 
     { label: "Experience or a project", done: work },
     { label: "A way to reach you", done: contact?.type === "contact" && (filled(contact.data.email) || filled(contact.data.phone)) },
     { label: "A profile link (LinkedIn, GitHub...)", done: contact?.type === "contact" && contact.data.links.some((l) => /^https?:/i.test(linkHref(l) ?? "")) },
+    ...mediaItem(doc, shown),
   ]
 }
 
@@ -66,3 +80,4 @@ export function PublishChecklist() {
     </div>
   )
 }
+

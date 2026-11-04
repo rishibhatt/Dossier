@@ -19,6 +19,7 @@ function toPublic(s: TemplateSpec): DesignTemplate {
     bodyFont: s.fonts.body,
     direction: s.direction,
     order: s.order,
+    group: s.group,
   }
 }
 
@@ -124,6 +125,9 @@ function scoreTemplate(spec: TemplateSpec, parsed: ParsedResume, brief: DesignBr
   if (brief?.emphasis && brief.emphasis === m.emphasis) add(`${brief.emphasis}-first`, 10)
   if (brief?.prefer?.includes(spec.id)) add("style preference", 9)
   if (brief?.direction && brief.direction === spec.direction) add("preferred direction", 8)
+
+  if (brief?.profession && spec.professions?.includes(brief.profession)) add("made for your field", 60)
+  else if (brief?.group && spec.group === brief.group) add("suits how you show work", 24)
 
   if (m.base) add("safe default", m.base)
 

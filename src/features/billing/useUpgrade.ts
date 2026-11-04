@@ -9,7 +9,7 @@ import type { PlanId } from "@/lib/billing/plans"
  * Where an upgrade prompt can come from. Each one is a moment the person asked for something the plan
  * does not include, after they have already seen their own site (see docs/growth/paywalls.md).
  */
-export type UpgradeTrigger = "zip_export" | "shuffle_limit" | "remove_badge" | "portfolio_limit" | "pro_feature"
+export type UpgradeTrigger = "zip_export" | "shuffle_limit" | "remove_badge" | "portfolio_limit" | "pro_feature" | "award_motion"
 
 export type UpgradeOptions = {
   /** Plan reported by the API error, when known. The sheet also fetches it. */

@@ -16,8 +16,9 @@ const CSP = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https://fonts.gstatic.com",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://*.clarity.ms https://*.posthog.com https://api.razorpay.com https://lumberjack.razorpay.com",
-  "frame-src 'self' https://googleads.g.doubleclick.net https://api.razorpay.com https://checkout.razorpay.com",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://stats.g.doubleclick.net https://*.clarity.ms https://*.posthog.com https://api.razorpay.com https://lumberjack.razorpay.com",
+  // Showreel sections embed YouTube (no-cookie domain) and Vimeo players on published portfolios.
+  "frame-src 'self' https://googleads.g.doubleclick.net https://api.razorpay.com https://checkout.razorpay.com https://www.youtube-nocookie.com https://player.vimeo.com",
   // The resume typesetter runs in a same-origin module worker.
   "worker-src 'self'",
   "object-src 'none'",

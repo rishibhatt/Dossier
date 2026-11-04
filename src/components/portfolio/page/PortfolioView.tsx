@@ -9,6 +9,6 @@ import { PortfolioPage, type PortfolioPageProps } from "@/components/portfolio/p
 export function PortfolioView({ motion = true, ...props }: Omit<PortfolioPageProps, "rootRef" | "T" | "editing" | "wrapSection" | "wrapList"> & { motion?: boolean }) {
   const rootRef = useRef<HTMLDivElement>(null)
   const c = props.config
-  usePortfolioMotion(rootRef, { disabled: !motion, key: `${c.meta.templateId}|${c.meta.variationSeed}|${c.motion.preset}` })
+  usePortfolioMotion(rootRef, { disabled: !motion, key: `${c.meta.templateId}|${c.meta.variationSeed}|${c.motion.preset}|${c.motion.tier}` })
   return <PortfolioPage {...props} rootRef={rootRef} />
 }

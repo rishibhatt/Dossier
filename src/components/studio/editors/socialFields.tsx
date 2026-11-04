@@ -4,7 +4,9 @@ import { useId, useState } from "react"
 import { Check } from "lucide-react"
 
 import { SocialIcon } from "@/components/portfolio/sections/SocialIcon"
-import { linkPlatform, normaliseSocial, QUICK_ADD_PLATFORMS, socialLabel, socialPlaceholder, type SocialPlatform } from "@/lib/portfolio/links"
+import { ALL_SOCIAL_PLATFORMS, linkPlatform, normaliseSocial, socialLabel, socialNeedsLink, socialPlaceholder, type SocialPlatform } from "@/lib/portfolio/links"
+import { GROUP_SOCIALS, portfolioGroup } from "@/lib/portfolio/professions"
+import { usePortfolioStore } from "@/store/usePortfolioStore"
 
 const sameLink = (a: string, b: string) => a.trim().toLowerCase().replace(/\/+$/, "") === b.trim().toLowerCase().replace(/\/+$/, "")
 
@@ -17,7 +19,11 @@ export function SocialQuickAdd({ links, onAdd }: { links: string[]; onAdd: (url:
   const [active, setActive] = useState<SocialPlatform | null>(null)
   const [draft, setDraft] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [more, setMore] = useState(false)
   const present = new Set(links.map(linkPlatform))
+  const group = usePortfolioStore((s) => portfolioGroup(s.document?.portfolioMeta))
+  const first = GROUP_SOCIALS[group]
+  const shown = more ? [...first, ...ALL_SOCIAL_PLATFORMS.filter((p) => !first.includes(p))] : first
 
   const pick = (p: SocialPlatform) => {
     setActive(active === p ? null : p)
@@ -28,7 +34,14 @@ export function SocialQuickAdd({ links, onAdd }: { links: string[]; onAdd: (url:
   const add = () => {
     if (!active) return
     const url = normaliseSocial(active, draft)
-    if (!url) return setError(active === "website" ? "That doesn't look like a web address." : `That doesn't look like a ${socialLabel(active)} username or link.`)
+    if (!url)
+      return setError(
+        active === "website"
+          ? "That doesn't look like a web address."
+          : socialNeedsLink(active)
+            ? `Paste the full link to your ${socialLabel(active)} page.`
+            : `That doesn't look like a ${socialLabel(active)} username or link.`
+      )
     if (links.some((l) => sameLink(l, url))) return setError("That link is already on your page.")
     onAdd(url)
     setActive(null)
@@ -40,7 +53,7 @@ export function SocialQuickAdd({ links, onAdd }: { links: string[]; onAdd: (url:
     <fieldset className="min-w-0 space-y-2">
       <legend className="sp-label !text-[0.8125rem]">Quick add a profile</legend>
       <div className="flex flex-wrap gap-2">
-        {QUICK_ADD_PLATFORMS.map((p) => {
+        {shown.map((p) => {
           const label = socialLabel(p)
           const added = p !== "website" && present.has(p)
           return (
@@ -59,6 +72,9 @@ export function SocialQuickAdd({ links, onAdd }: { links: string[]; onAdd: (url:
             </button>
           )
         })}
+        <button type="button" aria-expanded={more} onClick={() => setMore(!more)} className="sp-chip !px-3">
+          {more ? "Fewer" : "More"}
+        </button>
       </div>
       {active ? (
         <form
@@ -70,7 +86,7 @@ export function SocialQuickAdd({ links, onAdd }: { links: string[]; onAdd: (url:
           className="space-y-1.5"
         >
           <label htmlFor={`${id}-input`} className="sr-only">
-            {active === "website" ? "Website address" : `${socialLabel(active)} username or link`}
+            {active === "website" ? "Website address" : socialNeedsLink(active) ? `${socialLabel(active)} link` : `${socialLabel(active)} username or link`}
           </label>
           <div className="flex gap-2">
             <input

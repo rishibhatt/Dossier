@@ -5,12 +5,19 @@ import type { PortfolioSection, PortfolioSectionType } from "@/types/dossier"
 import { aboutModule } from "./about"
 import { certificationsModule } from "./certifications"
 import { contactModule } from "./contact"
+import { creditsModule } from "./credits"
 import { educationModule } from "./education"
 import { experienceModule } from "./experience"
+import { galleryModule } from "./gallery"
 import { hero } from "./hero"
 import { highlightsModule } from "./highlights"
+import { pressModule, publicationsModule } from "./mentions"
+import { practiceModule } from "./practice"
 import { projectsModule } from "./projects"
+import { servicesModule } from "./services"
+import { showreelModule } from "./showreel"
 import { skillsModule } from "./skills"
+import { testimonialsModule } from "./testimonials"
 import type { RenderCtx, SectionModule } from "./types"
 
 type Modules = { [K in PortfolioSectionType]: SectionModule<K> }
@@ -25,6 +32,14 @@ export const SECTION_MODULES: Modules = {
   education: educationModule,
   highlights: highlightsModule,
   certifications: certificationsModule,
+  gallery: galleryModule,
+  showreel: showreelModule,
+  credits: creditsModule,
+  services: servicesModule,
+  testimonials: testimonialsModule,
+  press: pressModule,
+  publications: publicationsModule,
+  practice: practiceModule,
 }
 
 /** Variant ids per type, in cycle order. */

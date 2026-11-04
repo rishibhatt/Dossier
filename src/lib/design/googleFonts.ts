@@ -57,6 +57,15 @@ const WEIGHTS: Record<string, string> = {
   Spectral: "400;500;600;700;800",
   "Crimson Pro": "400;500;600;700;800",
   Lexend: "400;500;600;700;800",
+  // profession templates (lib/design/templates/professionSpecs.ts)
+  "Instrument Serif": "400",
+  "Instrument Sans": "400;500;600;700",
+  Fraunces: "400;500;600;700;800",
+  "Big Shoulders Display": "400;500;600;700;800;900",
+  "Inter Tight": "400;500;600;700;800",
+  "Bodoni Moda": "400;500;600;700;800;900",
+  Unbounded: "400;500;600;700;800",
+  Geist: "400;500;600;700;800",
 }
 
 const FALLBACK_WEIGHTS = "400;700"

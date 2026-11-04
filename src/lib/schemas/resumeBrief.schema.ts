@@ -31,7 +31,7 @@ const obj = <T extends z.ZodRawShape>(shape: T) => z.object(shape).catch(() => z
  * n name, t title, loc location, ab about (first person), pitch hero line, k skills,
  * e experience {c company, r role, d dates, l location, b bullets}, p projects {n, d desc, t tech, u url},
  * ed education {i school, d degree, p period, x details}, cert {n name, i issuer, y year},
- * h highlights {v value, l label}, ct contact {e email, p phone, l links}, b brief {c category, t tone, m emphasis}.
+ * h highlights {v value, l label}, ct contact {e email, p phone, l links}, b brief {c category, t tone, m emphasis, p profession}.
  */
 export const compactResumeSchema = z.object({
   n: str,
@@ -46,7 +46,7 @@ export const compactResumeSchema = z.object({
   cert: list(z.object({ n: str, i: str, y: str })),
   h: list(z.object({ v: str, l: str })),
   ct: obj({ e: str, p: str, l: strList }),
-  b: obj({ c: str, t: str, m: str }),
+  b: obj({ c: str, t: str, m: str, p: str }),
 })
 
 export type CompactResume = z.output<typeof compactResumeSchema>

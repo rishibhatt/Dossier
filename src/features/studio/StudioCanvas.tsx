@@ -8,6 +8,7 @@ import { useAccountSummary } from "@/features/billing/useAccountSummary"
 import { openUpgrade } from "@/features/billing/useUpgrade"
 import { sectionIdAt, setCanvasRoot } from "@/features/studio/canvasDom"
 import { SectionToolbar } from "@/features/studio/SectionToolbar"
+import { ProfessionAsk } from "@/features/studio/ProfessionAsk"
 import { persistNow } from "@/features/studio/studioActions"
 import { useStudioLayout } from "@/features/studio/useViewport"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
@@ -101,6 +102,7 @@ export function StudioCanvas() {
       </div>
       <div className="pointer-events-none absolute inset-0 z-20 [&>*]:pointer-events-auto">
         <SectionToolbar host={host} scroller={scroller} />
+        {ready ? <ProfessionAsk /> : null}
       </div>
     </main>
   )

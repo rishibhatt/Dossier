@@ -1,13 +1,20 @@
 import { buildConfigFromTemplate, getTemplateSpec, orderSectionsForTemplate, reorderSectionsByTemplate } from "@/lib/design/templates"
 import { portfolioDocumentToParsedResume } from "@/lib/parseResume"
 
+import { WORK_SECTIONS } from "../studio/workSample"
 import { SAMPLE_RICH, SAMPLE_SPARSE } from "./sampleDocument"
 
 /** Dev QA: the sample document ordered and styled exactly as the pipeline would for template `id`. */
 export function buildSample(id: string, sample: string | undefined, seed: number) {
   const spec = getTemplateSpec(id)
   if (!spec) return null
-  const base = sample === "sparse" ? SAMPLE_SPARSE : SAMPLE_RICH
+  // ?sample=work adds one of every profession section (gallery, showreel, credits...) before Contact.
+  const base =
+    sample === "sparse"
+      ? SAMPLE_SPARSE
+      : sample === "work"
+        ? { ...SAMPLE_RICH, sections: [...SAMPLE_RICH.sections.slice(0, -1), ...WORK_SECTIONS, ...SAMPLE_RICH.sections.slice(-1)] }
+        : SAMPLE_RICH
   const parsed = portfolioDocumentToParsedResume(base, "general")
   const document = reorderSectionsByTemplate(base, orderSectionsForTemplate(spec, base.sections.map((s) => s.type)))
   const designConfig = buildConfigFromTemplate(parsed, id, seed, { sectionTypes: document.sections.map((s) => s.type) })

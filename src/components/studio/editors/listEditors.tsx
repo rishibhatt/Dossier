@@ -88,7 +88,7 @@ export function CertificationsEditor({ s }: { s: PortfolioCertificationsSection 
     <ItemList
       items={s.data.items}
       onChange={(items) => patchSection(s.id, "certifications", { items })}
-      make={() => ({ name: "", issuer: "", year: "" })}
+      make={() => ({ name: "", issuer: "", year: "", number: "" })}
       title={(it) => it.name}
       addLabel="Add a certificate"
       noun="certificate"
@@ -99,6 +99,7 @@ export function CertificationsEditor({ s }: { s: PortfolioCertificationsSection 
             <Field label="Issuer" value={it.issuer} onChange={(issuer) => set({ issuer })} />
             <Field label="Year" value={it.year} onChange={(year) => set({ year })} />
           </div>
+          <Field label="Registration or licence number (optional)" value={it.number ?? ""} onChange={(number) => set({ number })} />
         </>
       )}
     />

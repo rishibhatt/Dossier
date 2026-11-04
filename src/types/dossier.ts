@@ -1,3 +1,5 @@
+import type { ProfessionGroup } from "@/lib/portfolio/professions"
+
 export type ExperienceEntry = {
   company: string
   role: string
@@ -119,7 +121,8 @@ export type PortfolioHighlightsSection = {
   }
 }
 
-export type CertificationEntry = { name: string; issuer: string; year: string }
+/** `number`: registration or licence number (doctors, CAs, lawyers). Optional; older documents never have it. */
+export type CertificationEntry = { name: string; issuer: string; year: string; number?: string }
 
 export type PortfolioCertificationsSection = {
   id: string
@@ -127,6 +130,44 @@ export type PortfolioCertificationsSection = {
   data: {
     items: CertificationEntry[]
   }
+}
+
+/** One picture of the work, by link or small upload. `beforeUrl` pairs it with a "before" shot for the compare layout. */
+export type GalleryEntry = { imageUrl: string; caption: string; link?: string | null; beforeUrl?: string | null }
+
+export type PortfolioGallerySection = { id: string; type: "gallery"; data: { items: GalleryEntry[] } }
+
+/** A YouTube or Vimeo link, embedded; any other link shows as a titled card. */
+export type ShowreelEntry = { videoUrl: string; title: string; note: string }
+
+export type PortfolioShowreelSection = { id: string; type: "showreel"; data: { items: ShowreelEntry[] } }
+
+/** Stage and screen credits: the production, the part played, who made it, when. */
+export type CreditEntry = { title: string; role: string; company: string; year: string }
+
+export type PortfolioCreditsSection = { id: string; type: "credits"; data: { items: CreditEntry[] } }
+
+export type ServiceEntry = { name: string; description: string; price: string }
+
+export type PortfolioServicesSection = { id: string; type: "services"; data: { items: ServiceEntry[] } }
+
+/** Real words from a real client or colleague. Never generated. */
+export type TestimonialEntry = { quote: string; name: string; role: string }
+
+export type PortfolioTestimonialsSection = { id: string; type: "testimonials"; data: { items: TestimonialEntry[] } }
+
+/** A feature, interview, paper or talk: where it appeared, its title, when, and a link. Shared by press and publications. */
+export type MentionEntry = { title: string; outlet: string; year: string; link?: string | null }
+
+export type PortfolioPressSection = { id: string; type: "press"; data: { items: MentionEntry[] } }
+
+export type PortfolioPublicationsSection = { id: string; type: "publications"; data: { items: MentionEntry[] } }
+
+/** Where and when clients can see the person: clinic, chambers, studio. */
+export type PortfolioPracticeSection = {
+  id: string
+  type: "practice"
+  data: { name: string; address: string; hours: string[]; bookingUrl: string; mapUrl: string }
 }
 
 export type PortfolioSection =
@@ -139,6 +180,14 @@ export type PortfolioSection =
   | PortfolioEducationSection
   | PortfolioHighlightsSection
   | PortfolioCertificationsSection
+  | PortfolioGallerySection
+  | PortfolioShowreelSection
+  | PortfolioCreditsSection
+  | PortfolioServicesSection
+  | PortfolioTestimonialsSection
+  | PortfolioPressSection
+  | PortfolioPublicationsSection
+  | PortfolioPracticeSection
 
 export type PortfolioSectionType = PortfolioSection["type"]
 
@@ -149,6 +198,12 @@ export type PortfolioMeta = {
   type: PortfolioProfileKind
   tone: string
   emphasis: string[]
+  /** Profession id from lib/portfolio/professions.ts. Missing in documents made before professions existed. */
+  profession?: string
+  /** How the page shows work: visual | performer | licensed | builder. Derived from `type` when missing. */
+  group?: ProfessionGroup
+  /** The build could not tell the profession: the studio asks the person once. Cleared when they answer. */
+  professionAsk?: boolean
 }
 
 export type PortfolioDocument = {

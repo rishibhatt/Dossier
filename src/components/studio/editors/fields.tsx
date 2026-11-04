@@ -3,6 +3,7 @@
 import { useId, useState, type ReactNode } from "react"
 import { ArrowDown, ArrowUp, ChevronDown, Plus, Trash2, X } from "lucide-react"
 
+import { isImageSrc, shareLinkHint } from "@/lib/portfolio/media"
 import { cn } from "@/lib/utils"
 
 /** Labelled text field. Writes on every keystroke so the canvas stays live. */
@@ -232,43 +233,90 @@ export function SplitField({ label, values, onChange, sep, hint }: { label: stri
 
 const MAX_IMAGE = 1_500_000
 
-/** Picks an image from the device instead of asking for a URL. Stored inline, so it is capped at 1.5 MB. */
-export function ImageField({ label, value, onChange }: { label: string; value: string | null | undefined; onChange: (v: string | null) => void }) {
+/**
+ * An image by link (https), or picked from the device when `upload` is on. Uploads are stored inline in the
+ * page, so they are capped at 1.5 MB; galleries take links only so a page of pictures stays small.
+ */
+export function ImageField({ label, value, onChange, upload = true }: { label: string; value: string | null | undefined; onChange: (v: string | null) => void; upload?: boolean }) {
   const id = useId()
   const [error, setError] = useState<string | null>(null)
+  const [draft, setDraft] = useState("")
+  const [hint, setHint] = useState<string | null>(null)
+  const applyLink = () => {
+    const t = draft.trim()
+    if (!t) return
+    const share = shareLinkHint(t)
+    if (share) return setHint(share)
+    const href = /^https?:\/\//i.test(t) ? t.replace(/^http:/i, "https:") : `https://${t}`
+    if (!isImageSrc(href)) return setError("That doesn't look like a web address.")
+    setError(null)
+    setHint(null)
+    setDraft("")
+    onChange(href)
+  }
   return (
     <div className="min-w-0">
       <p className="sp-label !text-[0.8125rem]">{label}</p>
       <div className="flex items-center gap-3">
         <span className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-[2px] border border-[var(--site-rule-strong)] bg-[var(--site-paper-deep)]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          {value ? <img src={value} alt="" className="size-full object-cover" /> : <span className="sp-data">None</span>}
+          {value ? <img src={value} alt="" className="size-full object-cover" onError={() => setError("This picture did not load. Check that the link opens the image itself.")} /> : <span className="sp-data">None</span>}
         </span>
-        <label htmlFor={id} className="site-btn site-btn-ghost site-btn-sm cursor-pointer">
-          <span className="site-btn-label">{value ? "Replace" : "Choose image"}</span>
-        </label>
-        <input
-          id={id}
-          type="file"
-          accept="image/*"
-          className="sr-only"
-          onChange={(e) => {
-            const f = e.target.files?.[0]
-            e.target.value = ""
-            if (!f) return
-            if (f.size > MAX_IMAGE) return setError("That image is over 1.5 MB. Pick a smaller one.")
-            setError(null)
-            const r = new FileReader()
-            r.onload = () => typeof r.result === "string" && onChange(r.result)
-            r.readAsDataURL(f)
-          }}
-        />
+        {upload ? (
+          <>
+            <label htmlFor={id} className="site-btn site-btn-ghost site-btn-sm cursor-pointer">
+              <span className="site-btn-label">{value ? "Replace" : "Choose image"}</span>
+            </label>
+            <input
+              id={id}
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={(e) => {
+                const f = e.target.files?.[0]
+                e.target.value = ""
+                if (!f) return
+                if (f.size > MAX_IMAGE) return setError("That image is over 1.5 MB. Pick a smaller one, or paste a link to it.")
+                setError(null)
+                const r = new FileReader()
+                r.onload = () => typeof r.result === "string" && onChange(r.result)
+                r.readAsDataURL(f)
+              }}
+            />
+          </>
+        ) : null}
         {value ? (
-          <button type="button" onClick={() => onChange(null)} className="ws-quiet-btn">
+          <button type="button" onClick={() => (onChange(null), setError(null))} className="ws-quiet-btn">
             Remove
           </button>
         ) : null}
       </div>
+      <div className="mt-2 flex gap-2">
+        <label htmlFor={`${id}-link`} className="sr-only">
+          {label}: image link
+        </label>
+        <input
+          id={`${id}-link`}
+          value={draft}
+          inputMode="url"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck={false}
+          placeholder={upload ? "or paste an image link" : "Paste an image link"}
+          aria-invalid={Boolean(error)}
+          onChange={(e) => (setDraft(e.target.value), setError(null), setHint(null))}
+          onKeyDown={(e) => {
+            if (e.key !== "Enter") return
+            e.preventDefault()
+            applyLink()
+          }}
+          className="sp-field min-w-0 flex-1"
+        />
+        <button type="button" disabled={!draft.trim()} onClick={applyLink} className="site-btn site-btn-secondary site-btn-sm !h-12 shrink-0">
+          <span className="site-btn-label">Use link</span>
+        </button>
+      </div>
+      {hint ? <p className="mt-1.5 text-sm text-[var(--site-ink-2)]">{hint}</p> : null}
       {error ? (
         <p role="alert" className="mt-1.5 text-sm text-[var(--site-danger)]">
           {error}

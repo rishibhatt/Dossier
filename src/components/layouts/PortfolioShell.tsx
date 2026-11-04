@@ -32,7 +32,8 @@ export function PortfolioShell({ nav, name, role, children }: Props) {
   return (
     <div className="pf-shell">
       {nav ? (
-        <header className="pf-nav">
+        // Past 7 links a top bar runs off the edge: wide layouts keep the Menu instead (the side rail lists them all).
+        <header className="pf-nav" {...(nav.length > 7 ? { "data-pf-many": "" } : {})}>
           <nav className="pf-wrap pf-nav__in" aria-label="Portfolio sections">
             <div className="pf-nav__id">
               <a className="pf-nav__brand" href="#pf-top">

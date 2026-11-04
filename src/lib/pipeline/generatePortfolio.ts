@@ -36,6 +36,8 @@ import { runLLMTask } from "@/lib/llm/router"
 import type { Mode } from "@/lib/llm/types"
 import { readResume, type ResumeData } from "@/lib/pdf/extractSections"
 import { parsePdfFromBuffer } from "@/lib/pdf/parsePdf"
+import { createEmptySection } from "@/lib/portfolio/createEmptySection"
+import { guessProfession, GROUP_MEDIA_SECTION, portfolioGroup } from "@/lib/portfolio/professions"
 import { parsedFromStructured, type ParsedResume, type ProfessionCluster } from "@/lib/parseResume"
 import type { BuildPreview, BuildStage } from "@/types/buildStream"
 import type { PortfolioDocument, PortfolioProfileKind } from "@/types/dossier"
@@ -210,7 +212,10 @@ export async function executePortfolioPipeline(
   const source: "ai" | "fallback" = ai ? "ai" : "fallback"
   const data = ai ? mergeResume(ai.data, regex) : regex
   const brief = ai?.brief ?? null
-  const category = normalizeCategory(brief?.category)
+  // The model's profession word and the resume title must agree; otherwise the studio asks (0 extra tokens).
+  const guess = guessProfession(brief?.profession, data.title)
+  const aiCategory = normalizeCategory(brief?.category)
+  const category = aiCategory === "unknown" && guess.profession ? normalizeCategory(guess.profession.category) : aiCategory
 
   let document = buildPortfolioFromStructured(data, {
     tagline: brief?.line,
@@ -218,6 +223,24 @@ export async function executePortfolioPipeline(
     tone: brief?.tone ? `${brief.tone}, ${category === "unknown" ? "professional" : category}` : undefined,
     emphasis: brief?.emphasis ? [brief.emphasis] : undefined,
   })
+  const group = guess.profession?.group ?? portfolioGroup(document.portfolioMeta)
+  // Media-led fields get an empty gallery or showreel (never stand-in pictures), placed before Contact.
+  const media = GROUP_MEDIA_SECTION[group]
+  if (media && !document.sections.some((s) => s.type === media)) {
+    const at = document.sections.findIndex((s) => s.type === "contact")
+    const sections = [...document.sections]
+    sections.splice(at < 0 ? sections.length : at, 0, createEmptySection(media))
+    document = { ...document, sections }
+  }
+  document = {
+    ...document,
+    portfolioMeta: {
+      ...document.portfolioMeta!,
+      ...(guess.profession ? { profession: guess.profession.id } : {}),
+      group,
+      ...(guess.sure ? {} : { professionAsk: true }),
+    },
+  }
   emit("llm_extract_done", { ...previewOf(document), source })
 
   const parsedResume = applyBrief(parsedFromStructured(data, cleanedText), category, brief)
@@ -229,6 +252,8 @@ export async function executePortfolioPipeline(
     emphasis: brief?.emphasis,
     prefer: generationContext.autoStyle ? undefined : STYLE_PRESET_TEMPLATE_BIAS[generationContext.portfolioStylePreset],
     direction: generationContext.designDirection ?? undefined,
+    profession: guess.profession?.id,
+    group,
   }
   const ranked = recommendTemplates(parsedResume, designBrief, 8)
   let top = ranked[0]!

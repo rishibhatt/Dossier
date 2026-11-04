@@ -1,4 +1,4 @@
-import { Award, BarChart3, Briefcase, FolderOpen, GraduationCap, Info, Mail, User, Zap, type LucideIcon } from "lucide-react"
+import { Award, BarChart3, BookOpen, Briefcase, Clapperboard, FolderOpen, GraduationCap, Image, Info, Mail, MapPin, Newspaper, Quote, Ticket, User, Wrench, Zap, type LucideIcon } from "lucide-react"
 
 import type { PortfolioSection, PortfolioSectionType } from "@/types/dossier"
 
@@ -14,6 +14,14 @@ export const SECTION_CATALOG: Record<PortfolioSectionType, Entry> = {
   skills: { label: "Skills", blurb: "Tools and strengths, set as tags.", Icon: Zap, unit: ["skill", "skills"] },
   education: { label: "Education", blurb: "Schools, degrees and years.", Icon: GraduationCap, unit: ["entry", "entries"] },
   certifications: { label: "Certifications", blurb: "Licences and certificates with the issuer.", Icon: Award, unit: ["certificate", "certificates"] },
+  gallery: { label: "Gallery", blurb: "Pictures of your work, by link or small upload.", Icon: Image, unit: ["picture", "pictures"] },
+  showreel: { label: "Showreel", blurb: "Your reel or performances from YouTube or Vimeo.", Icon: Clapperboard, unit: ["video", "videos"] },
+  credits: { label: "Credits", blurb: "Productions, your part, the company and the year.", Icon: Ticket, unit: ["credit", "credits"] },
+  services: { label: "Services", blurb: "What clients can book you for.", Icon: Wrench, unit: ["service", "services"] },
+  testimonials: { label: "Kind words", blurb: "Quotes from clients or colleagues.", Icon: Quote, unit: ["quote", "quotes"] },
+  press: { label: "Press", blurb: "Features, interviews and awards.", Icon: Newspaper, unit: ["mention", "mentions"] },
+  publications: { label: "Publications", blurb: "Papers, chapters and talks.", Icon: BookOpen, unit: ["publication", "publications"] },
+  practice: { label: "Visit", blurb: "Address, hours and a booking link.", Icon: MapPin, unit: ["detail", "details"] },
   contact: { label: "Contact", blurb: "Email, phone and links, at the end of the page.", Icon: Mail, unit: ["way", "ways"] },
 }
 
@@ -28,6 +36,7 @@ export function sectionCount(section: PortfolioSection): number | null {
   switch (section.type) {
     case "hero":
     case "about":
+    case "practice":
       return null
     case "contact":
       return [section.data.email, section.data.phone, ...section.data.links].filter((v) => v?.trim()).length

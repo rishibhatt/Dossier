@@ -18,8 +18,9 @@ import { AUTH_EVENT_COOKIE, HUMAN_EVENTS, isTestVisit, looksAutomated, setNoTrac
  * `?notrack=1` turns tracking off in that browser for good (`?notrack=0` turns it back on), so the owner's
  * own visits to the live site stay out of the numbers.
  */
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? "G-TVF4GDK6G0"
-const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID ?? "yv0n7udwvu"
+// `||`, not `??`: an env var set to "" on the host must not silently switch tracking off.
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "G-TVF4GDK6G0"
+const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID || "yv0n7udwvu"
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY || process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN || "phc_ozxTMDUExhWAqgt6NBPHwWCLkvnFKh5hTEaidLcuXuv5"
 const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com"
 

@@ -4,6 +4,7 @@ import {
   inferPortfolioProfileFromStructured,
   isPortfolioProfileKind,
 } from "@/lib/ai/inferPortfolioType"
+import { getProfession, PROFESSION_GROUPS } from "@/lib/portfolio/professions"
 
 /**
  * Guarantees `portfolioMeta` exists and coerces invalid model values using heuristics.
@@ -25,6 +26,10 @@ export function ensurePortfolioMeta(
     raw?.emphasis && raw.emphasis.length > 0 ? raw.emphasis : inferred.emphasis
 
   const portfolioMeta: PortfolioMeta = { type, tone, emphasis }
+  const profession = getProfession(raw?.profession)
+  if (profession) portfolioMeta.profession = profession.id
+  if (raw?.group && PROFESSION_GROUPS.some((g) => g.id === raw.group)) portfolioMeta.group = raw.group
+  if (raw?.professionAsk) portfolioMeta.professionAsk = true
 
   return { ...document, portfolioMeta }
 }

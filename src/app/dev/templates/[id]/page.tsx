@@ -10,7 +10,7 @@ type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
-/** Dev-only: one template full-page (iframes in /dev/templates). ?sample=dense|sparse ?seed=N ?compact=1 */
+/** Dev-only: one template full-page (iframes in /dev/templates). ?sample=dense|sparse|work ?seed=N ?compact=1 */
 export default async function TemplatePreviewPage({ params, searchParams }: Props) {
   if (process.env.NODE_ENV === "production") notFound()
   const { id } = await params

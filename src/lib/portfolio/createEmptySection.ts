@@ -40,6 +40,23 @@ export function createEmptySection(type: PortfolioSectionType): PortfolioSection
       return { id: id("highlights"), type, data: { items: [{ value: "Add a number", label: "What it measures, from your resume" }] } }
     case "certifications":
       return { id: id("certifications"), type, data: { items: [{ name: "Certificate or licence", issuer: "Issuing body", year: "Year" }] } }
+    // Pictures and videos start empty: the page never shows a stand-in image, only the person's own work.
+    case "gallery":
+      return { id: id("gallery"), type, data: { items: [] } }
+    case "showreel":
+      return { id: id("showreel"), type, data: { items: [] } }
+    case "credits":
+      return { id: id("credits"), type, data: { items: [{ title: "Production name", role: "Your part", company: "Director, theatre or studio", year: "Year" }] } }
+    case "services":
+      return { id: id("services"), type, data: { items: [{ name: "What clients book you for", description: "Who it is for and what they get.", price: "" }] } }
+    case "testimonials":
+      return { id: id("testimonials"), type, data: { items: [{ quote: "Paste words a client or colleague wrote about you.", name: "Their name", role: "Their role or company" }] } }
+    case "press":
+      return { id: id("press"), type, data: { items: [{ title: "Headline of the feature", outlet: "Magazine or site", year: "Year", link: null }] } }
+    case "publications":
+      return { id: id("publications"), type, data: { items: [{ title: "Title of the paper or talk", outlet: "Journal, book or event", year: "Year", link: null }] } }
+    case "practice":
+      return { id: id("practice"), type, data: { name: "Clinic, chambers or studio name", address: "Street, area, city", hours: [], bookingUrl: "", mapUrl: "" } }
   }
 }
 

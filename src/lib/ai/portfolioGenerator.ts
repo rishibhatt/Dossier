@@ -213,6 +213,7 @@ export function buildPortfolioFromStructured(structured: StructuredResume & Part
   return {
     ...withMeta,
     portfolioMeta: {
+      ...base,
       type: opts.profileKind ?? base.type,
       tone: opts.tone?.trim() || base.tone,
       emphasis: opts.emphasis?.length ? opts.emphasis : base.emphasis,

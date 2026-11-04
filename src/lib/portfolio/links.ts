@@ -26,6 +26,17 @@ const NAMED: [RegExp, string][] = [
   [/scholar\.google/i, "Google Scholar"],
   [/orcid\./i, "ORCID"],
   [/youtube\./i, "YouTube"],
+  [/pinterest\./i, "Pinterest"],
+  [/vimeo\./i, "Vimeo"],
+  [/houzz\./i, "Houzz"],
+  [/archdaily\./i, "ArchDaily"],
+  [/imdb\./i, "IMDb"],
+  [/spotify\./i, "Spotify"],
+  [/soundcloud\./i, "SoundCloud"],
+  [/tiktok\./i, "TikTok"],
+  [/researchgate\./i, "ResearchGate"],
+  [/practo\./i, "Practo"],
+  [/doctolib\./i, "Doctolib"],
 ]
 
 /** Short human label for a link ("LinkedIn", "Website"). */
@@ -38,7 +49,30 @@ export const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, "")}`
 
 /* ---------- social profiles ---------- */
 
-export type SocialPlatform = "linkedin" | "github" | "x" | "instagram" | "behance" | "dribbble" | "youtube" | "medium" | "website"
+export type SocialPlatform =
+  | "linkedin"
+  | "github"
+  | "x"
+  | "instagram"
+  | "behance"
+  | "dribbble"
+  | "youtube"
+  | "medium"
+  | "pinterest"
+  | "vimeo"
+  | "houzz"
+  | "archdaily"
+  | "imdb"
+  | "spotify"
+  | "soundcloud"
+  | "tiktok"
+  | "mandy"
+  | "backstage"
+  | "practo"
+  | "doctolib"
+  | "researchgate"
+  | "scholar"
+  | "website"
 
 type Spec = {
   label: string
@@ -46,8 +80,8 @@ type Spec = {
   hosts: RegExp
   /** Canonical origin a pasted link is rewritten to. */
   origin: string
-  /** Path a bare handle maps to. */
-  path: (handle: string) => string
+  /** Path a bare handle maps to. Null where profile links carry ids, not handles: only a pasted link works. */
+  path: ((handle: string) => string) | null
   /** Hint shown in the studio quick-add field. */
   placeholder: string
 }
@@ -61,13 +95,32 @@ const SOCIAL: Record<Exclude<SocialPlatform, "website">, Spec> = {
   dribbble: { label: "Dribbble", hosts: /(^|\.)dribbble\.com$/, origin: "https://dribbble.com", path: (h) => `/${h}`, placeholder: "Username or link" },
   youtube: { label: "YouTube", hosts: /(^|\.)(youtube\.com|youtu\.be)$/, origin: "https://www.youtube.com", path: (h) => `/@${h}`, placeholder: "@channel or link" },
   medium: { label: "Medium", hosts: /(^|\.)medium\.com$/, origin: "https://medium.com", path: (h) => `/@${h}`, placeholder: "@handle or link" },
+  pinterest: { label: "Pinterest", hosts: /(^|\.)pinterest\.[a-z.]+$/, origin: "https://www.pinterest.com", path: (h) => `/${h}`, placeholder: "Username or link" },
+  vimeo: { label: "Vimeo", hosts: /(^|\.)vimeo\.com$/, origin: "https://vimeo.com", path: (h) => `/${h}`, placeholder: "Username or link" },
+  houzz: { label: "Houzz", hosts: /(^|\.)houzz\.[a-z.]+$/, origin: "https://www.houzz.com", path: null, placeholder: "Link to your Houzz profile" },
+  archdaily: { label: "ArchDaily", hosts: /(^|\.)archdaily\.[a-z.]+$/, origin: "https://www.archdaily.com", path: null, placeholder: "Link to your ArchDaily page" },
+  imdb: { label: "IMDb", hosts: /(^|\.)imdb\.com$/, origin: "https://www.imdb.com", path: null, placeholder: "imdb.com/name/... link" },
+  spotify: { label: "Spotify", hosts: /(^|\.)spotify\.com$/, origin: "https://open.spotify.com", path: null, placeholder: "Link to your artist page" },
+  soundcloud: { label: "SoundCloud", hosts: /(^|\.)soundcloud\.com$/, origin: "https://soundcloud.com", path: (h) => `/${h}`, placeholder: "Username or link" },
+  tiktok: { label: "TikTok", hosts: /(^|\.)tiktok\.com$/, origin: "https://www.tiktok.com", path: (h) => `/@${h}`, placeholder: "@handle or link" },
+  mandy: { label: "Mandy", hosts: /(^|\.)mandy\.com$/, origin: "https://www.mandy.com", path: null, placeholder: "Link to your Mandy profile" },
+  backstage: { label: "Backstage", hosts: /(^|\.)backstage\.com$/, origin: "https://www.backstage.com", path: null, placeholder: "Link to your Backstage profile" },
+  practo: { label: "Practo", hosts: /(^|\.)practo\.com$/, origin: "https://www.practo.com", path: null, placeholder: "Link to your Practo profile" },
+  doctolib: { label: "Doctolib", hosts: /(^|\.)doctolib\.[a-z.]+$/, origin: "https://www.doctolib.fr", path: null, placeholder: "Link to your Doctolib page" },
+  researchgate: { label: "ResearchGate", hosts: /(^|\.)researchgate\.net$/, origin: "https://www.researchgate.net", path: (h) => `/profile/${h}`, placeholder: "Profile name or link" },
+  scholar: { label: "Google Scholar", hosts: /(^|\.)scholar\.google\.[a-z.]+$/, origin: "https://scholar.google.com", path: null, placeholder: "Link to your Scholar profile" },
 }
 
-/** Platforms the studio offers as one-tap adds, in button order. */
+/** Platforms the studio offers as one-tap adds, in button order. Each profession group leads with its own (GROUP_SOCIALS). */
 export const QUICK_ADD_PLATFORMS: SocialPlatform[] = ["linkedin", "github", "x", "instagram", "behance", "dribbble", "youtube", "website"]
+
+/** Every platform the studio can add, for the More list. */
+export const ALL_SOCIAL_PLATFORMS: SocialPlatform[] = [...(Object.keys(SOCIAL) as SocialPlatform[]), "website"]
 
 export const socialLabel = (p: SocialPlatform) => (p === "website" ? "Website" : SOCIAL[p].label)
 export const socialPlaceholder = (p: SocialPlatform) => (p === "website" ? "yoursite.com" : SOCIAL[p].placeholder)
+/** True where only a pasted link works (profile URLs carry ids, not usernames). */
+export const socialNeedsLink = (p: SocialPlatform) => p === "website" || !SOCIAL[p].path
 
 /** Hostname of an http(s) link (or bare domain), lowercased without www. Null for anything else. */
 function hostOf(raw: string): string | null {
@@ -137,6 +190,8 @@ export function normaliseSocial(platform: SocialPlatform, input: string): string
     if (!path) return null
     return platform === "youtube" && /youtu\.be$/i.test(u.hostname) ? `https://youtu.be${path}` : `${spec.origin}${path}`
   }
+  const path = SOCIAL[platform].path
+  if (!path) return null
   const handle = t.replace(/^@/, "").replace(platform === "linkedin" ? /^in\//i : /^$/, "").replace(/\/+$/, "")
-  return HANDLE.test(handle) ? `${SOCIAL[platform].origin}${SOCIAL[platform].path(handle)}` : null
+  return HANDLE.test(handle) ? `${SOCIAL[platform].origin}${path(handle)}` : null
 }

@@ -1,3 +1,6 @@
+import type { ProfessionGroup } from "@/lib/portfolio/professions"
+
+import { professionSpecs } from "./professionSpecs"
 import type { PaletteInput, TemplateSpec } from "./types"
 
 /**
@@ -28,7 +31,7 @@ const p = (bg: string, bg2: string, text: string, muted: string, primary: string
   accent,
 })
 
-export const TEMPLATE_SPECS: readonly TemplateSpec[] = [
+const BASE_SPECS: readonly Omit<TemplateSpec, "group">[] = [
   {
     id: "terminal",
     name: "Terminal",
@@ -828,3 +831,19 @@ export const TEMPLATE_SPECS: readonly TemplateSpec[] = [
     match: { clusters: ["switcher"], stage: ["pivoting"], emphasis: "experience", projectLed: false },
   },
 ]
+
+/** Which group each original template serves. Kept, not retired: published sites keep rendering with them. */
+const GROUP_OF: Record<string, ProfessionGroup> = {
+  studio: "visual",
+  atelier: "visual",
+  kitchen: "visual",
+  nocturne: "visual",
+  clinic: "licensed",
+  chambers: "licensed",
+  ledger: "licensed",
+  scholar: "licensed",
+}
+
+const ORIGINAL: TemplateSpec[] = BASE_SPECS.map((spec) => ({ ...spec, group: GROUP_OF[spec.id] ?? "builder" }))
+
+export const TEMPLATE_SPECS: readonly TemplateSpec[] = [...ORIGINAL, ...professionSpecs((id) => ORIGINAL.find((spec) => spec.id === id)!)]

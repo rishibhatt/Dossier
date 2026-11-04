@@ -86,6 +86,7 @@ function scrollerFor(el: HTMLElement): Element | Window {
  * count up once, project covers drift lightly (data-pf-parallax="on").
  * Content is visible by default: hidden states are applied by GSAP only, inside a
  * prefers-reduced-motion: no-preference media query, and reverted on cleanup.
+ * Tier (root data-pf-tier): calm fades blocks only; expressive is the above; awwwards adds scroll-scrubbed effects.
  */
 export function usePortfolioMotion(rootRef: RefObject<HTMLElement | null>, { disabled, key }: { disabled?: boolean; key?: string }) {
   useGSAP(
@@ -93,6 +94,8 @@ export function usePortfolioMotion(rootRef: RefObject<HTMLElement | null>, { dis
       const root = rootRef.current
       if (!root || disabled) return
       const sig = root.dataset.pfMotion ?? "rise"
+      const tier = root.dataset.pfTier ?? "expressive"
+      const calm = tier === "calm"
       const mm = gsap.matchMedia()
       mm.add("(prefers-reduced-motion: no-preference)", (gctx) => {
         const q = <E extends Element>(s: string) => Array.from(root.querySelectorAll<E>(s))
@@ -111,6 +114,12 @@ export function usePortfolioMotion(rootRef: RefObject<HTMLElement | null>, { dis
             const timer = window.setTimeout(() => t.progress(1), ((Number(to.duration) || 1) + (Number(to.delay) || 0) + stagger * n + 0.6) * 1000)
             cleanups.push(() => window.clearTimeout(timer))
           })
+
+        // Calm tier: short fades only. No word masks, counters or parallax.
+        if (calm) {
+          cleanups.push(onceVisible(q("[data-pf-reveal]"), (el) => reveal(el, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: "power2.out" })))
+          return () => cleanups.forEach((c) => c())
+        }
 
         // signature moment: hero name by word masks
         const words = q("[data-pf-line] > span")
@@ -142,6 +151,29 @@ export function usePortfolioMotion(rootRef: RefObject<HTMLElement | null>, { dis
         }
         return () => cleanups.forEach((c) => c())
       })
+
+      /**
+       * Award tier, wide screens with a mouse only: scroll-scrubbed, so every state is reversible and nothing
+       * is ever left hidden. Phones and touch keep the expressive motion above.
+       */
+      if (tier === "awwwards") {
+        mm.add("(prefers-reduced-motion: no-preference) and (min-width: 768px) and (pointer: fine)", () => {
+          const scroller = scrollerFor(root)
+          const scrub = (trigger: Element, start: string, end: string) => ({ trigger, scroller, start, end, scrub: 0.6 })
+
+          // the intro drifts up and fades back as the page moves past it
+          const hero = root.querySelector(".pf-hero")
+          if (hero) gsap.to(hero, { yPercent: -10, opacity: 0.35, ease: "none", scrollTrigger: scrub(hero, "top top", "bottom top") })
+
+          // images open from an inset frame while the picture settles from a slight zoom
+          root.querySelectorAll<HTMLElement>(".pf-media").forEach((fig) => {
+            gsap.fromTo(fig, { clipPath: "inset(10% 8% 10% 8%)" }, { clipPath: "inset(0% 0% 0% 0%)", ease: "none", scrollTrigger: scrub(fig, "top bottom", "top 45%") })
+            const inner = fig.firstElementChild
+            if (inner && !inner.hasAttribute("data-pf-parallax")) gsap.fromTo(inner, { scale: 1.12 }, { scale: 1, ease: "none", scrollTrigger: scrub(fig, "top bottom", "top 45%") })
+          })
+          ScrollTrigger.refresh()
+        })
+      }
       return () => mm.revert()
     },
     { scope: rootRef, dependencies: [disabled, key], revertOnUpdate: true }

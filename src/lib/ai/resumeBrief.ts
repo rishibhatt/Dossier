@@ -17,7 +17,7 @@ ed:[{i school,d degree,p years,x honors/GPA}]
 cert:[{n name,i issuer,y year}]
 h:[{v number exactly as written,l what it measures <=40 chars}] <=4 measurable results, else []
 ct:{e email,p phone,l:[urls]}
-b:{c dev|design|fin|mkt|health|legal|edu|culin|eng|sales|hr|creative|academic|exec|freelance|student|switcher|other,t calm|bold|playful|formal|techy|warm,m projects|experience|education|credentials}`
+b:{c dev|design|fin|mkt|health|legal|edu|culin|eng|sales|hr|creative|academic|exec|freelance|student|switcher|other,t calm|bold|playful|formal|techy|warm,m projects|experience|education|credentials,p profession in 1-3 plain words}`
 
 /** Completion cap: a dense resume compacts to ~1.2-1.5k output tokens; gpt-oss adds a little low-effort reasoning. */
 export const RESUME_BRIEF_MAX_OUTPUT_TOKENS = 1_900
@@ -34,6 +34,8 @@ export type ResumeBriefSummary = {
   emphasis?: DesignBriefEmphasis
   /** Hero one-liner (<=110 chars). */
   line: string
+  /** The model's one-to-three-word profession ("interior designer"), checked against the title in code. */
+  profession?: string
 }
 
 const TONES: readonly DesignBriefTone[] = ["calm", "bold", "playful", "formal", "techy", "warm"]
@@ -104,6 +106,7 @@ export function expandCompactResume(c: CompactResume, source: string): { data: R
     tone: oneOf(c.b.t, TONES),
     emphasis: oneOf(c.b.m, EMPH),
     line: data.tagline ?? "",
+    profession: c.b.p.slice(0, 40) || undefined,
   }
   return { data, brief }
 }

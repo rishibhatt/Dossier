@@ -135,8 +135,13 @@ export type DesignLayoutBlock = {
 
 export type MotionPreset = "fade-up" | "slide-reveal" | "stagger-grid" | "magnetic" | "parallax"
 
+/** How much the page moves. calm and expressive are free; awwwards (scroll-driven) is Pro, clamped at publish. */
+export type MotionTier = "calm" | "expressive" | "awwwards"
+
 export type DesignMotionBlock = {
   preset: MotionPreset
+  /** Picked in the studio. Missing means expressive, the motion every site had before tiers. */
+  tier?: MotionTier
   heroAnimation: MotionVariantJson
   cardAnimation: MotionVariantJson
   textAnimation: MotionVariantJson

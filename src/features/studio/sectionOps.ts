@@ -6,6 +6,7 @@ import { toast } from "sonner"
 import { restoreSnapshot, takeSnapshot, useStudioStatus } from "@/features/studio/studioStatus"
 import { ALL_SECTION_TYPES, sectionLabel } from "@/features/studio/sectionCatalog"
 import { resolveVariant, VARIANT_IDS } from "@/components/portfolio/sections/registry"
+import { createEmptySection } from "@/lib/portfolio/createEmptySection"
 import { templateVariant } from "@/lib/portfolio/pairSections"
 import { useDossierStore } from "@/store/useDossierStore"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
@@ -65,6 +66,15 @@ export function seedSection(type: PortfolioSectionType): PortfolioSection {
       return { id, type, data: { items: [{ name: "Certificate name", issuer: "Issuer", year: "2024" }] } }
     case "contact":
       return { id, type, data: { email: r?.contact?.email ?? "", phone: r?.contact?.phone ?? "", links: r?.contact?.links ?? [], headline: "Get in touch", showSocialInHero: true } }
+    case "gallery": {
+      // Project covers already on the page are the person's own pictures: start the gallery with them.
+      const covers = (usePortfolioStore.getState().document?.sections ?? []).flatMap((s) =>
+        s.type === "projects" ? s.data.items.filter((p) => p.imageUrl?.trim()).map((p) => ({ imageUrl: p.imageUrl!.trim(), caption: p.name, link: p.link ?? null })) : []
+      )
+      return { id, type, data: { items: covers } }
+    }
+    default:
+      return { ...createEmptySection(type), id }
   }
 }
 

@@ -24,6 +24,8 @@ const projectEntrySchema = z.object({
   link: url.optional().nullable(),
 })
 
+const mentionSchema = z.object({ title: str, outlet: str, year: str, link: url.optional().nullable() })
+
 const sectionSchema = z.discriminatedUnion("type", [
   s("hero", { name: str, title: str, tagline: str, imageUrl: url.optional().nullable() }),
   s("about", { body: str }),
@@ -33,7 +35,15 @@ const sectionSchema = z.discriminatedUnion("type", [
   s("contact", { email: str, phone: str, links: z.array(str), headline: str.optional(), location: str.optional(), showSocialInHero: z.boolean().optional() }),
   s("education", { items: z.array(z.object({ institution: str, degree: str, period: str, details: str })) }),
   s("highlights", { items: z.array(z.object({ value: str, label: str })).max(12) }),
-  s("certifications", { items: z.array(z.object({ name: str, issuer: str, year: str })) }),
+  s("certifications", { items: z.array(z.object({ name: str, issuer: str, year: str, number: str.max(60).optional() })) }),
+  s("gallery", { items: z.array(z.object({ imageUrl: url, caption: str.max(300), link: url.optional().nullable(), beforeUrl: url.optional().nullable() })).max(40) }),
+  s("showreel", { items: z.array(z.object({ videoUrl: url, title: str.max(200), note: str.max(300) })).max(12) }),
+  s("credits", { items: z.array(z.object({ title: str, role: str, company: str, year: str })).max(80) }),
+  s("services", { items: z.array(z.object({ name: str, description: str, price: str.max(80) })).max(24) }),
+  s("testimonials", { items: z.array(z.object({ quote: str.max(1200), name: str, role: str })).max(16) }),
+  s("press", { items: z.array(mentionSchema).max(40) }),
+  s("publications", { items: z.array(mentionSchema).max(80) }),
+  s("practice", { name: str, address: str.max(400), hours: z.array(str.max(120)).max(14), bookingUrl: url, mapUrl: url }),
 ])
 
 const portfolioMetaSchema = z
@@ -41,6 +51,9 @@ const portfolioMetaSchema = z
     type: z.enum(["developer", "designer", "product", "student", "general"]).optional(),
     tone: z.string().optional(),
     emphasis: z.array(z.string()).optional(),
+    profession: z.string().max(40).optional(),
+    group: z.enum(["visual", "performer", "licensed", "builder"]).optional(),
+    professionAsk: z.boolean().optional(),
   })
   .optional()
 

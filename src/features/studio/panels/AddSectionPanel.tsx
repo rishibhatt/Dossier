@@ -7,6 +7,7 @@ import { PanelFrame } from "@/features/studio/panels/PanelFrame"
 import { SECTION_CATALOG } from "@/features/studio/sectionCatalog"
 import { addableTypes, insertSection } from "@/features/studio/sectionOps"
 import { SectionPreview } from "@/features/studio/SectionPreview"
+import { GROUP_SECTIONS, portfolioGroup } from "@/lib/portfolio/professions"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
 import { useStudioUiStore } from "@/store/useStudioUiStore"
 import type { PortfolioSectionType } from "@/types/dossier"
@@ -20,12 +21,20 @@ export function addAndReveal(type: PortfolioSectionType) {
   requestAnimationFrame(() => revealSection(canvasRoot(), id))
 }
 
+const rank = (first: readonly PortfolioSectionType[], t: PortfolioSectionType) => {
+  const i = first.indexOf(t)
+  return i < 0 ? first.length : i
+}
+
 /** The section gallery: every section the page can still take, each previewed in the current look. */
 export function AddSectionPanel() {
   const active = useStudioUiStore((s) => s.panel === "add")
   const types = usePortfolioStore((s) => s.document?.sections.map((x) => x.type).join(","))
   const present = (types ?? "").split(",").filter(Boolean) as PortfolioSectionType[]
-  const list = addableTypes(present)
+  const group = usePortfolioStore((s) => portfolioGroup(s.document?.portfolioMeta))
+  // The field's own sections first, then the rest in catalogue order.
+  const suggested = GROUP_SECTIONS[group]
+  const list = addableTypes(present).sort((a, b) => rank(suggested, a) - rank(suggested, b))
 
   return (
     <PanelFrame title="Add a section" hint="Each preview uses your current look and, where it can, your resume.">
@@ -46,7 +55,7 @@ export function AddSectionPanel() {
                   <div className="min-w-0 flex-1">
                     <p className="flex items-baseline gap-2">
                       <span className="font-semibold">{label}</span>
-                      {present.includes(type) ? <span className="sp-data">On your page</span> : null}
+                      {present.includes(type) ? <span className="sp-data">On your page</span> : suggested.includes(type) ? <span className="sp-data">For your field</span> : null}
                     </p>
                     <p className="mt-0.5 text-sm text-[var(--site-ink-2)]">{blurb}</p>
                   </div>

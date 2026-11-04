@@ -253,6 +253,59 @@ export const PORTFOLIO_CSS = String.raw`
   .pf[data-pf-shell=rail] .pf-nav__menu{display:none}
 }
 
+.pf:not([data-pf-shell=rail]) .pf-nav[data-pf-many] .pf-nav__links{display:none}
+.pf:not([data-pf-shell=rail]) .pf-nav[data-pf-many] .pf-nav__menu{display:block}
+
+/* ---------- work: gallery, showreel, credits, services, quotes, practice ---------- */
+.pf-figure{margin:0}
+.pf-shot{overflow:hidden;aspect-ratio:4/3;border-radius:calc(var(--de-radius) * .75);background:var(--de-bg2)}
+.pf-shot img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.22,1,.36,1)}
+.pf-shot--natural{aspect-ratio:auto}
+.pf-shot--natural img{height:auto}
+.pf-figure:hover .pf-shot img{transform:scale(1.025)}
+.pf-shot__cap{margin-top:.6rem;font-size:.875rem;line-height:1.45;color:var(--de-muted)}
+.pf-masonry{columns:1;column-gap:clamp(1rem,2.5cqi,1.5rem)}
+.pf-masonry>li{break-inside:avoid;margin-bottom:clamp(1rem,2.5cqi,1.5rem)}
+@container pfbody (min-width:34rem){.pf-masonry{columns:2}}
+@container pfbody (min-width:58rem){.pf-masonry{columns:3}}
+.pf-strip{display:flex;gap:clamp(.75rem,2cqi,1.25rem);overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;padding-bottom:.75rem;scrollbar-width:thin}
+.pf-strip>li{flex:0 0 auto;scroll-snap-align:start;max-width:85cqi}
+.pf-strip .pf-shot img{height:clamp(16rem,52cqi,30rem);width:auto;max-width:85cqi}
+.pf-strip:focus-visible{outline:2px solid var(--de-primary);outline-offset:4px}
+.pf-compare{display:grid;gap:clamp(1.5rem,4cqi,2.5rem)}
+.pf-pair{display:grid;grid-template-columns:1fr;gap:.75rem}
+@container pfbody (min-width:30rem){.pf-pair{grid-template-columns:1fr 1fr}}
+.pf-pair>div{position:relative}
+.pf-pair__tag{position:absolute;left:.6rem;top:.6rem;padding:.2rem .55rem;border-radius:999px;background:color-mix(in srgb,var(--de-bg) 88%,transparent);color:var(--de-fg);font-size:.75rem;font-weight:600;letter-spacing:.02em}
+.pf-video{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:calc(var(--de-radius) * .75);background:#000}
+.pf-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.pf-reels{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(1.25rem,3cqi,2rem)}
+@container pfbody (min-width:40rem){.pf-reels{grid-template-columns:repeat(2,minmax(0,1fr))}.pf-reel--lead{grid-column:1/-1}}
+.pf-reel .pf-item__title{margin-top:.75rem}
+.pf-reel--lead .pf-item__title{font-size:clamp(1.25rem,3cqi,1.75rem)}
+.pf-table-wrap{overflow-x:auto}
+.pf-table-wrap:focus-visible{outline:2px solid var(--de-primary);outline-offset:4px}
+.pf-table{width:100%;min-width:32rem;border-collapse:collapse;font-size:.9375rem}
+.pf-table th,.pf-table td{padding:.75rem .75rem .75rem 0;border-top:1px solid var(--de-border);text-align:left;vertical-align:baseline}
+.pf-table thead th{border-top:0;font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--de-muted)}
+.pf-table tbody th{font-family:var(--de-font-display);font-weight:var(--de-w-heading)}
+.pf-price{font-variant-numeric:tabular-nums;font-weight:600;color:var(--de-fg);white-space:nowrap}
+.pf-quotes{display:grid;gap:clamp(2rem,6cqi,3.5rem)}
+.pf-quote{margin:0}
+.pf-quote blockquote{margin:0;font-family:var(--de-font-display);font-size:clamp(1.25rem,3.4cqi,2rem);line-height:1.3;letter-spacing:-0.01em;text-wrap:pretty}
+.pf-quotes .pf-quote blockquote p::before{content:"\201C"}
+.pf-quotes .pf-quote blockquote p::after{content:"\201D"}
+.pf-card .pf-quote blockquote{font-size:1.0625rem;line-height:1.5;font-family:var(--de-font-body)}
+.pf-quote figcaption{margin-top:.75rem}
+.pf-quote__name{font-weight:600;color:var(--de-fg)}
+.pf-practice__split{display:grid;gap:1.5rem;padding-block:.5rem;border-top:1px solid var(--de-border)}
+@container pfbody (min-width:40rem){.pf-practice__split{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);align-items:end}}
+.pf-practice__address{margin-top:.5rem;color:var(--de-fg);white-space:pre-line}
+.pf-hours{margin-top:1rem;display:grid;gap:.25rem;font-size:.9375rem;color:var(--de-muted);font-variant-numeric:tabular-nums}
+.pf-practice__actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.25rem}
+.pf-practice__split .pf-practice__actions{margin-top:0}
+@media (prefers-reduced-motion:reduce){.pf-shot img{transition:none}.pf-figure:hover .pf-shot img{transform:none}}
+
 /* ---------- credit ---------- */
 
 /* ---------- studio edit mode ---------- */

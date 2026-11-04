@@ -147,7 +147,7 @@ export function buildConfigFromTemplate(
   // Every variant handles sparse and dense content itself, so the template's choice is used as is.
   const plans: DesignSectionPlan[] = sectionOrder.map((type) => ({
     type,
-    variant: type === "hero" ? spec.heroSection : spec.variants[type],
+    variant: (type === "hero" ? spec.heroSection : spec.variants[type]) ?? "",
   }))
 
   const f = spec.fonts

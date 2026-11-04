@@ -1,16 +1,21 @@
 "use client"
 
-import { useMemo } from "react"
+import { useId, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { Check, Loader2, Shuffle } from "lucide-react"
+import { Check, Loader2, Lock, Shuffle } from "lucide-react"
 
+import { useAccountSummary } from "@/features/billing/useAccountSummary"
+import { openUpgrade } from "@/features/billing/useUpgrade"
 import { PanelFrame, PanelGroup } from "@/features/studio/panels/PanelFrame"
-import { changeDesign } from "@/features/studio/studioActions"
+import { ProfessionSelect } from "@/features/studio/ProfessionAsk"
+import { changeDesign, persistNow } from "@/features/studio/studioActions"
 import { useStudioStatus } from "@/features/studio/studioStatus"
 import { TemplateThumb } from "@/features/studio/TemplateThumb"
 import { getTemplate, recommendTemplates, TEMPLATES, type DesignTemplate } from "@/lib/design/templates"
+import { getProfession, PROFESSION_GROUPS } from "@/lib/portfolio/professions"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
 import { useStudioUiStore } from "@/store/useStudioUiStore"
+import type { MotionTier } from "@/types/resolvedDesignConfig"
 
 const ACCENTS = ["#101114", "#2f6b45", "#b4361f", "#1d4ed8", "#7c3aed", "#0f766e", "#b45309", "#be185d"] as const
 
@@ -36,6 +41,64 @@ function Choice<T extends string>({ label, value, options, onChange }: { label: 
         </button>
       ))}
     </div>
+  )
+}
+
+const TIERS: { value: MotionTier; label: string; note: string }[] = [
+  { value: "calm", label: "Calm", note: "Blocks fade in gently. Nothing else moves." },
+  { value: "expressive", label: "Expressive", note: "Your name sets in word by word, lists stagger, numbers count up." },
+  { value: "awwwards", label: "Award", note: "Scroll-driven: images open as you scroll and the intro drifts away. On phones it stays Expressive." },
+]
+
+function ProfessionPicker() {
+  const id = useId()
+  const meta = usePortfolioStore((s) => s.document?.portfolioMeta)
+  const setProfession = usePortfolioStore((s) => s.setProfession)
+  const current = getProfession(meta?.profession)
+  const group = PROFESSION_GROUPS.find((g) => g.id === current?.group)
+  return (
+    <PanelGroup title="Your field">
+      <label htmlFor={id} className="sr-only">
+        Your field
+      </label>
+      <ProfessionSelect
+        id={id}
+        value={current?.id ?? ""}
+        onChange={(v) => {
+          useStudioStatus.getState().pushHistory()
+          setProfession(v)
+        }}
+      />
+      <p className="mt-1.5 text-xs text-[var(--site-ink-2)]">{group ? group.blurb : "Your field decides which looks and profile links come first."}</p>
+    </PanelGroup>
+  )
+}
+
+function MotionPicker() {
+  const tier = usePortfolioStore((s) => s.designConfig?.motion.tier ?? "expressive")
+  const setMotionTier = usePortfolioStore((s) => s.setMotionTier)
+  const { status, summary } = useAccountSummary()
+  // Locked only once the plan is known; the publish route clamps the tier for anyone below Pro anyway.
+  const locked = status !== "idle" && status !== "loading" && summary.plan !== "pro"
+  const pick = (t: MotionTier) => {
+    if (t === tier) return
+    if (t === "awwwards" && locked) return openUpgrade("award_motion", { plan: summary.plan, beforeLeave: persistNow })
+    useStudioStatus.getState().pushHistory()
+    setMotionTier(t)
+  }
+  return (
+    <PanelGroup title="Motion">
+      <div role="radiogroup" aria-label="Motion" className="grid auto-cols-fr grid-flow-col gap-1.5">
+        {TIERS.map((t) => (
+          <button key={t.value} type="button" role="radio" aria-checked={tier === t.value} onClick={() => pick(t.value)} className="sp-chip justify-center">
+            {t.value === "awwwards" && locked ? <Lock className="size-3.5 shrink-0" aria-hidden /> : null}
+            {t.label}
+            {t.value === "awwwards" && locked ? <span className="sr-only">(Pro)</span> : null}
+          </button>
+        ))}
+      </div>
+      <p className="mt-1.5 text-xs text-[var(--site-ink-2)]">{TIERS.find((t) => t.value === tier)?.note}</p>
+    </PanelGroup>
   )
 }
 
@@ -72,7 +135,11 @@ export function DesignPanel() {
 
   const currentId = designConfig?.meta.templateId ?? null
   const current = currentId ? getTemplate(currentId) : undefined
-  const recommended = useMemo(() => (parsedResume ? recommendTemplates(parsedResume, undefined, 3) : []), [parsedResume])
+  const profession = usePortfolioStore((s) => getProfession(s.document?.portfolioMeta?.profession))
+  const recommended = useMemo(
+    () => (parsedResume ? recommendTemplates(parsedResume, profession ? { category: profession.category, profession: profession.id, group: profession.group } : undefined, 3) : []),
+    [parsedResume, profession]
+  )
   const others = useMemo(() => TEMPLATES.filter((t) => !recommended.some((r) => r.template.id === t.id)), [recommended])
 
   const pick = (t: DesignTemplate) => {
@@ -109,8 +176,10 @@ export function DesignPanel() {
         </button>
       </div>
 
+      <ProfessionPicker />
+
       {recommended.length > 0 ? (
-        <PanelGroup title="Suits your resume">
+        <PanelGroup title={profession ? "Suits your field" : "Suits your resume"}>
           <div className="ws-looks">{recommended.map((r) => card(r.template, r.reason))}</div>
         </PanelGroup>
       ) : null}
@@ -118,6 +187,8 @@ export function DesignPanel() {
       <PanelGroup title={recommended.length > 0 ? "All looks" : "Looks"} aside={<span className="sp-data">{TEMPLATES.length}</span>}>
         <div className="ws-looks">{others.map((t) => card(t))}</div>
       </PanelGroup>
+
+      {tokens ? <MotionPicker /> : null}
 
       {tokens ? (
         <PanelGroup title="Fine-tune">

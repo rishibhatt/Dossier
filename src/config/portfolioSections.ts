@@ -14,6 +14,14 @@ export const sectionConfig = [
   { type: "experience" as const, label: messages.dossier.sectionExperience, nav: "Experience", blurb: "Roles, dates and what changed because of you." },
   { type: "skills" as const, label: messages.dossier.sectionSkills, nav: "Skills", blurb: "Tools, methods and strengths." },
   { type: "certifications" as const, label: "Certifications", nav: "Certifications", blurb: "Licences and certificates with issuer and year." },
+  { type: "gallery" as const, label: "Gallery", nav: "Gallery", blurb: "Pictures of your work, from links or small uploads." },
+  { type: "showreel" as const, label: "Showreel", nav: "Reel", blurb: "Your reel or performances from YouTube or Vimeo." },
+  { type: "credits" as const, label: "Credits", nav: "Credits", blurb: "Productions, the part you played, who made it and when." },
+  { type: "services" as const, label: "Services", nav: "Services", blurb: "What clients can book you for, with prices if you share them." },
+  { type: "testimonials" as const, label: "Kind words", nav: "Kind words", blurb: "Quotes from clients or colleagues, in their own words." },
+  { type: "press" as const, label: "Press", nav: "Press", blurb: "Features, interviews and awards, with links." },
+  { type: "publications" as const, label: "Publications", nav: "Publications", blurb: "Papers, chapters and talks, with where and when." },
+  { type: "practice" as const, label: "Visit", nav: "Visit", blurb: "Your clinic, chambers or studio: address, hours and booking link." },
   { type: "contact" as const, label: messages.dossier.sectionContact, nav: "Contact", blurb: "Email, phone, location and profile links." },
 ] as const satisfies readonly { type: PortfolioSectionType; label: string; nav: string; blurb: string }[]
 
