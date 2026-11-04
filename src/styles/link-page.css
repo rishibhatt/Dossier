@@ -1,0 +1,1181 @@
+/*
+ * Link-in-bio. `.lp-*` is the page itself (public /l/<username> and the editor preview render the same markup);
+ * it reads its palette from --lp-* set by the look, and each look restyles the shared markup on [data-theme].
+ * `.lb-*` is the editor on /tools/link-in-bio, on site tokens.
+ */
+@layer components {
+  /* ---------------------------------------------------------------- The page: shared */
+  .lp {
+    container-type: inline-size;
+    position: relative;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--lp-bg);
+    color: var(--lp-ink);
+    font-family: var(--font-inter), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .lp-full {
+    min-height: 100dvh;
+  }
+
+  .lp ::selection {
+    background: var(--lp-accent);
+    color: #fff;
+  }
+
+  .lp :focus-visible {
+    outline: 2px solid var(--lp-focus);
+    outline-offset: 3px;
+  }
+
+  .lp-col {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+    max-width: 34rem;
+    margin-inline: auto;
+    padding: 0.75rem clamp(1rem, 5cqi, 1.5rem) 1.25rem;
+  }
+
+  /* Running head: handle left, share right, over a rule. */
+  .lp-head {
+    display: flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid var(--lp-line);
+  }
+
+  .lp-handle {
+    font-family: var(--site-mono-face, ui-monospace, monospace);
+    font-size: 0.75rem;
+    color: var(--lp-mute);
+    overflow-wrap: anywhere;
+  }
+
+  .lp-share {
+    display: inline-flex;
+    height: 2.75rem;
+    align-items: center;
+    gap: 0.375rem;
+    margin-right: -0.5rem;
+    padding-inline: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--lp-ink);
+    transition: background-color 160ms ease;
+  }
+
+  .lp-share:hover {
+    background: color-mix(in srgb, var(--lp-ink) 8%, transparent);
+  }
+
+  .lp-share svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .lp-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lp-id {
+    margin-top: clamp(1.75rem, 8cqi, 2.75rem);
+  }
+
+  .lp-photo {
+    display: grid;
+    width: 5.5rem;
+    height: 5.5rem;
+    place-items: center;
+    border-radius: 2px;
+    object-fit: cover;
+    background: color-mix(in srgb, var(--lp-ink) 8%, transparent);
+  }
+
+  .lp-initials {
+    background: var(--lp-ink);
+    color: var(--lp-bg);
+    font-family: var(--site-display, system-ui);
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  .lp-name {
+    margin-top: 1.25rem;
+    font-family: var(--site-display, system-ui);
+    font-size: clamp(2.5rem, 13cqi, 4.25rem);
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 0.92;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+
+  .lp-bio {
+    margin-top: 0.875rem;
+    max-width: 34ch;
+    color: var(--lp-mute);
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .lp-links {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 2rem;
+  }
+
+  .lp-btn {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    min-height: 4rem;
+    align-items: center;
+    gap: 0.875rem;
+    overflow: hidden;
+    padding: 0.625rem 1rem 0.625rem 0.625rem;
+    border: 1px solid var(--lp-line);
+    border-radius: 4px;
+    background: var(--lp-btn);
+    color: var(--lp-btn-ink);
+    text-decoration: none;
+    transition: color 420ms var(--site-ease, ease), transform 60ms ease;
+  }
+
+  /* The flood: wipes in from the left on hover, the way the site's buttons fill. */
+  .lp-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--lp-flood);
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 480ms var(--site-ease, ease);
+  }
+
+  .lp-ico {
+    display: grid;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    place-items: center;
+    border-radius: 2px;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    font-family: var(--site-display, system-ui);
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .lp-ico svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .lp-favicon {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 2px;
+    object-fit: contain;
+  }
+
+  .lp-txt {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+    gap: 0.125rem;
+  }
+
+  .lp-t {
+    position: relative;
+    overflow: hidden;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  .lp-t > span {
+    display: block;
+  }
+
+  .lp-u {
+    overflow: hidden;
+    font-family: var(--site-mono-face, ui-monospace, monospace);
+    font-size: 0.6875rem;
+    color: color-mix(in srgb, currentColor 62%, transparent);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lp-btn-arrow {
+    width: 1.125rem;
+    height: 1.125rem;
+    flex: none;
+    transition: transform 420ms var(--site-ease, ease);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .lp-btn[href]:hover {
+      color: var(--lp-flood-ink);
+    }
+
+    .lp-btn[href]:hover::before {
+      clip-path: inset(0 0 0 0);
+    }
+
+    .lp-btn[href]:hover .lp-btn-arrow {
+      transform: translate(2px, -2px);
+    }
+  }
+
+  .lp-btn[href]:active {
+    transform: translateY(1px);
+  }
+
+  .lp-empty {
+    margin-top: 2rem;
+    padding: 1rem;
+    border: 1px dashed var(--lp-line);
+    border-radius: 4px;
+    color: var(--lp-mute);
+    font-size: 0.875rem;
+  }
+
+  .lp-icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+  }
+
+  .lp-icon {
+    display: grid;
+    width: 2.875rem;
+    height: 2.875rem;
+    place-items: center;
+    border: 1px solid var(--lp-line);
+    border-radius: 4px;
+    color: var(--lp-ink);
+    transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, transform 200ms var(--site-ease, ease);
+  }
+
+  .lp-icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .lp-icon[href]:hover {
+    border-color: var(--lp-ink);
+    background: var(--lp-ink);
+    color: var(--lp-bg);
+    transform: translateY(-2px);
+  }
+
+  /* "Made with Dossier": the published portfolios' floater (same rules as portfolioCss.ts, which only portfolio
+     pages load). The full wordmark shows on load, tucks into the logo tile, and opens again on hover or focus. */
+  .lp .pf-float {
+    position: sticky;
+    bottom: 0;
+    z-index: 40;
+    height: 0;
+    display: flex;
+    justify-content: flex-end;
+    padding-inline: max(0.75rem, env(safe-area-inset-right));
+    pointer-events: none;
+  }
+
+  .lp .pf-float a {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    height: 2.75rem;
+    padding-inline: 0.6875rem;
+    border-radius: 999px;
+    background: #fffefb;
+    border: 1px solid rgba(16, 17, 20, 0.14);
+    box-shadow: 0 10px 28px -14px rgba(16, 17, 20, 0.55);
+    transform: translateY(calc(-100% - 0.75rem - env(safe-area-inset-bottom)));
+    transition: box-shadow 0.3s, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .lp .pf-float__tile {
+    display: block;
+    flex: none;
+    width: 1.375rem;
+    height: 1.375rem;
+  }
+
+  .lp .pf-float__label {
+    display: block;
+    overflow: hidden;
+    max-width: 0;
+    transition: max-width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .lp .pf-float__label img {
+    display: block;
+    height: 1.6rem;
+    width: auto;
+    max-width: none;
+    margin-left: 0.5rem;
+  }
+
+  .lp .pf-float a:hover .pf-float__label,
+  .lp .pf-float a:focus-visible .pf-float__label {
+    max-width: 8rem;
+  }
+
+  .lp .pf-float a:hover,
+  .lp .pf-float a:focus-visible {
+    box-shadow: 0 14px 32px -14px rgba(16, 17, 20, 0.6);
+  }
+
+  .lp .pf-float a:active {
+    transform: translateY(calc(-100% - 0.7rem - env(safe-area-inset-bottom))) scale(0.97);
+  }
+
+  @keyframes pf-float-in {
+    from {
+      transform: translateY(calc(-100% + 0.5rem));
+    }
+  }
+
+  @keyframes pf-float-peek {
+    0%,
+    8% {
+      max-width: 0;
+    }
+    22%,
+    80% {
+      max-width: 8rem;
+    }
+    100% {
+      max-width: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lp .pf-float a {
+      animation: pf-float-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.5s backwards;
+    }
+
+    .lp .pf-float__label {
+      animation: pf-float-peek 5.5s cubic-bezier(0.22, 1, 0.36, 1) 0.5s backwards;
+    }
+  }
+
+  /* Room under the last row so the badge never sits on it. */
+  .lp-card {
+    padding-bottom: 4rem;
+  }
+
+  /* ---------------------------------------------------------------- Look 1: Specimen (paper, ruled) */
+  .lp[data-theme="specimen"] .lp-name {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--lp-ink);
+  }
+
+  /* ---------------------------------------------------------------- Look 2: Ink (dark, violet flood) */
+  .lp[data-theme="ink"] {
+    background:
+      radial-gradient(120% 60% at 100% 0%, rgba(109, 92, 246, 0.16), transparent 60%),
+      var(--lp-bg);
+  }
+
+  .lp[data-theme="ink"] .lp-initials {
+    background: var(--lp-accent);
+    color: #fff;
+  }
+
+  .lp[data-theme="ink"] .lp-ico {
+    background: rgba(243, 241, 234, 0.06);
+  }
+
+  /* ---------------------------------------------------------------- Look 3: Press card (a lifted plate with crop marks) */
+  .lp[data-theme="card"] {
+    background-color: var(--lp-bg);
+    background-image: radial-gradient(rgba(16, 17, 20, 0.14) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  .lp[data-theme="card"] .lp-head {
+    border-bottom: 0;
+  }
+
+  .lp[data-theme="card"] .lp-card {
+    position: relative;
+    margin-top: 0.5rem;
+    padding: clamp(1.25rem, 6cqi, 2rem);
+    border-radius: 2px;
+    background: #fffefb;
+    box-shadow: 0 1px 1px rgba(16, 17, 20, 0.04), 0 24px 48px -24px rgba(16, 17, 20, 0.45);
+  }
+
+  /* Crop marks just outside the plate's corners. */
+  .lp[data-theme="card"] .lp-card::before,
+  .lp[data-theme="card"] .lp-card::after {
+    content: "";
+    position: absolute;
+    inset: -10px;
+    pointer-events: none;
+    background:
+      linear-gradient(var(--lp-ink), var(--lp-ink)) 0 10px / 7px 1px no-repeat,
+      linear-gradient(var(--lp-ink), var(--lp-ink)) 10px 0 / 1px 7px no-repeat,
+      linear-gradient(var(--lp-ink), var(--lp-ink)) 100% 10px / 7px 1px no-repeat,
+      linear-gradient(var(--lp-ink), var(--lp-ink)) calc(100% - 10px) 0 / 1px 7px no-repeat;
+  }
+
+  .lp[data-theme="card"] .lp-card::after {
+    transform: scaleY(-1);
+  }
+
+  .lp[data-theme="card"] .lp-id {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: end;
+    column-gap: 1rem;
+    margin-top: 0;
+  }
+
+  .lp[data-theme="card"] .lp-name {
+    margin-top: 0;
+    font-size: clamp(2rem, 9cqi, 3rem);
+  }
+
+  .lp[data-theme="card"] .lp-bio {
+    grid-column: 1 / -1;
+  }
+
+  .lp[data-theme="card"] .lp-links {
+    gap: 0;
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--lp-ink);
+  }
+
+  .lp[data-theme="card"] .lp-btn {
+    border: 0;
+    border-bottom: 1px solid var(--lp-line);
+    border-radius: 0;
+    padding-inline: 0.25rem 0.5rem;
+  }
+
+  /* ---------------------------------------------------------------- Motion looks: shared */
+  /* Big, quiet rows: no letter tiles or addresses, only real logos and favicons beside the title. */
+  .lp[data-motion] .lp-ico[data-letter],
+  .lp[data-motion] .lp-u {
+    display: none;
+  }
+
+  .lp[data-motion] .lp-btn {
+    min-height: 4.25rem;
+    padding-inline: 1.125rem;
+  }
+
+  .lp[data-motion] .lp-t {
+    font-size: 1.125rem;
+    letter-spacing: -0.02em;
+  }
+
+  /* ---------------------------------------------------------------- Look 4: Marquee (poster name, bio ticker) */
+  .lp[data-theme="marquee"] .lp-name {
+    font-size: clamp(3rem, 17cqi, 5.75rem);
+    letter-spacing: -0.055em;
+    line-height: 0.86;
+  }
+
+  .lp-ticker {
+    overflow: hidden;
+    margin-top: 1.5rem;
+    margin-inline: calc(50% - 50cqi); /* full width of the page, whatever the column */
+    border-block: 1px solid var(--lp-ink);
+    background: var(--lp-ink);
+    color: var(--lp-bg);
+    cursor: default;
+  }
+
+  .lp-ticker-track {
+    display: flex;
+    width: max-content;
+  }
+
+  .lp-ticker-track > span {
+    display: flex;
+  }
+
+  .lp-ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem 0.75rem 0;
+    font-family: var(--site-display, system-ui);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+
+  .lp-ticker-item i {
+    width: 0.4375rem;
+    height: 0.4375rem;
+    flex: none;
+    border-radius: 1px;
+    background: var(--lp-accent);
+    transform: rotate(45deg);
+  }
+
+  .lp[data-theme="marquee"] .lp-links {
+    margin-top: 1.5rem;
+  }
+
+  .lp[data-theme="marquee"] .lp-btn {
+    border-color: var(--lp-btn);
+  }
+
+  .lp[data-theme="marquee"] .lp-ico {
+    width: 2rem;
+    height: 2rem;
+    background: rgba(247, 245, 240, 0.12);
+  }
+
+  /* Rolling label: the title slides up and its twin rolls in, the site's own button hover. */
+  .lp[data-theme="marquee"] .lp-t > span,
+  .lp[data-theme="marquee"] .lp-t::after {
+    transition: transform 420ms var(--site-ease, ease);
+  }
+
+  .lp[data-theme="marquee"] .lp-t::after {
+    content: attr(data-label);
+    position: absolute;
+    inset: 0;
+    transform: translateY(105%);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .lp[data-theme="marquee"] .lp-btn[href]:hover .lp-t > span {
+      transform: translateY(-105%);
+    }
+
+    .lp[data-theme="marquee"] .lp-btn[href]:hover .lp-t::after {
+      transform: translateY(0);
+    }
+  }
+
+  .lp[data-theme="marquee"] .lp-icon {
+    border-color: var(--lp-ink);
+  }
+
+  /* ---------------------------------------------------------------- Look 5: Highlight (ink, violet marker behind the name) */
+  .lp[data-theme="highlight"] {
+    background:
+      radial-gradient(90% 50% at 0% 0%, rgba(109, 92, 246, 0.14), transparent 70%),
+      var(--lp-bg);
+  }
+
+  .lp[data-theme="highlight"] .lp-name {
+    font-size: clamp(2.75rem, 15cqi, 5rem);
+  }
+
+  /* The marker: drawn in full by default (and under reduced motion); GSAP sweeps it in from 0. */
+  .lp[data-theme="highlight"] [data-lp-name] {
+    background-image: linear-gradient(rgba(122, 107, 255, 0.55), rgba(122, 107, 255, 0.55));
+    background-repeat: no-repeat;
+    background-position: 0 88%;
+    background-size: 100% 0.38em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  .lp[data-theme="highlight"] .lp-initials {
+    background: var(--lp-accent);
+    color: #fff;
+  }
+
+  .lp[data-theme="highlight"] .lp-links {
+    gap: 0;
+    border-top: 1px solid var(--lp-line);
+  }
+
+  .lp[data-theme="highlight"] .lp-btn {
+    border: 0;
+    border-bottom: 1px solid var(--lp-line);
+    border-radius: 0;
+    padding-inline: 0 0.25rem;
+  }
+
+  .lp[data-theme="highlight"] .lp-btn::before {
+    display: none;
+  }
+
+  .lp[data-theme="highlight"] .lp-ico {
+    width: 2rem;
+    height: 2rem;
+    background: rgba(243, 241, 234, 0.08);
+  }
+
+  .lp[data-theme="highlight"] .lp-t {
+    font-family: var(--site-display, system-ui);
+    font-size: 1.375rem;
+    font-weight: 650;
+    letter-spacing: -0.03em;
+    overflow: visible;
+  }
+
+  /* A violet proof mark slides under the title. */
+  .lp[data-theme="highlight"] .lp-t::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -3px;
+    height: 2px;
+    background: var(--lp-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 420ms var(--site-ease, ease);
+  }
+
+  .lp[data-theme="highlight"] .lp-txt {
+    justify-items: start;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .lp[data-theme="highlight"] .lp-btn[href]:hover {
+      color: var(--lp-ink);
+    }
+
+    .lp[data-theme="highlight"] .lp-btn[href]:hover .lp-t::after {
+      transform: scaleX(1);
+    }
+
+    .lp[data-theme="highlight"] .lp-btn[href]:hover .lp-btn-arrow {
+      color: var(--lp-accent);
+    }
+  }
+
+  /* ---------------------------------------------------------------- The editor */
+  .lb {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .lb {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      align-items: start;
+      gap: 3rem;
+    }
+
+    .lb-side {
+      position: sticky;
+      top: 5rem;
+    }
+  }
+
+  .lb-block + .lb-block {
+    margin-top: 2rem;
+  }
+
+  .lb-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid var(--site-ink);
+  }
+
+  .lb-head h2 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+
+  /* Profile: one ruled sheet, fields set into it without boxes. */
+  .lb-sheet {
+    border: 1px solid var(--site-rule-strong);
+    border-radius: var(--site-radius);
+    background: var(--site-sheet);
+  }
+
+  .lb-sheet:focus-within {
+    border-color: var(--site-accent-ink);
+    box-shadow: 0 0 0 3px rgba(109, 92, 246, 0.25);
+  }
+
+  .lb-cell {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.25rem 0.875rem;
+  }
+
+  .lb-cell + .lb-cell {
+    border-top: 1px solid var(--site-rule);
+  }
+
+  .lb-cell label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--site-ink-2);
+  }
+
+  .lb-bare {
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.625rem 0;
+    border: 0;
+    background: transparent;
+    color: var(--site-ink);
+    font-size: 1rem;
+    line-height: 1.45;
+    resize: none;
+  }
+
+  .lb-bare::placeholder {
+    color: var(--site-ink-3);
+  }
+
+  .lb-bare:focus-visible {
+    outline: none;
+  }
+
+  .lb-count {
+    grid-column: 2;
+    margin-top: -0.5rem;
+    padding-bottom: 0.375rem;
+    text-align: right;
+  }
+
+  /* Add a link: one field, paste and press Enter. */
+  .lb-add {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .lb-add .sp-field {
+    min-height: 2.75rem;
+    padding-block: 0.5rem;
+  }
+
+  .lb-list {
+    display: grid;
+    gap: 0.375rem;
+    margin-top: 0.75rem;
+  }
+
+  .lb-row {
+    display: grid;
+    grid-template-columns: 2.25rem 2rem minmax(0, 1fr) auto;
+    column-gap: 0.625rem;
+    align-items: center;
+    min-height: 3.75rem;
+    border: 1px solid var(--site-rule-strong);
+    border-radius: var(--site-radius);
+    background: var(--site-sheet);
+    transition: border-color 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+  }
+
+  .lb-row:focus-within {
+    border-color: var(--site-accent-ink);
+    box-shadow: 0 0 0 3px rgba(109, 92, 246, 0.25);
+  }
+
+  .lb-row[data-off] .lb-text {
+    opacity: 0.5;
+  }
+
+  .lb-row[data-dragging] {
+    position: relative;
+    z-index: 2;
+    border-color: var(--site-ink);
+    box-shadow: var(--site-lift);
+  }
+
+  .lb-row[data-invalid] {
+    border-color: var(--site-danger);
+  }
+
+  .lb-grip {
+    display: grid;
+    height: 100%;
+    min-height: 2.75rem;
+    place-items: center;
+    color: var(--site-ink-3);
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .lb-grip:hover {
+    color: var(--site-ink);
+  }
+
+  .lb-row[data-dragging] .lb-grip {
+    cursor: grabbing;
+  }
+
+  .lb-ico {
+    display: grid;
+    width: 2rem;
+    height: 2rem;
+    place-items: center;
+    border-radius: 2px;
+    background: var(--site-paper-deep);
+    color: var(--site-ink);
+    font-family: var(--site-display);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .lb-ico svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .lb-favicon {
+    width: 1rem;
+    height: 1rem;
+    object-fit: contain;
+  }
+
+  .lb-photo-thumb {
+    display: block;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 2px;
+    object-fit: cover;
+    background: var(--site-paper-deep);
+  }
+
+  /* "How do I get an image link?": a tooltip that opens on click or tap (works on touch), closes on Esc or outside. */
+  .lb-tip {
+    position: relative;
+    justify-self: start;
+  }
+
+  .lb-tip summary {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--site-accent-ink);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .lb-tip summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .lb-tip summary:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .lb-tip-pop {
+    position: absolute;
+    top: calc(100% + 0.375rem);
+    left: 0;
+    z-index: 30;
+    width: min(22rem, calc(100vw - 3rem));
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--site-rule-strong);
+    border-radius: var(--site-radius);
+    background: var(--site-card);
+    box-shadow: var(--site-lift);
+  }
+
+  /* The pointer on the top edge, aimed at the question. */
+  .lb-tip-pop::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 1.25rem;
+    width: 10px;
+    height: 10px;
+    border-top: 1px solid var(--site-rule-strong);
+    border-left: 1px solid var(--site-rule-strong);
+    background: var(--site-card);
+    transform: rotate(45deg);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lb-tip[open] .lb-tip-pop {
+      animation: lb-tip-in 220ms var(--site-ease);
+    }
+  }
+
+  @keyframes lb-tip-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+
+  .lb-tip ol {
+    display: grid;
+    gap: 0.375rem;
+    padding-left: 1.125rem;
+    list-style: decimal outside;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--site-ink);
+  }
+
+  .lb-tip-pop p {
+    margin-top: 0.625rem;
+    padding-top: 0.625rem;
+    border-top: 1px solid var(--site-rule);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--site-ink-2);
+  }
+
+  .lb-text {
+    display: grid;
+    min-width: 0;
+    padding-block: 0.25rem;
+  }
+
+  .lb-title,
+  .lb-url {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    border-radius: 2px;
+    background: transparent;
+    color: var(--site-ink);
+    text-overflow: ellipsis;
+  }
+
+  .lb-title {
+    height: 1.75rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+
+  .lb-url {
+    height: 1.5rem;
+    font-family: var(--site-mono-face);
+    font-size: 0.75rem;
+    color: var(--site-ink-2);
+  }
+
+  .lb-title::placeholder,
+  .lb-url::placeholder {
+    color: var(--site-ink-3);
+  }
+
+  .lb-title:focus-visible,
+  .lb-url:focus-visible {
+    outline: none;
+    background: var(--site-paper);
+    box-shadow: 0 2px 0 var(--site-accent-ink);
+  }
+
+  .lb-tools {
+    display: flex;
+    align-items: center;
+    padding-right: 0.25rem;
+  }
+
+  .lb-tool {
+    display: grid;
+    min-width: 2.75rem;
+    height: 2.75rem;
+    place-items: center;
+    border-radius: var(--site-radius);
+    color: var(--site-ink-2);
+    transition: background-color 160ms ease, color 160ms ease;
+  }
+
+  .lb-tool:hover {
+    background: rgba(16, 17, 20, 0.06);
+    color: var(--site-ink);
+  }
+
+  .lb-tool svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  /* "Icon" chip: chosen inverts to ink, like every chosen state on the site. */
+  .lb-mark {
+    height: 1.75rem;
+    padding-inline: 0.5rem;
+    border: 1px solid var(--site-rule-strong);
+    border-radius: var(--site-radius);
+    font-family: var(--site-mono-face);
+    font-size: 0.6875rem;
+    color: var(--site-ink-2);
+  }
+
+  .lb-mark[aria-pressed="true"] {
+    border-color: var(--site-ink);
+    background: var(--site-ink);
+    color: var(--site-paper);
+  }
+
+  /* Visibility switch: 44px target, small track. */
+  .lb-switch {
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    place-items: center;
+  }
+
+  .lb-switch span {
+    position: relative;
+    width: 2rem;
+    height: 1.125rem;
+    border: 1px solid var(--site-ink);
+    border-radius: 2px;
+    background: var(--site-sheet);
+    transition: background-color 200ms var(--site-ease);
+  }
+
+  .lb-switch span::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 1px;
+    background: var(--site-ink);
+    transition: transform 200ms var(--site-ease), background-color 200ms var(--site-ease);
+  }
+
+  .lb-switch[aria-checked="true"] span {
+    background: var(--site-ink);
+  }
+
+  .lb-switch[aria-checked="true"] span::after {
+    background: var(--site-paper);
+    transform: translateX(0.875rem);
+  }
+
+  .lb-error {
+    margin-top: 0.5rem;
+    color: var(--site-danger);
+    font-size: 0.875rem;
+  }
+
+  .lb-themes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+    gap: 0.5rem;
+  }
+
+  .lb-theme {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid var(--site-rule-strong);
+    border-radius: var(--site-radius);
+    background: var(--site-sheet);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .lb-theme:hover {
+    border-color: var(--site-ink);
+  }
+
+  .lb-theme[aria-checked="true"] {
+    border-color: var(--site-ink);
+    box-shadow: inset 0 0 0 1px var(--site-ink);
+  }
+
+  .lb-swatch {
+    display: grid;
+    gap: 3px;
+    height: 4.25rem;
+    padding: 0.5rem;
+    border-radius: 2px;
+    align-content: center;
+  }
+
+  .lb-swatch b {
+    justify-self: start;
+    padding-inline: 0.25rem;
+    border-radius: 1px;
+    font-family: var(--site-display);
+    font-size: 0.875rem;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  .lb-swatch i {
+    display: block;
+    height: 0.5rem;
+    border-radius: 1px;
+  }
+
+  /* The preview: a proof plate at phone width, not a phone frame. */
+  .lb-plate {
+    overflow: hidden;
+    max-width: 24rem;
+    margin-inline: auto;
+    border: 1px solid var(--site-rule-strong);
+    border-radius: 2px;
+    background: var(--site-card);
+    box-shadow: var(--site-lift);
+  }
+
+  .lb-plate-view {
+    height: min(40rem, 75dvh);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+
+  .lb-plate-cap {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0.75rem;
+    border-top: 1px solid var(--site-rule);
+    background: var(--site-sheet);
+  }
+
+  .lb-publish {
+    max-width: 24rem;
+    margin: 1.25rem auto 0;
+  }
+
+  .lb-live {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 0.25rem 0 0.75rem;
+    border: 1px solid var(--site-ink);
+    border-radius: var(--site-radius);
+    background: var(--site-sheet);
+  }
+
+  .lb-live a {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

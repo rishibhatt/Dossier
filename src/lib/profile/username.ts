@@ -4,7 +4,7 @@ export const USERNAME_PATTERN = /^[a-z0-9][a-z0-9-]{2,29}$/
 /** Names that would collide with routes or look official. */
 const RESERVED_USERNAMES = new Set([
   "admin", "api", "app", "auth", "billing", "blog", "build", "dashboard", "dossier", "dossier-cv",
-  "help", "home", "login", "logout", "p", "preview", "pricing", "privacy", "settings", "signup",
+  "help", "home", "l", "login", "logout", "p", "preview", "pricing", "privacy", "settings", "signup",
   "static", "support", "templates", "terms", "tools", "u", "www",
 ])
 

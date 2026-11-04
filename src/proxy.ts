@@ -6,7 +6,7 @@ import { ROUTES } from "@/lib/constants/routes"
 import { createSupabaseMiddlewareClient } from "@/lib/supabase/middleware"
 
 const PROTECTED_PREFIXES = ["/dashboard", "/build"]
-const PUBLIC_PREFIXES = ["/api/csp-report", "/blog", "/resume-keywords", "/portfolio-examples", "/tools", "/og", "/p", "/u", "/faq", "/features", "/how-it-works", "/pricing", "/contact", "/privacy", "/terms", "/refund-policy"]
+const PUBLIC_PREFIXES = ["/api/csp-report", "/blog", "/resume-keywords", "/portfolio-examples", "/tools", "/og", "/l", "/p", "/u", "/faq", "/features", "/how-it-works", "/pricing", "/contact", "/privacy", "/terms", "/refund-policy"]
 
 // Generated icons, manifest and social images: no extension in the URL, so the matcher below lets them in.
 const PUBLIC_FILES = new Set(["/icon", "/apple-icon", "/manifest.webmanifest", "/opengraph-image", "/twitter-image", "/robots.txt", "/sitemap.xml"])

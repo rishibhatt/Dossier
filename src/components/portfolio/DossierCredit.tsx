@@ -14,6 +14,9 @@ type Props = {
   slug?: string | null
   /** Studio: open the upgrade sheet instead of following the link. */
   onClick?: () => void
+  /** The link-in-bio page points the badge at its own tool. */
+  href?: string
+  label?: string
 }
 
 /**
@@ -22,7 +25,7 @@ type Props = {
  * load, tucks into the logo tile after a few seconds, opens again on hover or focus. Pre-rendered SVG, so
  * portfolios never load the brand font. Backlink with UTM tags. Pure, so it renders in the static export too.
  */
-export function DossierCredit({ slug, onClick }: Props) {
+export function DossierCredit({ slug, onClick, href, label = "Made with Dossier: build your own portfolio" }: Props) {
   const handle = onClick
     ? (e: MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault()
@@ -31,7 +34,7 @@ export function DossierCredit({ slug, onClick }: Props) {
     : undefined
   return (
     <div className="pf-float" data-dossier-credit="">
-      <a href={creditHref(slug)} target="_blank" rel="noopener" onClick={handle} aria-label="Made with Dossier: build your own portfolio">
+      <a href={href ?? creditHref(slug)} target="_blank" rel="noopener" onClick={handle} aria-label={label}>
         <svg className="pf-float__tile" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
           <rect width="40" height="40" rx="10" fill="#0b0c11" />
           <g stroke="#f5f3ff" strokeLinecap="round" strokeLinejoin="round">

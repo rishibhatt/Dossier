@@ -15,6 +15,7 @@ import {
 } from "@/lib/credits/constants"
 import { getActiveShufflePacks, getCreditBalance } from "@/lib/credits/server"
 import { SLUG_PATTERN } from "@/lib/portfolio/published"
+import { USERNAME_PATTERN } from "@/lib/profile/username"
 import { createAdminSupabaseClient } from "@/lib/supabase/admin"
 import type { CreditReason, Database, ReferralStatus } from "@/types/database"
 
@@ -192,17 +193,23 @@ export async function captureReferralAfterAuth({
 }
 
 /**
- * A signup whose first visit came from a portfolio's "Made with Dossier" badge (utm_source=portfolio, ref=<slug>)
- * counts as an invite from that portfolio's owner, under the same rules (window, self and abuse checks, credit on
- * first publish). The click time is the first visit, so the usual invite window applies.
+ * A signup whose first visit came from a "Made with Dossier" badge counts as an invite from that page's owner,
+ * under the same rules (window, self and abuse checks, credit on first publish): a portfolio badge
+ * (utm_source=portfolio, ref=<slug>) or a link-in-bio page badge (utm_source=linkinbio, ref=<username>).
+ * The click time is the first visit, so the usual invite window applies.
  */
 async function badgeReferral(admin: Client, source: SignupSource | null): Promise<ReferralCookie | null> {
-  if (!source?.ref || source.utm_source !== "portfolio" || !SLUG_PATTERN.test(source.ref)) return null
+  if (!source?.ref) return null
+  const fromSite = source.utm_source === "portfolio" && SLUG_PATTERN.test(source.ref)
+  const fromLinks = source.utm_source === "linkinbio" && USERNAME_PATTERN.test(source.ref)
+  if (!fromSite && !fromLinks) return null
   const clickedAt = Date.parse(source.at)
   if (!Number.isFinite(clickedAt) || Date.now() - clickedAt > REFERRAL_WINDOW_DAYS * DAY_MS) return null
-  const { data: site } = await admin.from("published_portfolios").select("user_id").eq("slug", source.ref).maybeSingle()
-  if (!site?.user_id) return null
-  const code = await ensureReferralCode(admin, site.user_id)
+  const { data: owner } = fromSite
+    ? await admin.from("published_portfolios").select("user_id").eq("slug", source.ref).maybeSingle()
+    : await admin.from("users").select("user_id:id").eq("username", source.ref).maybeSingle()
+  if (!owner?.user_id) return null
+  const code = await ensureReferralCode(admin, owner.user_id)
   return code ? { code, clickedAt } : null
 }
 

@@ -53,9 +53,9 @@ const HOW: Record<FreeToolSlug, string[]> = {
     "LinkedIn shows about three lines before \"see more\". Your first sentence carries the section.",
   ],
   "link-in-bio": [
-    "Most bios allow one link. This page gives that link a name, a role and up to five places to go.",
-    "Put the link you most want opened first. People rarely scroll a link page.",
-    "On Dossier, your portfolio site can be that page, with your work one tap further.",
+    "Most bios allow one link. This page gives that link your name, a short bio and up to 12 places to go. Paste a link and the title fills itself in. Switch a link off to hide it without deleting it.",
+    "Put the link you most want opened first. People rarely scroll a link page. Profiles such as LinkedIn and GitHub can sit as small icons under the buttons, so they do not crowd out your work.",
+    "Your draft is kept in this browser. Publishing needs a free account: the page goes live at dossier-cv.com/l/yourname, the same name as your portfolio link. Links must be web addresses or email, so nothing else can run on your page.",
   ],
   "resume-to-website": [
     "Upload a PDF up to 4 MB. Dossier reads it into sections and suggests a look from your profession.",

@@ -5,6 +5,7 @@
 @import "./typography.css";
 @import "./workspace-redesign.css";
 @import "./site.css";
+@import "./link-page.css";
 
 @custom-variant dark (&:is(.dark *));
 

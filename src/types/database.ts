@@ -275,6 +275,12 @@ export type Database = {
         }
         Relationships: []
       }
+      link_pages: {
+        Row: { user_id: string; page: Json; published: boolean; created_at: string; updated_at: string }
+        Insert: { user_id: string; page: Json; published?: boolean; created_at?: string; updated_at?: string }
+        Update: { page?: Json; published?: boolean }
+        Relationships: []
+      }
       username_history: {
         Row: { username: string; user_id: string; released_at: string }
         Insert: { username: string; user_id: string; released_at?: string }

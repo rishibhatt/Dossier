@@ -76,13 +76,13 @@ export const FREE_TOOLS: readonly FreeTool[] = [
     slug: "link-in-bio",
     no: "004",
     name: "Link-in-bio page",
-    title: "Free link-in-bio page for your resume | Dossier",
+    title: "Free link-in-bio page, a simple Linktree alternative | Dossier",
     description:
-      "Lay out a simple link page for your Instagram, X or email signature: name, role and up to five links. Preview it free, then publish it as part of your Dossier site.",
+      "Make a free link-in-bio page for Instagram, LinkedIn or TikTok: your name, a short bio and up to 12 links, with a live preview. Publish it at your own Dossier link.",
     query: "link in bio for resume",
     h1: "One link for your bio, with your work behind it.",
-    intro: "Add your name, role and the links you want people to open. The preview updates as you type.",
-    output: "A live preview and a tidy text version to copy",
+    intro: "Paste your links, drag them into order and pick a look. The preview is the page people will see. Publishing is free.",
+    output: "A published page at dossier-cv.com/l/yourname, and a text version to copy",
     cta: "Publish it with your portfolio",
   },
   {

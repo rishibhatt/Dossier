@@ -215,7 +215,7 @@ export function SiteHeader({ user }: { user: SessionUser | null | undefined }) {
   const onResumePages = pathname === ROUTES.resume || pathname === ROUTES.resumeTemplates || pathname === ROUTES.resumeExamples
   const onResumeSide = pathname === ROUTES.resume || pathname?.startsWith(ROUTES.resumeTemplates) || pathname?.startsWith(ROUTES.resumeExamples)
   const onLetterPage = pathname === ROUTES.coverLetter
-  const hideFloating = pathname === ROUTES.login || pathname === ROUTES.signup || onDetailWithBar
+  const hideFloating = pathname === ROUTES.login || pathname === ROUTES.signup || onDetailWithBar || pathname === `${ROUTES.tools}/link-in-bio`
   const account = user ? { href: ROUTES.dashboard, label: "Dashboard" } : { href: ROUTES.login, label: "Log in" }
 
   return (
