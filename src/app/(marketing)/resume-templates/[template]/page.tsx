@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!t) return {}
   const v = getVerification(t.templateId)
   return buildPageMetadata({
-    title: `${t.engine.name} resume template (${t.engine.layout.toLowerCase()}), free PDF | Dossier`,
+    title: `${t.engine.name} resume template: free ${t.engine.columns === 2 ? "two-column" : "one-column"} PDF | Dossier`,
     description: `${t.engine.name} is a free ${t.engine.columns === 2 ? "two-column" : "one-column"} resume template. ${t.engine.bestFor}${v ? ` ${stampText(v)}.` : ""} Edit it in your browser and download the PDF free.`,
     path: `${ROUTES.resumeTemplates}/${t.slug}`,
     image: `/og/resume-templates/${t.slug}`,

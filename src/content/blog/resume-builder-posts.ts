@@ -31,7 +31,7 @@ export const RESUME_BUILDER_POSTS: readonly Post[] = [
       { t: "p", text: "You will tailor your resume for every application. If the free plan deletes your draft after a few days, or locks editing behind a plan, you pay later instead of now." },
       { t: "h2", text: "How Dossier Resume handles these" },
       { t: "ul", items: [
-        "The full PDF downloads free from all 12 templates, with no watermark.",
+        "The full PDF downloads free from every template, with no watermark.",
         "You can start without an account. You sign in when you download, and the draft moves to your account.",
         "A free account keeps 2 resumes you can edit and download again. Starter and Pro keep up to 200.",
         "The PDF has real text, and each template is tested by reading its PDF back with a parser. The dated results are on each [template page](/resume-templates).",

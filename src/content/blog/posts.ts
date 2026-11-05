@@ -3,8 +3,11 @@
  * Inline links use [label](/path). Add a post by appending to GUIDES, to RESUME_BUILDER_POSTS when it hands off to the builder, or to JOB_SEARCH_POSTS for mid-search problems. Keep claims checkable: no invented statistics.
  */
 import { COVER_LETTER_POSTS } from "./cover-letter-posts"
+import { FRESHERS_POSTS } from "./freshers-posts"
 import { JOB_SEARCH_POSTS } from "./job-search-posts"
+import { MIGRATION_POSTS } from "./migration-posts"
 import { RESUME_BUILDER_POSTS } from "./resume-builder-posts"
+import { RESUME_FORMAT_POSTS } from "./resume-format-posts"
 
 export type Block =
   | { t: "h2"; text: string }
@@ -632,7 +635,7 @@ const GUIDES: readonly Post[] = [
   },
 ]
 
-export const POSTS: readonly Post[] = [...GUIDES, ...RESUME_BUILDER_POSTS, ...JOB_SEARCH_POSTS, ...COVER_LETTER_POSTS]
+export const POSTS: readonly Post[] = [...GUIDES, ...RESUME_BUILDER_POSTS, ...JOB_SEARCH_POSTS, ...COVER_LETTER_POSTS, ...FRESHERS_POSTS, ...RESUME_FORMAT_POSTS, ...MIGRATION_POSTS]
 
 export function getPost(slug: string): Post | undefined {
   return POSTS.find((p) => p.slug === slug)

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation"
 import { PageHead } from "@/components/marketing/PageHead"
 import { buildPageMetadata } from "@/config/seo"
 import { siteConfig } from "@/config/site"
+import { exampleEntries } from "@/content/resume/examples"
 import { getRole, ROLES } from "@/content/roles"
 import { ROUTES } from "@/lib/constants/routes"
 
@@ -46,7 +47,29 @@ export default async function RolePage({ params }: Props) {
 
   const url = `${siteConfig.url}${ROUTES.resumeKeywords}/${r.slug}`
   const related = r.related.map((s) => getRole(s)).filter((x): x is NonNullable<typeof x> => Boolean(x))
+  const example = exampleEntries().find((e) => e.keywordRole === r.slug)
+  const lower = r.title.toLowerCase()
+  // Built only from this role's own data, so each page answers in words no other page repeats.
+  const faq = [
+    {
+      q: `What keywords should a ${lower} resume include?`,
+      a: `Start with the skills the job post repeats. For ${lower} roles these often include ${r.skills.slice(0, 5).join(", ")}. Put each one inside a bullet that shows where you used it, not only in a skills list.`,
+    },
+    {
+      q: `Which tools should I list on a ${lower} resume?`,
+      a: `List the tools you use often enough to talk about in an interview. Common ones in ${lower} job posts are ${r.tools.slice(0, 6).join(", ")}. Order them by how much you use them.`,
+    },
+    {
+      q: `What action verbs work for a ${lower} resume?`,
+      a: `Verbs that describe a result fit best: ${r.verbs.join(", ")}. Start each bullet with one, then give the outcome and a number where you have one.`,
+    },
+  ]
   const ld = [
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+    },
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
@@ -114,6 +137,34 @@ export default async function RolePage({ params }: Props) {
                 <li key={m}>{m}</li>
               ))}
             </ul>
+          </section>
+
+          {example ? (
+            <p className="site-body mt-12">
+              See these keywords in place on a full{" "}
+              <Link href={`${ROUTES.resumeExamples}/${example.slug}`} className="underline underline-offset-4">
+                {example.person.role.toLowerCase()} resume example
+              </Link>
+              , or{" "}
+              <Link href={`${ROUTES.resume}/new`} className="underline underline-offset-4">
+                build your own resume free
+              </Link>
+              .
+            </p>
+          ) : null}
+
+          <section aria-labelledby="faq" className="mt-12 border-t border-[var(--site-rule)] pt-8">
+            <h2 id="faq" className="site-h3">
+              Questions people ask
+            </h2>
+            <dl className="mt-4">
+              {faq.map((f) => (
+                <div key={f.q} className="border-b border-[var(--site-rule)] py-5">
+                  <dt className="font-semibold">{f.q}</dt>
+                  <dd className="mt-2 leading-[1.75] text-[var(--site-ink-2)]">{f.a}</dd>
+                </div>
+              ))}
+            </dl>
           </section>
         </div>
 

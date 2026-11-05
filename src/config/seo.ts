@@ -38,7 +38,9 @@ export type PageSeoInput = {
 }
 
 export function buildPageMetadata(input: PageSeoInput): Metadata {
-  const { title, description, path, indexable = true, openGraph, image: imagePath = "/opengraph-image" } = input
+  const { description, path, indexable = true, openGraph, image: imagePath = "/opengraph-image" } = input
+  // Google cuts titles near 60 characters. Drop the brand suffix first so the query words stay visible.
+  const title = input.title.length > 60 && input.title.endsWith(" | Dossier") ? input.title.slice(0, -" | Dossier".length) : input.title
   const url = `${siteConfig.url}${path.startsWith("/") ? path : `/${path}`}`
 
   // Pages that set their own `openGraph` replace the one from the file-based image, so the image is named here too.

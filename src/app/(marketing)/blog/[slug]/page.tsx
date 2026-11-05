@@ -52,6 +52,9 @@ export default async function PostPage({ params }: Props) {
       : post.tool === "cover-letter"
         ? { name: "Cover letter maker", href: ROUTES.coverLetterNew, cta: "Write my cover letter" }
         : freeTool && { name: freeTool.name, href: `${ROUTES.tools}/${freeTool.slug}`, cta: "Try it free" }
+  // Inline offer goes before the second section heading: after the reader got the first answer.
+  const h2s = post.body.flatMap((b, i) => (b.t === "h2" ? [i] : []))
+  const ctaAt = h2s[1] ?? -1
   const others = POSTS.filter((p) => p.slug !== post.slug)
   const related = [...others.filter((p) => p.category === post.category), ...others.filter((p) => p.category !== post.category)].slice(0, 3)
 
@@ -101,7 +104,22 @@ export default async function PostPage({ params }: Props) {
         <Image src={heroSrc} alt={`Cover for: ${post.title}`} width={1200} height={630} priority unoptimized={!post.hero} className="mb-12 h-auto w-full border border-[var(--site-rule)]" />
         <div className="grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-8">
-            <Prose blocks={post.body} />
+            {tool && ctaAt > 0 ? (
+              <>
+                <Prose blocks={post.body.slice(0, ctaAt)} />
+                {/* On phones the sidebar box only appears after the whole article, so readers get one inline offer early. */}
+                <aside aria-label="Free tool" className="my-10 max-w-[40rem] border border-[var(--site-ink)] bg-[var(--site-sheet)] p-5 lg:hidden">
+                  <p className="font-semibold">{tool.name}</p>
+                  <p className="mt-1 text-[0.9375rem] text-[var(--site-ink-2)]">{post.toolPitch}</p>
+                  <Link href={tool.href} className="site-btn site-btn-primary mt-4 w-full">
+                    <span className="site-btn-label">{tool.cta}</span>
+                  </Link>
+                </aside>
+                <Prose blocks={post.body.slice(ctaAt)} />
+              </>
+            ) : (
+              <Prose blocks={post.body} />
+            )}
             {post.faq?.length ? (
               <section aria-labelledby="post-faq" className="mt-14 max-w-[40rem] border-t border-[var(--site-rule)] pt-8">
                 <h2 id="post-faq" className="site-h3">
