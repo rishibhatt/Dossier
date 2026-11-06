@@ -68,7 +68,15 @@ export default async function TemplatePage({ params }: Props) {
     renders: { a4: getThumb(t.templateId, s.id, "a4"), "us-letter": getThumb(t.templateId, s.id, "us-letter") },
   }))
   const keywordRoles = t.keywordRoles.map((slug) => getRole(slug)).filter((r): r is NonNullable<typeof r> => Boolean(r))
-  const others = templateEntries().filter((x) => x.slug !== t.slug)
+  // Only the closest few: listing all 41 others (each card with its test note) made every template page ~85% the same text,
+  // and Google left them "Crawled - currently not indexed". Closest = most shared role, stage and style facets.
+  const overlap = (x: typeof t) => (["role", "stage", "style"] as const).reduce((n, k) => n + x.facets[k].filter((f) => (t.facets[k] as string[]).includes(f)).length, 0)
+  const others = templateEntries()
+    .filter((x) => x.slug !== t.slug)
+    .map((x) => ({ x, score: overlap(x) }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 6)
+    .map(({ x }) => x)
   const formats = FORMAT_FACETS.filter((f) => t.facets.format.includes(f.id))
   const ogThumb = getThumb(t.templateId, t.sample, "a4")
 
@@ -299,7 +307,7 @@ export default async function TemplatePage({ params }: Props) {
         <div className="site-wrap">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <h2 id="other-tpl" className="site-h2">
-              Other templates
+              Similar templates
             </h2>
             <Link href={ROUTES.resumeTemplates} className="site-link-mark font-medium">
               See all {templateEntries().length} with filters
